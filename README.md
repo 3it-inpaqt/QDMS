@@ -7,7 +7,7 @@ More precisely, it simulates the voltage output of a memristor circuit composed 
 To install the library and its dependencies, use:
 
 ```
-pip install git+https://github.com/Talgarr/TestOfficial
+pip install git+https://github.com/3it-nano/QDMS
 ```
 
 ## Uninstallation
