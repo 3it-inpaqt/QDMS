@@ -310,20 +310,6 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
     plt.close('all')
 
     if file_output:
-        with open(f'{directory_name}\\PulsedProgramming\\pulsed_graph.txt', "w") as file:
-            file.write('Index\tResistance (Ohm)\tAction\tState found')
-            file.write('\n')
-            for index in range(len(pulsed_programming.graph_resistance)):
-                file.write(str(x[index]))
-                file.write('\t')
-                file.write(str(y[index]))
-                file.write('\t')
-                file.write(str(action[index]))
-                file.write('\t')
-                file.write(str(annotation[index]))
-                file.write('\n')
-
-    if file_output:
         x, y, action, annotation = zip(*pulsed_programming.graph_resistance)
         with h5py.File(f'{directory_name}\\PulsedProgramming\\pulsed_graph.hdf5', 'w') as f:
             f.create_dataset("x", data=x)

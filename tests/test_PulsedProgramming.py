@@ -65,14 +65,6 @@ def test_distribution():
     assert result
 
 
-def test_simple_convergence():
-    memristor = qdms.Data_Driven()
-    circuit = qdms.Circuit(memristor, 1)
-    pulsed_programming = qdms.PulsedProgramming(circuit, 2, hrs=3000, tolerance=1, is_relative_tolerance=True, pulse_algorithm='simple')
-    pulsed_programming.simulate()
-    assert not len(pulsed_programming.graph_resistance) - 1 == pulsed_programming.max_pulse
-
-
 def test_log_convergence():
     memristor = qdms.Data_Driven()
     circuit = qdms.Circuit(memristor, 1)

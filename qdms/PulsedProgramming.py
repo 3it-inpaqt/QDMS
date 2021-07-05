@@ -59,7 +59,6 @@ class PulsedProgramming:
         The pulse algorithm use. Those are the available choices (Sources in the methods). Default is 'fabien'.
         'fabien' : Use fabien_convergence()
         'log' : Use a log_convergence()
-        'simple' : Use simple_convergence()
 
     res_states : iterable[iterable[float]]
         Contains the targets resistance (Ohm) of the pulsed programming.
@@ -255,7 +254,7 @@ class PulsedProgramming:
         res_states_practical : list of list of float
             Returns the practical value found.
         """
-        if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log' and self.pulse_algorithm != 'simple':
+        if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
         if self.distribution_type != 'full_spread' and self.distribution_type != 'linear' and self.distribution_type != 'half_spread':
@@ -278,71 +277,9 @@ class PulsedProgramming:
                     self.fabien_convergence(i, res_state_temp, self.max_pulse)
                 elif self.pulse_algorithm == 'log':
                     self.log_convergence(i, res_state_temp, self.max_pulse)
-                elif self.pulse_algorithm == 'simple':
-                    self.simple_convergence(i, res_state_temp, self.max_pulse)
                 self.res_states_practical[j][i] = (self.graph_resistance[-1][0])
             self.circuit.memristor_model.g = 1 / self.circuit.memristor_model.r_on
         return self.res_states_practical
-
-    def simple_convergence(self, i_state, res_states, max_pulse):
-        """
-        This function run the pulsed programming with always the same voltage to find the resistance (Ohm)
-        for the i_state.
-
-        Parameters
-        ----------
-        i_state : int
-            The target state to find.
-
-        res_states : iterable[float]
-            List of target resistance.
-
-        max_pulse : int
-            The max number of pulses.
-
-        Returns
-        ----------
-        """
-        voltage_reset = -1.2
-        voltage_set = 1.2
-
-        counter = len(self.graph_resistance)
-        action = 'read'
-        flag_finish = False
-        counter_read = 0
-
-        target_res = res_states[i_state]
-        if self.is_relative_tolerance:
-            res_max = target_res + self.tolerance * target_res / 100
-            res_min = target_res - self.tolerance * target_res / 100
-        else:
-            res_max = target_res + self.tolerance
-            res_min = target_res - self.tolerance
-
-        current_res = self.read_resistance(self.circuit.memristor_model)
-        while not flag_finish:
-            if res_min <= current_res <= res_max:
-                action = 'read'
-                counter_read += 1
-                self.graph_voltages.append([0.2, counter, action])
-            if current_res > res_max:
-                action = 'set'
-                self.write_resistance(self.circuit.memristor_model, voltage_set, 200e-9)
-                self.graph_voltages.append([voltage_set, counter, action])
-            elif current_res < res_min:
-                action = 'reset'
-                self.write_resistance(self.circuit.memristor_model, voltage_reset, 200e-9)
-                self.graph_voltages.append([voltage_reset, counter, action])
-            if counter_read == self.number_of_reading:
-                flag_finish = not flag_finish
-            if counter >= max_pulse:
-                flag_finish = not flag_finish
-                print('Got max pulse')
-
-            self.graph_resistance.append([current_res, counter, action, flag_finish])
-            counter += 1
-
-            current_res = self.read_resistance(self.circuit.memristor_model)
 
     def log_convergence(self, i_state, res_states, max_pulse):
         """
