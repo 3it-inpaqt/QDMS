@@ -47,7 +47,6 @@ class Data_Driven(Memristor):
         # r_off = 1.7e4
         # r_on = 1280
 
-        # time_series_resolution = 2e-7
         r_off = 3590
         r_on = 1000
 

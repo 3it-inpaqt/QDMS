@@ -6,6 +6,7 @@ from .QDSimulation import QDSimulation
 import math
 import time
 from .HelperFunction import is_square
+import h5py
 
 
 def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, plots=None, file_output=False, verbose=False):
@@ -142,13 +143,9 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False):
     plt.close('all')
 
     if file_output:
-        with open(f'{directory_name}\\Result\\result.txt', "w") as file:
-            file.write('Voltages (V)\t\tResistance (Ohm)\n------------\t\t----------------\n')
-            for i in range(len(memristor_simulation.voltages)):
-                file.write(str(memristor_simulation.voltages))
-                file.write('\t')
-                file.write(str(memristor_simulation.resistances))
-                file.write('\n')
+        with h5py.File(f'{directory_name}\\Result\\result.hdf5', 'w') as f:
+            f.create_dataset("voltages", data=memristor_simulation.voltages)
+            f.create_dataset("resistances", data=memristor_simulation.resistances)
 
 
 def create_resist_plot(pulsed_programming, directory_name, file_output=False):
@@ -190,17 +187,10 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False):
     plt.close('all')
 
     if file_output:
-        with open(f'{directory_name}\\Resist\\resist.txt', "w") as file:
-            file.write('Target (Ohm)\tPractical (Ohm)\tState\n'
-                       '------------\t---------------\t-----\n')
-            for i in range(len(pulsed_programming.res_states_practical)):
-                for j in range(pulsed_programming.nb_states):
-                    file.write(str(pulsed_programming.res_states[i][j]))
-                    file.write('\t\t')
-                    file.write(str(pulsed_programming.res_states_practical[i][j]))
-                    file.write('\t')
-                    file.write(str(j))
-                    file.write('\n')
+        with h5py.File(f'{directory_name}\\Resist\\resist.hdf5', 'w') as f:
+            f.create_dataset("res_states", data=pulsed_programming.res_states)
+            f.create_dataset("res_states_practical", data=pulsed_programming.res_states_practical)
+            f.create_dataset("nb_states", data=pulsed_programming.nb_states)
 
 
 def create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=False):
@@ -333,6 +323,14 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
                 file.write(str(annotation[index]))
                 file.write('\n')
 
+    if file_output:
+        x, y, action, annotation = zip(*pulsed_programming.graph_resistance)
+        with h5py.File(f'{directory_name}\\PulsedProgramming\\pulsed_graph.hdf5', 'w') as f:
+            f.create_dataset("x", data=x)
+            f.create_dataset("y", data=y)
+            f.create_dataset("action", data=action)
+            f.create_dataset("annotation", data=annotation)
+
 
 def create_amplitude_plot(pulsed_programming, directory_name, file_output=False):
     """
@@ -387,18 +385,12 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False)
     plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
     plt.close('all')
 
-    voltages, counter, action = zip(*pulsed_programming.graph_voltages)
     if file_output:
-        with open(f'{directory_name}\\PulsedProgramming\\amplitude.txt', "w") as file:
-            file.write('Index\tVoltage (V)\tAction')
-            file.write('\n')
-            for index in range(len(pulsed_programming.graph_voltages)):
-                file.write(str(counter[index]))
-                file.write('\t')
-                file.write(str(voltages[index]))
-                file.write('\t')
-                file.write(str(action[index]))
-                file.write('\n')
+        voltages, counter, action = zip(*pulsed_programming.graph_voltages)
+        with h5py.File(f'{directory_name}\\PulsedProgramming\\amplitude.hdf5', 'w') as f:
+            f.create_dataset("voltages", data=voltages)
+            f.create_dataset("counter", data=counter)
+            f.create_dataset("action", data=action)
 
 
 def create_gaussian_distribution(pulsed_programming, directory_name, file_output=False):
@@ -436,14 +428,8 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
         plt.close('all')
 
         if file_output:
-            with open(f'{directory_name}\\PulsedProgramming\\variability_read.txt', "w") as file:
-                file.write('Index\tVariability (%)')
-                file.write('\n')
-                for index in range(len(pulsed_programming.variability_read)):
-                    file.write(str(index))
-                    file.write('\t')
-                    file.write(str(pulsed_programming.variability_read[index]))
-                    file.write('\n')
+            with h5py.File(f'{directory_name}\\PulsedProgramming\\variability_read.hdf5', 'w') as f:
+                f.create_dataset("variability_read", data=pulsed_programming.variability_read)
 
     # Write
     if pulsed_programming.variance_write != 0:
@@ -461,14 +447,8 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
         plt.close('all')
 
         if file_output:
-            with open(f'{directory_name}\\PulsedProgramming\\variability_write.txt', "w") as file:
-                file.write('Index\tVariability (%)')
-                file.write('\n')
-                for index in range(len(pulsed_programming.variability_write)):
-                    file.write(str(index))
-                    file.write('\t')
-                    file.write(str(pulsed_programming.variability_write[index]))
-                    file.write('\n')
+            with h5py.File(f'{directory_name}\\PulsedProgramming\\variability_write.hdf5', 'w') as f:
+                f.create_dataset("variability_write", data=pulsed_programming.variability_write)
 
 
 def create_stability_diagram(qd_simulation, directory_name, file_output=False):
@@ -524,19 +504,9 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False):
     plt.close('all')
 
     if file_output:
-        with open(f'{directory_name}\\StabilityDiagram\\stability.txt', "w") as file:
-            file.write('Voltages (V)\t')
-            for x in range(len(qd_simulation.voltages)):
-                file.write(str(qd_simulation.voltages[x]))
-                file.write('\t')
-            file.write('\n')
-            for x in range(len(qd_simulation.voltages)):
-                file.write(str(qd_simulation.voltages[x]))
-                file.write('\t')
-                for y in range(len(qd_simulation.voltages)):
-                    file.write(str(qd_simulation.stability_diagram[x][y]))
-                    file.write('\t')
-                file.write('\n')
+        with h5py.File(f'{directory_name}\\StabilityDiagram\\stability.hdf5', 'w') as f:
+            f.create_dataset("voltages", data=qd_simulation.voltages)
+            f.create_dataset("stability_diagram", data=qd_simulation.stability_diagram)
 
 
 def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
@@ -578,22 +548,12 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
     plt.close('all')
 
     if file_output:
-        with open(f'{directory_name}\\StabilityDiagram\\honeycomb.txt', "w") as file:
+        with h5py.File(f'{directory_name}\\StabilityDiagram\\honeycomb.hdf5', 'w') as f:
             dx, dy = np.gradient(qd_simulation.stability_diagram)
             color = np.sqrt((dx / 2) ** 2 + (dy / 2) ** 2)
 
-            file.write('Voltages (V)\t')
-            for x in range(len(dx)):
-                file.write(str(qd_simulation.voltages[x]))
-                file.write('\t')
-            file.write('\n')
-            for x in range(len(dx)):
-                file.write(str(qd_simulation.voltages[x]))
-                file.write(' : \t')
-                for y in range(len(dy)):
-                    file.write(str(color[x][y]))
-                    file.write('\t')
-                file.write('\n')
+            f.create_dataset("voltages", data=qd_simulation.voltages)
+            f.create_dataset("honeycomb", data=color)
 
 
 def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):
