@@ -542,6 +542,10 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
             f.create_dataset("honeycomb", data=color)
 
 
+def create_staircase_plot(qd_simulation, directory_name, file_output=False):
+    print(qd_simulation.stability_diagram[len(qd_simulation.voltages)//2])
+
+
 def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):
     """
     This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
