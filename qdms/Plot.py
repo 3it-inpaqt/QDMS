@@ -543,7 +543,11 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
 
 
 def create_staircase_plot(qd_simulation, directory_name, file_output=False):
-    print(qd_simulation.stability_diagram[len(qd_simulation.voltages)//2])
+    y = qd_simulation.stability_diagram[len(qd_simulation.voltages)//2]
+    x = qd_simulation.voltages
+
+    plt.plot(x, y)
+    plt.show()
 
 
 def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):
