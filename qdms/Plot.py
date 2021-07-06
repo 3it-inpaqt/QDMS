@@ -546,9 +546,13 @@ def create_staircase_plot(qd_simulation, directory_name, file_output=False):
     y = np.diff(qd_simulation.stability_diagram[0])
     x = qd_simulation.voltages[0:len(qd_simulation.voltages)-1]
 
+    for y_ in y:
+        if round(y_, 3) != 0:
+            print(y_)
+
     plt.title(f'{np.mean(np.diff(x))} resolution (V) ')
     plt.xlabel(f'Voltage (V)')
-    plt.ylabel(f'Number of electron (V)')
+    plt.ylabel(f'Current (A)')
     plt.plot(x, y)
     plt.show()
 
