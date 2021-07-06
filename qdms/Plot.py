@@ -544,8 +544,11 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
 
 def create_staircase_plot(qd_simulation, directory_name, file_output=False):
     y = qd_simulation.stability_diagram[0]
-    x = qd_simulation.voltages
+    x = np.diff(qd_simulation.voltages)
 
+    plt.title(f'{np.mean(np.diff(x))} resolution (V) ')
+    plt.xlabel(f'Voltage (V)')
+    plt.ylabel(f'Number of electron (V)')
     plt.plot(x, y)
     plt.show()
 
