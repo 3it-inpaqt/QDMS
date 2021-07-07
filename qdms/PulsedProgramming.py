@@ -73,17 +73,11 @@ class PulsedProgramming:
     is_relative_tolerance : bool
         If true, the tolerance_value would be in percentage instead of (Ohm). ex: 10 : if true, 10% : if false, 10 Ohm
 
-    variability_read : iterable[float]
-        A gaussian distribution with (mu=0, sigma=variance_read)
-
     variability_write : iterable[float]
         A gaussian distribution with (mu=0, sigma=variance_write)
 
     index_variability : int
         Index of the current variability. If over 1000, reset to 0.
-
-    variance_read : float
-        Variance of the gaussian distribution on the memristor reading. See variability.
 
     variance_write : float
         Variance of the gaussian distribution on the memristor write. See variability.
@@ -98,8 +92,6 @@ class PulsedProgramming:
         The distribution type can add controlled variability to the voltages output by targeting individual resistance
         values for the memristor's states. A plot of the distribution is output in Resist folder. The possibilities are:
             'linear' : The states are chosen in a linear manner.
-            'half_spread' : Similarly to a crossbar, each row can make a distribution. So their is a
-                            sqrt(number of memristor) amount of distribution.
             'full_spread' : All the memristor have a different distribution.
 
     lrs : float
@@ -118,7 +110,7 @@ class PulsedProgramming:
     """
 
     def __init__(self, circuit, nb_states, pulse_algorithm='fabien', distribution_type='linear', max_voltage=0,
-                 tolerance=0, is_relative_tolerance=False, variance_read=0, variance_write=0, lrs=None, hrs=None, number_of_reading=1, max_pulse=20000):
+                 tolerance=0, is_relative_tolerance=False, variance_write=0, lrs=None, hrs=None, number_of_reading=1, max_pulse=20000):
         self.circuit = circuit
         self.nb_states = nb_states
         self.distribution_type = distribution_type
@@ -131,9 +123,7 @@ class PulsedProgramming:
         self.max_voltage = max_voltage
         self.is_relative_tolerance = is_relative_tolerance
         self.index_variability = 0
-        self.variance_read = variance_read
         self.variance_write = variance_write
-        self.variability_read = np.random.normal(0, variance_read, 1000)
         self.variability_write = np.random.normal(0, variance_write, 1000)
         self.number_of_reading = number_of_reading
         self.max_pulse = max_pulse
@@ -147,32 +137,10 @@ class PulsedProgramming:
         str_out += 'Memristor:\t\t\t\t' + str(type(self.circuit.memristor_model)) + '\n'
         str_out += 'Nb_states:\t\t\t\t' + str(self.nb_states) + '\n'
         str_out += 'Tolerance (Ohm):\t\t' + str(self.tolerance) + '\n'
-        str_out += 'Variance read:\t' + str(self.variance_read) + '\n'
         str_out += 'Variance write:\t' + str(self.variance_write) + '\n'
         str_out += 'Max voltage (V):\t\t' + str(self.max_voltage) + '\n'
         str_out += "-------------------------------------\n"
         return str_out
-
-    def read_resistance(self, memristor):
-        """
-        This function read the resistance (Ohm) state of the memristor.
-        A variability is added following a gaussian distribution.
-
-        Technically a tension of 0.2 V is applied for 1 us.
-
-        Parameters
-        ----------
-        memristor : Memristor
-            The memristor read.
-
-        Returns
-        ----------
-        resistance : float
-            The resistance (Ohm) read.
-        """
-        self.index_variability = self.index_variability + 1 if self.index_variability < len(self.variability_read) - 1 else 0
-        resistance = 1 / memristor.g
-        return resistance + resistance * (self.variability_read[self.index_variability])
 
     def write_resistance(self, memristor, voltage, t_pulse):
         """
@@ -324,7 +292,7 @@ class PulsedProgramming:
         # is_setting = False
 
         r_shift = 1
-        current_res = self.read_resistance(self.circuit.memristor_model)
+        current_res = self.circuit.memristor_model.read()
         while not flag_finish:
             if res_min < current_res < res_max:
                 action = 'read'
@@ -363,7 +331,7 @@ class PulsedProgramming:
             counter += 1
 
             previous_res = current_res
-            current_res = self.read_resistance(self.circuit.memristor_model)
+            current_res = self.circuit.memristor_model.read()
             r_shift = abs(current_res - previous_res) if abs(current_res - previous_res) != 0 else 1
 
     def fabien_convergence(self, i_state, res_states, max_pulse):
@@ -403,7 +371,7 @@ class PulsedProgramming:
         counter_read = 0
 
         while not flag_finish:
-            current_res = self.read_resistance(self.circuit.memristor_model)
+            current_res = self.circuit.memristor_model.read()
 
             if res_min <= current_res <= res_max:
                 action = 'read'

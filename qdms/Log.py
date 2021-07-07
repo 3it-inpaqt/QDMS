@@ -149,9 +149,7 @@ def save_pulsed_programming_hdf5(pulsed_programming, path):
         f.create_dataset("max_voltage", data=pulsed_programming.max_voltage)
         f.create_dataset("tolerance", data=pulsed_programming.tolerance)
         f.create_dataset("index_variability", data=pulsed_programming.index_variability)
-        f.create_dataset("variance_read", data=pulsed_programming.variance_read)
         f.create_dataset("variance_write", data=pulsed_programming.variance_write)
-        f.create_dataset("variability_read", data=pulsed_programming.variability_read)
         f.create_dataset("variability_write", data=pulsed_programming.variability_write)
         f.create_dataset("number_of_reading", data=pulsed_programming.number_of_reading)
         graph_resistance_1, graph_resistance_2, graph_resistance_3, graph_resistance_4 = zip(*pulsed_programming.graph_resistance)
@@ -412,9 +410,7 @@ def load_pulsed_programming_hdf5(path, circuit):
         max_voltage = np.array(file.get('max_voltage'))
         tolerance = np.array(file.get('tolerance'))
         index_variability = np.array(file.get('index_variability'))
-        variance_read = np.array(file.get('variance_read'))
         variance_write = np.array(file.get('variance_write'))
-        variability_read = np.array(file.get('variability_read'))
         variability_write = np.array(file.get('variability_write'))
         number_of_reading = np.array(file.get('number_of_reading'))
         graph_resistance_1 = np.array(file.get('graph_resistance_1'))
@@ -441,9 +437,7 @@ def load_pulsed_programming_hdf5(path, circuit):
     pulsed_programming.max_voltage = max_voltage
     pulsed_programming.tolerance = tolerance
     pulsed_programming.index_variability = index_variability
-    pulsed_programming.variance_read = variance_read
     pulsed_programming.variance_write = variance_write
-    pulsed_programming.variability_read = variability_read
     pulsed_programming.variability_write = variability_write
     pulsed_programming.number_of_reading = number_of_reading
     pulsed_programming.graph_resistance = graph_resistance

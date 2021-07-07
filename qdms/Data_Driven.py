@@ -93,8 +93,8 @@ class Data_Driven(Memristor):
         res = 1 / self.g
         variability = 0
         if self.is_variability_on:
-            variability = random.choice([-2.161e-4 * res, 2.161e-4 * res])
-        return res + res * np.random.normal(variability)
+            variability = 2.161e-4 * res
+        return np.random.normal(res, variability * res / 100)
 
     def simulate(self, voltage_signal, return_current=False, version2018=False):
         len_voltage_signal = 1
