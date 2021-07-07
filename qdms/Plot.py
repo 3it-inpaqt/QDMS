@@ -543,18 +543,33 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
 
 
 def create_staircase_plot(qd_simulation, directory_name, file_output=False):
+    fig, ax = plt.subplots()
+
     y = np.diff(qd_simulation.stability_diagram[0])
-    x = qd_simulation.voltages[0:len(qd_simulation.voltages)-1]
+    x = qd_simulation.voltages[0:len(qd_simulation.voltages) - 1]
 
-    for y_ in y:
-        if round(y_, 3) != 0:
-            print(y_)
+    scatter = {}
+    for i in range(len(y)):
+        if round(y[i], 3) != 0:
+            scatter[i] = y[i]
 
-    plt.title(f'{np.mean(np.diff(x))} resolution (V) ')
-    plt.xlabel(f'Voltage (V)')
-    plt.ylabel(f'Current (A)')
-    plt.plot(x, y)
-    plt.show()
+    p = 0
+    keys = []
+    for c in list(scatter.keys()):
+        if c != p + 1:
+            keys.append(p)
+            keys.append(c)
+        p = c
+    keys.pop(0)
+    keys.append(list(scatter.keys())[-1])
+    resolution = round(np.mean(np.diff(x)), 5)
+    ax.set_title(f'{resolution} resolution (V)')
+    ax.set_xlabel(f'Voltage (V)')
+    ax.set_ylabel(f'Current')
+    ax.plot(x, y)
+    for key in keys:
+        ax.scatter(x[key], scatter.get(key))
+    plt.savefig(f'{directory_name}\\staircase_{resolution}.png', dpi=600)
 
 
 def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):

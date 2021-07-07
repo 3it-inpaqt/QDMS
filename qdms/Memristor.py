@@ -37,6 +37,21 @@ class Memristor(ABC):
         self.finite_states = None
 
     @abstractmethod
+    def read(self):
+        """
+        Function to read the resistance of the memristive device. It can implement variability.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        resistance : float
+            The current resistance of the device.
+        """
+        return
+
+    @abstractmethod
     def simulate(self, voltage_signal):
         """Method to determine the equivalent conductance of a memristive device when a given voltage signal is applied.
 

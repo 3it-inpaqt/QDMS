@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from .Memristor import Memristor as Memristor
+import random
 
 
 class Data_Driven(Memristor):
@@ -40,9 +41,11 @@ class Data_Driven(Memristor):
         b_p model parameter.
     b_n : float
         b_n model parameter.
+    is_variability_on : bool
+        If true, a variability will be apply on reading.
     """
 
-    def __init__(self):
+    def __init__(self, is_variability_on=False):
         time_series_resolution = 1e-9
         # r_off = 1.7e4
         # r_on = 1280
@@ -83,6 +86,15 @@ class Data_Driven(Memristor):
         self.b_n = 2.71689828
 
         self.g = 1 / self.r_on
+
+        self.is_variability_on = is_variability_on
+
+    def read(self):
+        res = 1 / self.g
+        variability = 0
+        if self.is_variability_on:
+            variability = random.choice([-2.161e-4 * res, 2.161e-4 * res])
+        return res + res * np.random.normal(variability)
 
     def simulate(self, voltage_signal, return_current=False, version2018=False):
         len_voltage_signal = 1
