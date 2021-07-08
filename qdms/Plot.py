@@ -9,7 +9,7 @@ from .HelperFunction import is_square
 import h5py
 
 
-def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, plots=None, file_output=False, verbose=False):
+def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, plots=None, file_output=False, verbose=False, show=False):
     """
     This function plot the result plot, resistance plot, the pulsed programming plot and the stability diagram.
     It creates the folders and saves the plots accordingly.
@@ -42,6 +42,9 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, p
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -55,48 +58,48 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, p
               'Start plots')
         start = time.time()
     if 'result' in plots and memristor_sim is not None:
-        create_result_plot(memristor_sim, directory_name, file_output=file_output)
+        create_result_plot(memristor_sim, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Result plot: {time.time()-start}')
         start = time.time()
 
     if 'resist' in plots and memristor_sim is not None:
-        create_resist_plot(pulsed_programming, directory_name, file_output=file_output)
+        create_resist_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Resist plot: {time.time()-start}')
         start = time.time()
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
-        create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=file_output)
+        create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
 
     if 'amplitude' in plots and pulsed_programming is not None:
-        create_amplitude_plot(pulsed_programming, directory_name, file_output=file_output)
+        create_amplitude_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Amplitude plot: {time.time()-start}')
         start = time.time()
 
     if 'gaussian' in plots and pulsed_programming is not None:
-        create_gaussian_distribution(pulsed_programming, directory_name, file_output=file_output)
+        create_gaussian_distribution(pulsed_programming, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Gaussian plot: {time.time() - start}')
         start = time.time()
 
     if 'stability' in plots and qd_sim is not None:
-        create_stability_diagram(qd_sim, directory_name, file_output=file_output)
+        create_stability_diagram(qd_sim, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Stability plot: {time.time()-start}')
         start = time.time()
 
     if 'honeycomb' in plots and qd_sim is not None:
-        create_honeycomb_diagram(qd_sim, directory_name, file_output=file_output)
+        create_honeycomb_diagram(qd_sim, directory_name, file_output=file_output, show=show)
     if verbose:
         print(f'Honeycomb plot: {time.time()-start}')
 
 
-def create_result_plot(memristor_simulation, directory_name, file_output=False):
+def create_result_plot(memristor_simulation, directory_name, file_output=False, show=False):
     """
     This function creates plots from the simulation voltages and save them in Result
 
@@ -110,6 +113,9 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False):
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -140,6 +146,8 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False):
     plt.tight_layout()
     plt.tight_layout()
     plt.savefig(fname=f'{directory_name}\\Result\\{filename}')
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -148,7 +156,7 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False):
             f.create_dataset("resistances", data=memristor_simulation.resistances)
 
 
-def create_resist_plot(pulsed_programming, directory_name, file_output=False):
+def create_resist_plot(pulsed_programming, directory_name, file_output=False, show=False):
     """
     This function creates plots from the simulation resistances and save them in Resist
 
@@ -162,6 +170,9 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False):
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -184,6 +195,8 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False):
                f'_{pulsed_programming.distribution_type}.jpg'
     plt.tight_layout()
     plt.savefig(fname=f'{directory_name}\\Resist\\{filename}')
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -193,7 +206,7 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False):
             f.create_dataset("nb_states", data=pulsed_programming.nb_states)
 
 
-def create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=False):
+def create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=False, show=False):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -210,6 +223,9 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -307,6 +323,8 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
     filename = f'{pulsed_programming.nb_states}_states_{pulsed_programming.distribution_type}_{pulsed_programming.pulse_algorithm}.jpg'
     plt.tight_layout()
     plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -318,7 +336,7 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
             f.create_dataset("annotation", data=annotation)
 
 
-def create_amplitude_plot(pulsed_programming, directory_name, file_output=False):
+def create_amplitude_plot(pulsed_programming, directory_name, file_output=False, show=False):
     """
     This function creates a plot from the amplitude of the pulses in the pulsed programming simulation.
 
@@ -332,6 +350,9 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False)
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -369,6 +390,8 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False)
     filename = f'{pulsed_programming.pulse_algorithm}_{pulsed_programming.max_voltage}_V_max.jpg'
     plt.tight_layout()
     plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -379,7 +402,7 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False)
             f.create_dataset("action", data=action)
 
 
-def create_gaussian_distribution(pulsed_programming, directory_name, file_output=False):
+def create_gaussian_distribution(pulsed_programming, directory_name, file_output=False, show=False):
     """
     Output the gaussian distribution of the variability_read and variability_write.
 
@@ -393,6 +416,9 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -412,6 +438,8 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
         filename = f'variability_write_gaussian_{pulsed_programming.variance_write}_variance.jpg'
         plt.tight_layout()
         plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
+        if show:
+            plt.show()
         plt.close('all')
 
         if file_output:
@@ -419,7 +447,7 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
                 f.create_dataset("variability_write", data=pulsed_programming.variability_write)
 
 
-def create_stability_diagram(qd_simulation, directory_name, file_output=False):
+def create_stability_diagram(qd_simulation, directory_name, file_output=False, show=False):
     """
     This function creates the stability diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's uses scatter with the height represented as color.
@@ -434,6 +462,9 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False):
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -469,6 +500,8 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False):
     filename = f'number_of_electron_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
     plt.savefig(f'{directory_name}\\StabilityDiagram\\{filename}')
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -477,7 +510,7 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False):
             f.create_dataset("stability_diagram", data=qd_simulation.stability_diagram)
 
 
-def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
+def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False, show=False):
     """
     This function creates the honeycomb diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's the differential of the stability diagram created in create_stability_diagram
@@ -492,6 +525,9 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
 
     file_output : bool
         If true, output the values of the graph in a file.
+
+    show : bool
+        If true, will show the plots.
     Returns
     ----------
     """
@@ -513,6 +549,8 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
     filename = f'stability_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
     plt.savefig(f'{directory_name}\\StabilityDiagram\\{filename}', dpi=1200)
+    if show:
+        plt.show()
     plt.close('all')
 
     if file_output:
@@ -524,7 +562,7 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False):
             f.create_dataset("honeycomb", data=color)
 
 
-def create_staircase_plot(qd_simulation, directory_name, file_output=False):
+def create_staircase_plot(qd_simulation, directory_name, file_output=False, show=False):
     fig, ax = plt.subplots()
 
     y = np.diff(qd_simulation.stability_diagram[0])
