@@ -13,6 +13,8 @@ import os
 import time
 
 
+########################################################################################################################
+# Creating values functions
 def parametric_test_resolution_memristor(path, configurations=None):
     """
     This function generates many memristor simulations and saves them in a folder with proper names to use
@@ -297,7 +299,8 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
             config_done += 1
 
 
-
+########################################################################################################################
+# Loading functions
 def load_resolution_memristor_data(path, verbose=False):
     """
     This function load a folder of saved folders for the create_resolution_memristor_plot function. The folders name need
@@ -481,3 +484,790 @@ def load_voltage_min_max_data(path, verbose=False):
         memristor_simulations.append(memristor_simulation)
 
     return memristor_simulations
+
+
+########################################################################################################################
+# Plot functions
+
+def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):
+    """
+    This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
+    They shouldn't have variability and be between the same LRS and HRS.
+
+    Parameters
+    ----------
+    memristor_simulations : list of list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    resolution_goal : float
+        The resolution goal. Will be plot as a black solid line across the graphic.
+
+    Returns
+    ----------
+    """
+
+    fig, ax = plt.subplots()
+    x = []
+    y = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    counter = 0
+    biggest_nb_state = 0
+    distribution_type = ''
+    for current_conf in memristor_simulations:
+        for current in current_conf:
+            biggest_nb_state = current.pulsed_programming.nb_states if current.pulsed_programming.nb_states > biggest_nb_state else biggest_nb_state
+            x.append(current.pulsed_programming.nb_states)
+            y.append(np.mean(np.diff(current.voltages)))
+
+        temp = []
+        for index in range(len(x)):
+            temp.append([x[index], y[index]])
+        temp = list(np.unique(temp, axis=0))
+        x, y = zip(*temp)
+        x = list(x)
+        y = list(y)
+
+        if current_conf[0].pulsed_programming.distribution_type == 'linear':
+            distribution_type = 'No spreading'
+        elif current_conf[0].pulsed_programming.distribution_type == 'half_spread':
+            distribution_type = 'Line state spreading'
+        elif current_conf[0].pulsed_programming.distribution_type == 'full_spread':
+            distribution_type = 'Full state spreading'
+        number_of_memristor = int(np.sqrt(current_conf[0].pulsed_programming.circuit.number_of_memristor))
+        label = f'{distribution_type} ({number_of_memristor}x{number_of_memristor})'
+        marker = 'o' if number_of_memristor == 2 else 's'
+        ax.plot(x, y, color=colors[counter], label=label, marker=marker, linestyle='dotted')
+        counter += 1
+        x.clear()
+        y.clear()
+
+    ax.plot([1, biggest_nb_state],[resolution_goal, resolution_goal], label='Goal', color='black')
+    ax.set_yscale('log')
+    ax.legend()
+    title = f'LRS: {round(memristor_simulations[0][0].pulsed_programming.lrs/1000, 1)}k\u03A9 & HRS: {round(memristor_simulations[0][0].pulsed_programming.hrs/1000, 1)}k\u03A9'
+    plt.title(title)
+
+    plt.ylabel('Resolution (V)')
+    plt.xlabel('# of states for a memristor')
+    filename = f'resolution_memristor_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_resolution_memristor_cut_plot(memristor_simulations, directory_name, resolution_goal=100e-6, cut_extremes=None):
+    """
+    This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
+    They shouldn't have variability and be between the same LRS and HRS.
+
+    Parameters
+    ----------
+    memristor_simulations : list of list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    resolution_goal : float
+        The resolution goal. Will be plot as a black solid line across the graphic.
+
+    cut_extremes : float
+        From the data generated by memristor_simulation.simulate(), cut the <cut_extremes> highest and lowest values.
+        Between 0 (0%) and 0.5 (50%, on bottom and top, which is 100%)
+
+
+    Returns
+    ----------
+    """
+    def cut_extreme(voltages_list, value):
+        """
+        This function cut the <value> highest and lowest values.
+        Parameters
+        ----------
+        voltages_list : iterable[float]
+            Contains the voltages to cut.
+
+        value : float
+            Percentage to cut. Between 0 (0%) and 0.5 (50%, on bottom and top, which is 100%)
+
+        Returns
+        -------
+        cut_voltages : iterable[float]
+            Contains the cut voltages.
+        """
+        low_value = int(len(voltages_list) * value)
+        high_value = int(len(voltages_list) * (1-value))
+        return voltages_list[low_value:high_value]
+
+    if cut_extremes is None:
+        cut_extremes = [0, 1, 5, 10]
+
+    fig, ax = plt.subplots()
+    x = []
+    y = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    markers = ['o', '^', 's', 'P']
+    counter = 0
+    biggest_nb_state = 0
+    for cut_extremes_ in cut_extremes:
+        for current in memristor_simulations[0]:
+            nb_state = current.pulsed_programming.nb_states
+            biggest_nb_state = nb_state if biggest_nb_state < nb_state else biggest_nb_state
+            x.append(nb_state)
+            voltages = current.voltages if cut_extremes == 0 else cut_extreme(current.voltages, cut_extremes_ / 100)
+            y.append(np.mean(np.diff(voltages)))
+
+        # temp = []
+        # for index in range(len(x)):
+        #     temp.append([x[index], y[index]])
+        # temp = list(np.unique(temp, axis=0))
+        # x, y = zip(*temp)
+        # x = list(x)
+        # y = list(y)
+
+        label = f'{cut_extremes_} %'
+        ax.plot(x, y, color=colors[counter], label=label, marker='o', linestyle='dotted')
+        counter += 1
+        x.clear()
+        y.clear()
+
+    ax.plot([2, biggest_nb_state],[resolution_goal, resolution_goal], label='Goal', color='black')
+    ax.set_yscale('log')
+    ax.legend()
+    title = f'LRS: {round(memristor_simulations[0][0].pulsed_programming.lrs/1000, 1)}k\u03A9 & HRS: {round(memristor_simulations[0][0].pulsed_programming.hrs/1000, 1)}k\u03A9'
+
+    plt.title(f'{title}')
+    plt.ylabel('Resolution (V)')
+    plt.xlabel('# of states for a memristor')
+    filename = f'resolution_memristor_plot_{cut_extremes}.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_voltage_min_max_plot_1(memristor_simulations, directory_name):
+    """
+    This function creates a plot showing the impact of the number of memristor on the maximum
+    and minimum voltage possible.
+
+    Parameters
+    ----------
+    memristor_simulations : list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    fig, ax = plt.subplots()
+
+    counter = 0
+    for current in memristor_simulations:
+        x = [int(current.pulsed_programming.circuit.number_of_memristor), int(current.pulsed_programming.circuit.number_of_memristor)]
+        voltages_min = min(current.voltages)
+        voltages_max = max(current.voltages)
+        y = [voltages_min, voltages_max]
+        ax.plot(x, y, color='black', marker='o', linestyle='dotted')
+
+        counter += 1
+
+    title = f'LRS: {round(memristor_simulations[0].pulsed_programming.lrs/1000, 1)}k\u03A9 & HRS: {round(memristor_simulations[0].pulsed_programming.hrs/1000, 1)}k\u03A9'
+    plt.title(title)
+    plt.ylabel('Voltage output (V)')
+    plt.xlabel('Number of memristors')
+    filename = f'voltage_min_max_plot_1.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_voltage_min_max_plot_2(memristor_simulations, directory_name):
+    """
+    This function creates a plot showing the impact of lrs and hrs on the maximum and minimum voltage possible.
+
+    Parameters
+    ----------
+    memristor_simulations : list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    fig, ax = plt.subplots()
+
+    counter = 0
+    for current in memristor_simulations:
+        x = [int(current.pulsed_programming.lrs), int(current.pulsed_programming.hrs)]
+        voltages_min = min(current.voltages)
+        voltages_max = max(current.voltages)
+
+        v_in = current.pulsed_programming.circuit.v_in
+        gain_resistance = current.pulsed_programming.circuit.gain_resistance
+        if current.pulsed_programming.circuit.is_new_architecture:
+            color = 'blue'
+            linestyle = (0, (3, 1, 1, 1))
+            label = f'New v_in={v_in} gain={gain_resistance} r_l={current.pulsed_programming.circuit.R_L}'
+            y = [voltages_min, voltages_max]
+
+        else:
+            color = 'red'
+            linestyle = (0, (1, 1))
+            label = f'Old v_in={v_in} gain={gain_resistance}'
+            y = [voltages_max, voltages_min]
+
+        handles, labels = ax.get_legend_handles_labels()
+        if label in labels:
+            ax.plot(x, y, color=color, marker='o', linestyle=linestyle)
+        else:
+            ax.plot(x, y, color=color, label=label, marker='o', linestyle=linestyle)
+        counter += 1
+    ax.legend()
+
+    # plt.title('title')
+    plt.ylabel('Voltage output (V)')
+    plt.xlabel('LRS and HRS (Ohm)')
+    filename = f'voltage_min_max_plot_2.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
+    """
+    This function creates a plot showing the impact of lrs and hrs on the maximum and minimum voltage possible.
+
+    Parameters
+    ----------
+    memristor_simulations : list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    fig, ax = plt.subplots()
+
+    counter = 0
+    for current in memristor_simulations:
+        x = [int(current.pulsed_programming.circuit.number_of_memristor), int(current.pulsed_programming.circuit.number_of_memristor)]
+        voltages_min = min(current.voltages)
+        voltages_max = max(current.voltages)
+        y = [voltages_min, voltages_max]
+        lns1 = ax.plot(x, y, color='blue', marker='o', label='Voltage output', linestyle='dotted')
+
+        counter += 1
+    ax.set_ylabel('Voltage output (V)')
+    x.clear()
+    y.clear()
+
+    counter = 0
+    ax2 = ax.twinx()
+    for current in memristor_simulations:
+        x.append(current.pulsed_programming.circuit.number_of_memristor)
+        y.append(np.mean(np.diff(current.voltages)))
+
+    temp = []
+    for index in range(len(x)):
+        temp.append([x[index], y[index]])
+    temp = list(np.unique(temp, axis=0))
+    x, y = zip(*temp)
+    x = list(x)
+    y = list(y)
+
+    lns2 = ax2.plot(x, y, color='red', marker='^', label='Resolution', linestyle='dotted')
+
+    lns = lns1 + lns2
+    labs = [l.get_label() for l in lns]
+    ax.legend(lns, labs, loc=0)
+
+    ax2.set_yscale('log')
+    # plt.title('title')
+    ax2.set_ylabel('Resolution (V)')
+    ax.set_xlabel('# of states for a memristor')
+    filename = f'resolution_memristor_plot_min_max_.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+    plt.close('all')
+    # plt.show()
+
+
+def create_resolution_variance_plot(memristor_simulations, directory_name, resolution_goal=None):
+    """
+    This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
+    They shouldn't have variability and be between the same LRS and HRS.
+
+    Parameters
+    ----------
+    memristor_simulations : list of list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    fig, ax = plt.subplots()
+    variance = []
+    variance_ = []
+    resolution = []
+    resolution_ = []
+    std = []
+    std_ = []
+    biggest_variance = 0
+
+    for current_var in memristor_simulations:
+        for current_sim in current_var:
+            variance_.append(current_sim.pulsed_programming.variance_read * 300)
+            resolution_.append(current_sim.resolution)
+        biggest_variance = variance_[0] if variance_[0] > biggest_variance else biggest_variance
+        variance.append(variance_[0])
+        # std.append(np.mean(std_[:]))
+        resolution.append(np.mean(resolution_[:])*1e9)
+        std.append(np.std(resolution_[:])*1e9)
+        variance_.clear()
+        resolution_.clear()
+        std_.clear()
+
+    for index in range(len(variance)):
+        plt.errorbar(variance[index], resolution[index], std[index], label=str(round(variance[index],2))+' %', marker='o', capsize=5, color='black')
+    if resolution_goal is not None:
+        plt.plot([0,biggest_variance],[resolution_goal, resolution_goal], label='Goal', color='black')
+
+    nb_memristor = memristor_simulations[0][0].pulsed_programming.circuit.number_of_memristor
+    nb_states = memristor_simulations[0][0].pulsed_programming.nb_states
+    distribution = memristor_simulations[0][0].pulsed_programming.distribution_type
+    tolerance = memristor_simulations[0][0].pulsed_programming.tolerance
+    plt.title(f'{int(np.sqrt(nb_memristor))}x{int(np.sqrt(nb_memristor))} {distribution} {nb_states} states {tolerance} tolerance {len(memristor_simulations[0])} simulations per point')
+    plt.ylabel('Resolution (nV)')
+    plt.xlabel('Variability (%)')
+    # plt.xscale('symlog')
+    filename = f'resolution_variance_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1600)
+
+    # plt.close('all')
+    plt.show()
+
+
+def create_std_variance_plot(memristor_simulations, directory_name, resolution_goal=None):
+    """
+    This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
+    They shouldn't have variability and be between the same LRS and HRS.
+
+    Parameters
+    ----------
+    memristor_simulations : list of list of MemristorSimulation.MemristorSimulation
+        Contains the memristor simulations that will be plot. They are divided in list by the configuration, like 2x2 half_spread.
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    fig, ax = plt.subplots()
+    variance = []
+    variance_ = []
+    resolution_ = []
+    std = []
+    biggest_variance = 0
+
+    for current_var in memristor_simulations:
+        for current_sim in current_var:
+            variance_.append(current_sim.pulsed_programming.variance_read * 300)
+            resolution_.append(current_sim.resolution)
+        biggest_variance = variance_[0] if variance_[0] > biggest_variance else biggest_variance
+        variance.append(variance_[0])
+        std.append(np.std(resolution_[:])*1e9)
+        variance_.clear()
+
+    plt.scatter(variance, std, color='black')
+    if resolution_goal is not None:
+        plt.plot([0,biggest_variance],[resolution_goal, resolution_goal], label='Goal', color='black')
+
+    nb_memristor = memristor_simulations[0][0].pulsed_programming.circuit.number_of_memristor
+    nb_states = memristor_simulations[0][0].pulsed_programming.nb_states
+    distribution = memristor_simulations[0][0].pulsed_programming.distribution_type
+    tolerance = memristor_simulations[0][0].pulsed_programming.tolerance
+    plt.title(f'{int(np.sqrt(nb_memristor))}x{int(np.sqrt(nb_memristor))} {distribution} {nb_states} states {tolerance} tolerance {len(memristor_simulations[0])} simulations per point')
+    plt.ylabel('Std (nV)')
+    plt.xlabel('Variability (%)')
+    # plt.xscale('symlog')
+    filename = f'std_variance_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1600)
+
+    # plt.close('all')
+    plt.show()
+
+
+def create_pulsed_programming_efficiency_plot_1(pulsed_programmings, directory_name):
+    """
+    This function creates a plot showing the impact of the variance on the efficiency of the pulsed programming with
+    different % of lrs and hrs.
+
+    Parameters
+    ----------
+    pulsed_programmings : list of list of PulsedProgramming.PulsedProgramming
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+
+    if not os.path.isdir(f'{directory_name}'):
+        os.mkdir(f'{directory_name}')
+
+    ax = plt.subplot(1, 1, 1)
+    x = []
+    y = []
+    error_bar = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    linestyle = [(0, (1, 10)), (0, (1, 5)), (0, (1, 1)),
+                 (0, (3, 10, 1, 10)), (0, (3, 5, 1, 5)), (0, (3, 1, 1, 1))]
+    counter = 0
+    dict_ = {}
+    for current_conf in pulsed_programmings:
+        for current in current_conf:
+            delta_r = current.circuit.memristor_model.r_off - current.circuit.memristor_model.r_on
+            lrs = (current.lrs - current.circuit.memristor_model.r_on) / delta_r
+            hrs = (current.hrs - current.circuit.memristor_model.r_on) / delta_r
+            if dict_.get(f'{lrs}_{hrs}') is None:
+                dict_[f'{lrs}_{hrs}'] = {}
+            if dict_.get(f'{lrs}_{hrs}').get(f'{current.variance_read*300}') is None:
+                dict_[f'{lrs}_{hrs}'][f'{current.variance_read*300}'] = []
+            dict_[f'{lrs}_{hrs}'][f'{current.variance_read * 300}'].append(current)
+
+    y_ = []
+    for key in dict_.keys():
+        for current_key in dict_.get(key).keys():
+            for current in dict_.get(key).get(current_key):
+                second_final_read = first_final_read = 0
+                flag_first = True
+                for current_ in current.graph_resistance:
+                    if current_[3] and flag_first:
+                        first_final_read = current_[1]
+                        flag_first = not flag_first
+                    elif current_[3]:
+                        second_final_read = current_[1]
+                y_.append(second_final_read - first_final_read)
+            x.append(dict_.get(key).get(current_key)[0].variance_read * 300)
+            y.append(np.mean(y_[:]))
+            error_bar.append(np.std(y_[:]))
+            y_.clear()
+        lrs, hrs = key.split('_')
+        label = f'{int(round(float(lrs)*100))}-{int(round(float(hrs)*100))}%'
+        # ax.errorbar(x, y, error_bar, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter],capsize=5)
+        ax.plot(x, y, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter])
+        counter += 1
+        x.clear()
+        y.clear()
+        error_bar.clear()
+
+    for key in dict_.keys():
+        pulsed_programmings_ = dict_.get(key).get('0.0')
+        algorithm = pulsed_programmings_[0].pulse_algorithm
+        nb_simulations = len(pulsed_programmings_)
+        textstr = 'Constants\n---------------\n'
+        # textstr += f'Pulse algorithm : {algorithm}\n'
+        textstr += f'Number of reading : {pulsed_programmings_[0].number_of_reading}\n'
+        textstr += f'Variability write : {pulsed_programmings_[0].variance_write * 300} %\n'
+        textstr += f'Tolerance : {pulsed_programmings_[0].tolerance} '
+        textstr += '%\n' if pulsed_programmings_[0].is_relative_tolerance else 'Ohm\n'
+        break
+
+    plt.figtext(0.70, 0.35, textstr, fontsize=8)
+
+    handles, labels = ax.get_legend_handles_labels()
+    hl = sorted(zip(labels, handles))
+    labels2, handles2 = zip(*hl)
+    ax.legend(handles2, labels2, bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    plt.title(f'{algorithm} algorithm with {nb_simulations} simulations per point')
+    ax.set_ylabel('Number of pulses')
+    ax.set_xlabel('Variability read (%)')
+    filename = f'efficiency_1_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_pulsed_programming_efficiency_plot_2(pulsed_programmings, directory_name):
+    """
+    This function creates a plot showing the impact of the tolerance on the efficiency of the pulsed programming with
+    varying pulse algorithm and read variability.
+
+    Parameters
+    ----------
+    pulsed_programmings : list of list of PulsedProgramming.PulsedProgramming
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    if not os.path.isdir(f'{directory_name}'):
+        os.mkdir(f'{directory_name}')
+
+    ax = plt.subplot(1, 1, 1)
+    x = []
+    y = []
+    error_bar = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    linestyle = [(0, (1, 10)), (0, (1, 5)), (0, (1, 1)),
+                 (0, (3, 10, 1, 10)), (0, (3, 5, 1, 5)), (0, (3, 1, 1, 1))]
+    counter = 0
+    dict_ = {}
+    for current_conf in pulsed_programmings:
+        for current in current_conf:
+            key = f'{current.pulse_algorithm}_{current.variance_read*300}'
+            if dict_.get(f'{key}') is None:
+                dict_[f'{key}'] = {}
+            if dict_.get(f'{key}').get(float(current.tolerance)) is None:
+                dict_[f'{key}'][float(current.tolerance)] = []
+            dict_[f'{key}'][float(current.tolerance)].append(current)
+    for i in dict_.keys():
+        dict_[i] = dict(sorted(dict_.get(i).items()))
+
+    # for i in dict_.keys():
+    #     print(i)
+    #     for j in dict_.get(i).keys():
+    #         print(j, dict_.get(i).get(j))
+    y_ = []
+    for key in dict_.keys():
+        for current_key in dict_.get(key).keys():
+            for current in dict_.get(key).get(current_key):
+                second_final_read = first_final_read = 0
+                flag_first = True
+                for current_ in current.graph_resistance:
+                    if current_[3] and flag_first:
+                        first_final_read = current_[1]
+                        flag_first = not flag_first
+                    elif current_[3]:
+                        second_final_read = current_[1]
+                y_.append(second_final_read - first_final_read)
+            x.append(dict_.get(key).get(current_key)[0].tolerance)
+            y.append(np.mean(y_[:]))
+            error_bar.append(np.std(y_[:]))
+            y_.clear()
+        label = f'{key}'
+        # ax.errorbar(x, y, error_bar, color=colors[counter], marker='o', label=label, linestyle='solid',capsize=5)
+        ax.plot(x, y, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter])
+        counter += 1
+        x.clear()
+        y.clear()
+        error_bar.clear()
+
+    for key in dict_.keys():
+        pulsed_programmings_ = dict_.get(key).get(1)
+        nb_simulations = len(pulsed_programmings_)
+        textstr = 'Constants\n---------------\n'
+        break
+
+    plt.figtext(0.75, 0.35, textstr, fontsize=8)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.title(f'{nb_simulations} simulations per point')
+    ax.set_ylabel('Number of pulses')
+    ax.set_xlabel('Tolerance (%)')
+    filename = f'efficiency_2_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_pulsed_programming_accuracy_plot_1(pulsed_programmings, directory_name):
+    """
+    This function creates a plot showing the impact of the variance on the accuracy of the pulsed programming.
+
+    Parameters
+    ----------
+    pulsed_programmings : list of list of PulsedProgramming.PulsedProgramming
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+
+    if not os.path.isdir(f'{directory_name}'):
+        os.mkdir(f'{directory_name}')
+
+    ax = plt.subplot(1, 1, 1)
+    x = []
+    y = []
+    error_bar = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    linestyle = [(0, (1, 10)), (0, (1, 5)), (0, (1, 1)),
+                 (0, (3, 10, 1, 10)), (0, (3, 5, 1, 5)), (0, (3, 1, 1, 1))]
+    counter = 0
+    dict_ = {}
+    for current_conf in pulsed_programmings:
+        for current in current_conf:
+            delta_r = current.circuit.memristor_model.r_off - current.circuit.memristor_model.r_on
+            lrs = (current.lrs - current.circuit.memristor_model.r_on) / delta_r
+            hrs = (current.hrs - current.circuit.memristor_model.r_on) / delta_r
+            if dict_.get(f'{lrs}_{hrs}') is None:
+                dict_[f'{lrs}_{hrs}'] = {}
+            if dict_.get(f'{lrs}_{hrs}').get(f'{current.variance_read*300}') is None:
+                dict_[f'{lrs}_{hrs}'][f'{current.variance_read*300}'] = []
+            dict_[f'{lrs}_{hrs}'][f'{current.variance_read * 300}'].append(current)
+
+    y_ = []
+    for key in dict_.keys():
+        for current_key in dict_.get(key).keys():
+            for current in dict_.get(key).get(current_key):
+                accuracy = 100 * (current.res_states_practical[0][1] - current.res_states[0][1]) / current.res_states[0][1]
+                y_.append(accuracy)
+            x.append(dict_.get(key).get(current_key)[0].variance_read * 300)
+            y.append(np.mean(y_[:]))
+            error_bar.append(np.std(y_[:]))
+            y_.clear()
+        lrs, hrs = key.split('_')
+        label = f'{int(round(float(lrs)*100))}-{int(round(float(hrs)*100))}%'
+        # ax.errorbar(x, y, error_bar, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter],capsize=5)
+        ax.plot(x, y, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter])
+        counter += 1
+        x.clear()
+        y.clear()
+        error_bar.clear()
+
+    for key in dict_.keys():
+        pulsed_programmings_ = dict_.get(key).get('0.0')
+        algorithm = pulsed_programmings_[0].pulse_algorithm
+        nb_simulations = len(pulsed_programmings_)
+
+        textstr = 'Constants\n---------------\n'
+        textstr += f'Pulse algorithm : {algorithm}\n'
+        textstr += f'Number of reading : {pulsed_programmings_[0].number_of_reading}\n'
+        textstr += f'Variability write : {pulsed_programmings_[0].variance_write * 300} %\n'
+        textstr += f'Tolerance : {pulsed_programmings_[0].tolerance} '
+        textstr += '%\n' if pulsed_programmings_[0].is_relative_tolerance else 'Ohm\n'
+        break
+
+    handles, labels = ax.get_legend_handles_labels()
+    hl = sorted(zip(labels, handles))
+    labels2, handles2 = zip(*hl)
+    ax.legend(handles2, labels2, bbox_to_anchor=(1.1, 1), loc='upper left')
+
+    plt.figtext(0.75, 0.35, textstr, fontsize=8)
+
+    plt.title(f'{nb_simulations} simulations per point')
+    ax.set_ylabel('Accuracy (%)')
+    ax.set_xlabel('Variability read (%)')
+    filename = f'accuracy_1_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
+
+
+def create_pulsed_programming_accuracy_plot_2(pulsed_programmings, directory_name):
+    """
+    This function creates a plot showing the impact of the tolerance on the accuracy of the pulsed programming.
+
+    Parameters
+    ----------
+    pulsed_programmings : list of list of PulsedProgramming.PulsedProgramming
+
+    directory_name : string
+        The directory name where the plots will be save
+
+    Returns
+    ----------
+    """
+    if not os.path.isdir(f'{directory_name}'):
+        os.mkdir(f'{directory_name}')
+
+    ax = plt.subplot(1, 1, 1)
+    x = []
+    y = []
+    error_bar = []
+    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
+    linestyle = [(0, (1, 10)), (0, (1, 5)), (0, (1, 1)),
+                 (0, (3, 10, 1, 10)), (0, (3, 5, 1, 5)), (0, (3, 1, 1, 1))]
+    counter = 0
+    dict_ = {}
+    for current_conf in pulsed_programmings:
+        for current in current_conf:
+            key = f'{current.pulse_algorithm}_{current.variance_read*300}'
+            if dict_.get(f'{key}') is None:
+                dict_[f'{key}'] = {}
+            if dict_.get(f'{key}').get(float(current.tolerance)) is None:
+                dict_[f'{key}'][float(current.tolerance)] = []
+            dict_[f'{key}'][float(current.tolerance)].append(current)
+
+    for i in dict_.keys():
+        dict_[i] = dict(sorted(dict_.get(i).items()))
+
+    # for i in dict_.keys():
+    #     print(i)
+    #     for j in dict_.get(i).keys():
+    #         print(j, dict_.get(i).get(j))
+    y_ = []
+    for key in dict_.keys():
+        for current_key in dict_.get(key).keys():
+            for current in dict_.get(key).get(current_key):
+                accuracy = 100 * (current.res_states_practical[0][1] - current.res_states[0][1]) / current.res_states[0][1]
+                y_.append(accuracy)
+            x.append(dict_.get(key).get(current_key)[0].tolerance)
+            y.append(np.mean(y_[:]))
+            error_bar.append(np.std(y_[:]))
+            y_.clear()
+        label = f'{key.split("_")[0]} {key.split("_")[1]}% read'
+        # ax.errorbar(x, y, error_bar, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter],capsize=5)
+        ax.plot(x, y, color=colors[counter], marker='o', label=label, linestyle=linestyle[counter])
+        counter += 1
+        x.clear()
+        y.clear()
+        error_bar.clear()
+
+    for key in dict_.keys():
+        pulsed_programmings_ = dict_.get(key).get(1)
+        nb_simulations = len(pulsed_programmings_)
+
+        textstr = 'Constants\n---------------\n'
+        # textstr += f'Pulse algorithm : {algorithm}\n'
+        textstr += f'Number of reading : {pulsed_programmings_[0].number_of_reading}\n'
+        textstr += f'Variability write : {pulsed_programmings_[0].variance_write * 300} %\n'
+        textstr += f'Tolerance : {pulsed_programmings_[0].tolerance} '
+        textstr += '%\n' if pulsed_programmings_[0].is_relative_tolerance else 'Ohm\n'
+        break
+    plt.figtext(0.70, 0.35, textstr, fontsize=8)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.title(f'{nb_simulations} simulations per point')
+    ax.set_ylabel('Accuracy (%)')
+    ax.set_xlabel('Tolerance (%)')
+    filename = f'accuracy_2_plot.jpg'
+    plt.tight_layout()
+    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
+
+    plt.close('all')
+    # plt.show()
