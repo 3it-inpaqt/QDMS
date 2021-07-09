@@ -80,3 +80,5 @@ class Circuit:
             g += res.g
         return g
 
+    def current_v_out(self):
+        return self.calculate_voltage(self.current_conductance())

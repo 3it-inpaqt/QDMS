@@ -119,7 +119,7 @@ def find_resistances(voltages, circuit):
 
 
 def change_resistance(resistances, circuit):
-    current_v_out = circuit.calc
+    current_v_out = circuit.calcu(circuit.current_conductance()
 
 memristor = qdms.Data_Driven()
 # find_min_max_voltage(memristor, 0.20, 1)
@@ -129,4 +129,3 @@ switch_v_in(circuit_, 0.2)
 voltages_ = find_voltages(0.01, circuit_)
 resistances_ = find_resistances(voltages_, circuit_)
 print(np.array(resistances_))
-print(1 / circuit_.calculate_conductance())
