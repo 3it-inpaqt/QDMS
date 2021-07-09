@@ -1,4 +1,5 @@
 from .Memristor import Memristor
+import copy
 
 
 class Circuit:
@@ -27,7 +28,7 @@ class Circuit:
         voltage divider. The new architecture moves the memristor in the feedback loop of an op-amp.
 
     """
-    def __init__(self, memristor_model, number_of_memristor, gain_resistance=0, v_in=0.05, R_L=1,
+    def __init__(self, memristor_model, number_of_memristor, gain_resistance=0, v_in=1e-3, R_L=1,
                  is_new_architecture=True):
         if not isinstance(memristor_model, Memristor):
             print(f'Error: memristor object <{memristor_model}> doesn\'t inherited from Memristor ABC')
@@ -38,6 +39,9 @@ class Circuit:
         self.v_in = v_in
         self.R_L = R_L
         self.is_new_architecture = is_new_architecture
+        self.list_memristor = []
+        for _ in range(number_of_memristor):
+            current_resistance.append(copy.deepcopy(memristor_model))
 
     def __str__(self):
         str_out = "Here is the current parameter list for the circuit"
@@ -69,3 +73,4 @@ class Circuit:
         else:
             voltage = conductance * self.gain_resistance * self.v_in
         return voltage
+

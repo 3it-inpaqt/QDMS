@@ -158,8 +158,6 @@ class MemristorSimulation:
 
             if self.pulsed_programming.distribution_type == 'linear':
                 j = 0
-            elif self.pulsed_programming.distribution_type == 'half_spread':
-                j = int((j + 1) % math.sqrt(self.pulsed_programming.circuit.number_of_memristor))
             elif self.pulsed_programming.distribution_type == 'full_spread':
                 j += 1
 
