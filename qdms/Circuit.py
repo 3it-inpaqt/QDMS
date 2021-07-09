@@ -41,7 +41,7 @@ class Circuit:
         self.is_new_architecture = is_new_architecture
         self.list_memristor = []
         for _ in range(number_of_memristor):
-            current_resistance.append(copy.deepcopy(memristor_model))
+            self.list_memristor.append(copy.deepcopy(memristor_model))
 
     def __str__(self):
         str_out = "Here is the current parameter list for the circuit"
