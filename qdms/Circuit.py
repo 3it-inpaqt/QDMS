@@ -74,7 +74,7 @@ class Circuit:
             voltage = conductance * self.gain_resistance * self.v_in
         return voltage
 
-    def calculate_conductance(self):
+    def current_conductance(self):
         g = 0
         for res in self.list_memristor:
             g += res.g
