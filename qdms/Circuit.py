@@ -69,7 +69,7 @@ class Circuit:
 
         """
         if self.is_new_architecture:
-            voltage = (1/conductance + self.gain_resistance) * (self.v_in / self.R_L)
+            voltage = (1/conductance) * (self.v_in / self.R_L)
         else:
             voltage = conductance * self.gain_resistance * self.v_in
         return voltage

@@ -1,5 +1,7 @@
 import qdms
 import numpy as np
+import copy
+import math
 
 
 def algorithm(voltage_min, voltage_max, resolution):
@@ -76,14 +78,30 @@ def algorithm(voltage_min, voltage_max, resolution):
 #     return flag_finish, v_in
 
 
-def switch_v_in(circuit, voltage_min):
+def switch_v_in_v_min(circuit, voltage_min):
     r_min = circuit.memristor_model.r_on
     g_max = circuit.number_of_memristor * 1 / r_min
 
     if circuit.is_new_architecture:
-        v_in = (voltage_min * circuit.R_L) / (1/g_max + circuit.gain_resistance)
+        v_in = (voltage_min * circuit.R_L) / (1/g_max)
     else:
         v_in = voltage_min / (g_max * circuit.gain_resistance)
+    circuit.v_in = v_in
+
+
+def switch_v_in(circuit, voltage_min, voltage_max):
+    r_min = circuit.memristor_model.r_on
+    r_max = circuit.memristor_model.r_off
+    g_min = circuit.number_of_memristor * 1 / r_max
+    g_max = circuit.number_of_memristor * 1 / r_min
+
+    if circuit.is_new_architecture:
+        v_in_min = (voltage_min * circuit.R_L) / (1/g_max)
+        v_in_max = (voltage_max * circuit.R_L) / (1/g_min)
+    else:
+        v_in_min = voltage_min / (g_max * circuit.gain_resistance)
+        v_in_max = voltage_max / (g_min * circuit.gain_resistance)
+    v_in = np.mean([v_in_min, v_in_max])
     circuit.v_in = v_in
 
 
@@ -97,35 +115,113 @@ def calculate_min_max_voltage(circuit):
     return voltage_min, voltage_max
 
 
-def find_voltages(resolution, circuit):
-    voltage_min, voltage_max = calculate_min_max_voltage(circuit)
-    voltages = []
-    voltage = voltage_min
-    while voltage < voltage_max:
-        voltages.append(voltage)
-        voltage += resolution
-    return voltages
-
-
-def find_resistances(voltages, circuit):
-    resistances = []
+def find_conductance(circuit, voltages):
+    conductance = []
     for voltage in voltages:
         if circuit.is_new_architecture:
-            res = (voltage * circuit.R_L) / circuit.v_in - circuit.gain_resistance
+            res = (voltage * circuit.R_L) / circuit.v_in
         else:
             res = (circuit.gain_resistance * circuit.v_in) / voltage
-        resistances.append(res)
-    return resistances
+        conductance.append(1 / res)
+    return conductance
 
 
-def change_resistance(resistances, circuit):
-    current_v_out = circuit.calcu(circuit.current_conductance()
+def change_conductance_simple(g_target, circuit, current_res=0):
+    # current_v_out = circuit.current_v_out()
+    # print(current_v_out)
+    delta_g = g_target - circuit.current_conductance()
+    circuit.list_memristor[current_res].g += delta_g
+    diff_g = circuit.list_memristor[current_res].g - 1 / circuit.list_memristor[current_res].r_off
+    if diff_g < 0:
+        circuit.list_memristor[current_res].g = 1 / circuit.list_memristor[current_res].r_off
+        if not current_res + 1 == len(circuit.list_memristor):
+            change_conductance_simple(g_target, circuit, current_res + 1)
+        else:
+            print('Impossible to get the wanted conductance')
+
+
+def find_smallest_res_change(res):
+    res = np.swapaxes(np.array(res), 0, 1)
+    minimum = []
+    for res_list in res:
+        diff = np.diff(res_list)
+        print(f'{len(diff[np.nonzero(diff)])+1} etat\t{list(res_list)}')
+        try:
+            minimum_ = np.min(diff[np.nonzero(diff)])
+        except:
+            pass
+        minimum.append(minimum_)
+    return min(minimum)
+
+
+def ask_v_max(circuit):
+    v_min, v_max = calculate_min_max_voltage(circuit)
+    voltage_max = 0
+    while v_max < voltage_max or voltage_max < v_min:
+        voltage_max = float(input(f'Voltage maximum must be between {v_min} and {v_max} (V). Enter v_max wanted: '))
+    return voltage_max
+
 
 memristor = qdms.Data_Driven()
-# find_min_max_voltage(memristor, 0.20, 1)
-# find_min_voltage(memristor, 0.2)
 circuit_ = qdms.Circuit(memristor, 9)
-switch_v_in(circuit_, 0.2)
-voltages_ = find_voltages(0.01, circuit_)
-resistances_ = find_resistances(voltages_, circuit_)
-print(np.array(resistances_))
+resolution = 0.001
+v_min = 0.115
+
+
+switch_v_in_v_min(circuit_, v_min)
+v_max = ask_v_max(circuit_)
+switch_v_in(circuit_, v_min, v_max)
+
+num = (v_max - v_min) / resolution
+voltages_ = np.linspace(v_min, v_max, num=math.ceil(num))
+conductance_ = find_conductance(circuit_, voltages_)
+resistance_ = [1 / i for i in conductance_]
+# print(len(conductance_))
+
+m = []
+# SIMPLE
+#####################
+for g in conductance_:
+    change_conductance_simple(g, circuit_)
+    print(g - circuit_.current_conductance(),[1/l.g for l in circuit_.list_memristor])
+
+# COMPLEX
+#####################
+result = []
+rotation = 0
+index = 1
+# for res in resistance_:
+#     print(res)
+#     circuit_.list_memristor[0].g = 1 / (res * 9)
+#     # for i in range(circuit_.number_of_memristor):
+#     #     circuit_.list_memristor[i].g = 1 / (res * 9)
+#     print(1/circuit_.current_conductance(), [1 / l.g for l in circuit_.list_memristor])
+#     print()
+#     index += 1
+
+
+# FINAL
+#####################
+# print(len(conductance_))
+
+
+# for g in conductance_:
+#     delta_g = (g - circuit_.current_conductance()) / 9
+#     for i in range(circuit_.number_of_memristor):
+#         circuit_.list_memristor[i].g += delta_g
+#         print(g - circuit_.current_conductance(), [1/l.g for l in circuit_.list_memristor])
+#     print()
+
+    # m.append([1/i.g for i in circuit_.list_memristor])
+
+# print(find_smallest_res_change(m))
+
+
+# nb_state = 8
+# nb_memristor = 9
+# result = list(itertools.combinations_with_replacement([i+1 for i in range(nb_state)], nb_memristor))
+# print(result)
+# print(len(result))
+
+
+# nb_state = len(conductance_)**(1/circuit_.number_of_memristor)
