@@ -148,62 +148,107 @@ def change_conductance_simple(g_target, circuit, record_, current_res=0):
             circuit.list_memristor[current_res].g = 1 / state_res
 
 
-def ask_v_max(circuit):
-    v_min, v_max = calculate_min_max_voltage(circuit)
-    voltage_max = 0
-    while v_max < voltage_max or voltage_max < v_min:
-        voltage_max = float(input(f'Voltage maximum must be between {v_min} and {v_max} (V). Enter v_max wanted: '))
-    return voltage_max
+def set_initial_g(g_target, circuit, current_res=0):
+    delta_g = g_target - circuit.current_conductance()
+    if circuit.list_memristor[current_res].g + delta_g < 1 / circuit.memristor_model.r_off:
+        circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
+        set_initial_g(g_target, circuit, current_res + 1)
+    else:
+        circuit.list_memristor[current_res].g += delta_g
+
+
+def rec(delta_g, g_target, circuit, current_res):
+    # print(1/circuit.list_memristor[current_res].g)
+
+    delta_res = 1 / (circuit.list_memristor[current_res].g + delta_g) - 1 / circuit.list_memristor[current_res].g
+    # if delta_res < 0:
+    #     print(delta_res, delta_g, current_res)
+    if abs(delta_res) < 100 and delta_res != 0:
+        adjust = 100 / delta_res
+        circuit.list_memristor[current_res].g += delta_g * adjust
+        delta_g = g_target - circuit.current_conductance()
+        rec(delta_g, g_target, circuit, current_res - 1)
+        # circuit.list_memristor[current_res - 1].g -= delta_g * adjust - delta_g
+    else:
+        circuit.list_memristor[current_res].g += delta_g
+
+
+def set_g(g_target, circuit, current_res=0):
+    delta_g = g_target - circuit.current_conductance()
+    if circuit.list_memristor[current_res].g + delta_g < 1 / circuit.memristor_model.r_off:
+        circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
+        set_g(g_target, circuit, current_res + 1)
+    else:
+        rec(delta_g, g_target, circuit, current_res)
 
 
 def ask_v_min_v_max(circuit):
     v_min, v_max = calculate_min_max_voltage(circuit)
-    voltage_max = voltage_min = 0
-    while v_max < voltage_min or voltage_min < v_min:
-        voltage_min = float(input(f'Voltage minimum must be between {v_min} and {v_max} (V). Enter v_min wanted: '))
-    while v_max < voltage_max or voltage_max < voltage_min:
-        voltage_max = float(input(f'Voltage maximum must be between {voltage_min} and {v_max} (V). Enter v_max wanted: '))
+    voltage_min = voltage_max = -1
+    while not v_min <= voltage_min <= v_max:
+        voltage_min = float(input(f'Enter v_min (must be between {v_min} and {v_max}):'))
+    while not voltage_min <= voltage_max <= v_max:
+        voltage_max = float(input(f'Enter v_max (must be between {voltage_min} and {v_max}):'))
     return voltage_min, voltage_max
 
 
-def find_all(circuit):
-    print(circuit.current_conductance())
-
 memristor_ = qdms.Data_Driven()
 circuit_ = qdms.Circuit(memristor_, 9)
-resolution = 0.0001
-
+resolution = 0.001
 v_min, v_max = ask_v_min_v_max(circuit_)
-# switch_v_in_v_min(circuit_, v_min)
-# v_max = ask_v_max(circuit_)
-# switch_v_in(circuit_, v_min, v_max)
+print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round((v_max - v_min) / resolution)} values')
 
 num = (v_max - v_min) / resolution
 voltages_ = np.linspace(v_min, v_max, num=math.ceil(num))
 conductance_ = find_conductance(circuit_, voltages_)
+resistances_ = 1 / (np.array(conductance_))
+set_initial_g(1 / resistances_[0], circuit_)
+print(resistances_[0],1/circuit_.current_conductance(),[1/i.g for i in circuit_.list_memristor])
+
+for g in list(1 / resistances_):
+    set_g(g, circuit_)
+    print(round(1 / g) ,round(1/circuit_.current_conductance()),[ round(1/i.g) for i in circuit_.list_memristor])
+    print()
+
+
+# circuit_.list_memristor[0].g += delta_g_[0]
+# print(resistances_[0],1/circuit_.current_conductance(),[1/i.g for i in circuit_.list_memristor])
+
+# memristor_ = qdms.Data_Driven()
+# circuit_ = qdms.Circuit(memristor_, 9)
+# resolution = 0.0001
+#
+# v_min, v_max = ask_v_min_v_max(circuit_)
+# switch_v_in_v_min(circuit_, v_min)
+# v_max = ask_v_max(circuit_)
+# switch_v_in(circuit_, v_min, v_max)
+
+# num = (v_max - v_min) / resolution
+# voltages_ = np.linspace(v_min, v_max, num=math.ceil(num))
+# conductance_ = find_conductance(circuit_, voltages_)
 # print(len(conductance_))
 
-find_all(circuit_)
+# find_all(circuit_)
 
-result = []
+# result = []
 # SIMPLE
 #####################
-record = {}
-for i in range(9):
-    record[i] = []
-for g in conductance_:
-    for i in range(9):
-        record[i].append(1 / circuit_.list_memristor[i].g)
-    change_conductance_simple(g, circuit_, record)
-    result.append(circuit_.current_conductance())
-for i in record.keys():
-    print([round(i) for i in record[i]])
-diff = [voltages_[i] - circuit_.calculate_voltage(result[i]) for i in range(len(conductance_))]
-counter = 0
-for i in diff:
-    if i > resolution:
-        counter += 1
-print(counter, len(diff))
+# record = {}
+# for i in range(9):
+#     record[i] = []
+# for g in conductance_:
+#     for i in range(9):
+#         record[i].append(1 / circuit_.list_memristor[i].g)
+#     change_conductance_simple(g, circuit_, record)
+#     result.append(circuit_.current_conductance())
+# for i in record.keys():
+#     print([round(i) for i in record[i]])
+# diff = [voltages_[i] - circuit_.calculate_voltage(result[i]) for i in range(len(conductance_))]
+# counter = 0
+# for i in diff:
+#     if i > resolution:
+#         counter += 1
+# print(counter, len(diff))
     # print(g - circuit_.current_conductance(),[1/l.g for l in circuit_.list_memristor])
 
 # COMPLEX
