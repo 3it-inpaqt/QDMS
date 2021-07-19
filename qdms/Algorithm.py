@@ -3,6 +3,8 @@ import numpy as np
 import copy
 import math
 import itertools
+import time
+from bisect import bisect_left
 
 
 def algorithm(voltage_min, voltage_max, resolution):
@@ -254,22 +256,57 @@ def ask_v_min_v_max(circuit):
     return voltage_min, voltage_max
 
 
+def take_closest(myList, myNumber):
+    """
+    Assumes myList is sorted. Returns closest value to myNumber.
+
+    If two numbers are equally close, return the smallest number.
+    """
+    pos = bisect_left(myList, myNumber)
+    if pos == 0:
+        return myList[0]
+    if pos == len(myList):
+        return myList[-1]
+    before = myList[pos - 1]
+    after = myList[pos]
+    if after - myNumber < myNumber - before:
+        return after
+    else:
+        return before
+
+
 memristor_ = qdms.Data_Driven()
-circuit_ = qdms.Circuit(memristor_, 4)
+circuit_ = qdms.Circuit(memristor_, 9)
 pulsed_programming_ = qdms.PulsedProgramming(circuit_, 5, distribution_type='full_spread', tolerance=1, is_relative_tolerance=True)
 pulsed_programming_.simulate()
-memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_)
+memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_, verbose=True)
 memristor_simulation_.simulate()
-for key in memristor_simulation_.voltages_memristor.keys():
-    print(f'{key}\t{memristor_simulation_.voltages_memristor.get(key)}')
+# for key in memristor_simulation_.voltages_memristor.keys():
+#     print(f'{key}\t{memristor_simulation_.voltages_memristor.get(key)}')
 
 
-resolution = 0.001
-# v_min, v_max = ask_v_min_v_max(circuit_)
-v_min = 0.4
-v_max = 0.41
-print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round((v_max - v_min) / resolution)} values')
+resolution = 0.0001
+v_min = 0.2
+v_max = 0.3
+v_min, v_max = ask_v_min_v_max(circuit_)
+voltages_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
+print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltages_target))} values')
 
+voltages = {}
+time_start = time.time()
+for voltages_t in voltages_target:
+    # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
+    v = take_closest(list(memristor_simulation_.voltages_memristor.keys()), voltages_t)
+    voltages[v] = memristor_simulation_.voltages_memristor.get(v)
+print(f'Total time {time.time() - time_start}')
+
+list_key = list(voltages.keys())
+diff = []
+for i in range(len(list_key)):
+    print(f'{list_key[i]}\t{voltages.get(list_key[i])}')
+    diff.append(list_key[i] - voltages_target[i])
+print(f'Max diff: {max(diff)} (V)\tPercentage of diff: {max(diff) / resolution * 100} %')
+print(f'Mean diff: {np.mean(diff)} (V)\tPercentage of diff: {np.mean(diff) / resolution * 100} %')
 
 
 # record_ = {}
@@ -292,8 +329,6 @@ print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which giv
 #
 # for key in record_.keys():
 #     print([round(res) for res in record_.get(key)])
-
-
 
 
 # circuit_.list_memristor[0].g += delta_g_[0]

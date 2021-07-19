@@ -241,15 +241,16 @@ class PulsedProgramming:
         for j in range(number_of_iteration):
             for i in range(self.nb_states):
                 res_state_temp = self.res_states[j]
+                target_res = res_state_temp[i_state]
                 if self.pulse_algorithm == 'fabien':
-                    self.fabien_convergence(i, res_state_temp, self.max_pulse)
+                    self.fabien_convergence(target_res, self.max_pulse)
                 elif self.pulse_algorithm == 'log':
-                    self.log_convergence(i, res_state_temp, self.max_pulse)
+                    self.log_convergence(target_res, self.max_pulse)
                 self.res_states_practical[j][i] = (self.graph_resistance[-1][0])
             self.circuit.memristor_model.g = 1 / self.circuit.memristor_model.r_on
         return self.res_states_practical
 
-    def log_convergence(self, i_state, res_states, max_pulse):
+    def log_convergence(self, target_res, max_pulse):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
         for the i_state.
@@ -276,7 +277,6 @@ class PulsedProgramming:
         max_shift = 0.2
         a = 0.1
 
-        target_res = res_states[i_state]
         if self.is_relative_tolerance:
             res_max = target_res + self.tolerance * target_res / 100
             res_min = target_res - self.tolerance * target_res / 100
@@ -334,7 +334,7 @@ class PulsedProgramming:
             current_res = self.circuit.memristor_model.read()
             r_shift = abs(current_res - previous_res) if abs(current_res - previous_res) != 0 else 1
 
-    def fabien_convergence(self, i_state, res_states, max_pulse):
+    def fabien_convergence(self, target_res, max_pulse):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
         for the i_state.
@@ -342,11 +342,8 @@ class PulsedProgramming:
 
         Parameters
         ----------
-        i_state : int
-            The target state to find.
-
-        res_states : iterable[float]
-            List of target resistance.
+        target_res : float
+            The target resistance (Ohm)
 
         max_pulse : int
             The max number of pulses.
@@ -357,7 +354,6 @@ class PulsedProgramming:
         step = 0.005
         positive_voltage = voltage_set = 0.5
         negative_voltage = voltage_reset = -0.5
-        target_res = res_states[i_state]
         if self.is_relative_tolerance:
             res_max = target_res + self.tolerance * target_res / 100
             res_min = target_res - self.tolerance * target_res / 100
