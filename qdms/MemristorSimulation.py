@@ -164,7 +164,7 @@ class MemristorSimulation:
                 j += 1
         print(current_res)
         for i in range(self.pulsed_programming.circuit.number_of_memristor):
-            self.pulsed_programming.circuit.list_memristor[i] = current_res[i]
+            self.pulsed_programming.circuit.list_memristor[i].g = 1 / current_res[i]
         voltage = self.pulsed_programming.circuit.calculate_voltage(conductance)
         self.voltages_memristor[voltage] = [1/i.g for i in self.pulsed_programming.circuit.list_memristor]
         self.voltages.append(voltage)
