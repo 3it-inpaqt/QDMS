@@ -163,6 +163,8 @@ class MemristorSimulation:
             elif self.pulsed_programming.distribution_type == 'full_spread':
                 j += 1
         print(current_res)
+        for i in range(len(self.pulsed_programming.circuit.number_of_memristor)):
+            self.pulsed_programming.circuit.list_memristor[i] = current_res[i]
         voltage = self.pulsed_programming.circuit.calculate_voltage(conductance)
         self.voltages_memristor[voltage] = [1/i.g for i in self.pulsed_programming.circuit.list_memristor]
         self.voltages.append(voltage)
