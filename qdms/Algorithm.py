@@ -260,7 +260,6 @@ pulsed_programming_ = qdms.PulsedProgramming(circuit_, 5, distribution_type='ful
 pulsed_programming_.simulate()
 memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_)
 memristor_simulation_.simulate()
-print(memristor_simulation_.list_resistance)
 print(memristor_simulation_.voltages_memristor)
 
 
