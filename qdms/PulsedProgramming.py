@@ -240,8 +240,7 @@ class PulsedProgramming:
 
         for j in range(number_of_iteration):
             for i in range(self.nb_states):
-                res_state_temp = self.res_states[j]
-                target_res = res_state_temp[i_state]
+                target_res = self.res_states[j][i]
                 if self.pulse_algorithm == 'fabien':
                     self.fabien_convergence(target_res, self.max_pulse)
                 elif self.pulse_algorithm == 'log':
