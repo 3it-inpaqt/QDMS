@@ -149,6 +149,7 @@ class MemristorSimulation:
         ----------
 
         """
+        current_res = []
         conductance = 0
         j = 0
         for i in current_states:
@@ -156,12 +157,12 @@ class MemristorSimulation:
                 conductance += list_resistance[j][i]
             else:
                 conductance += 1 / list_resistance[j][i]
-
+            current_res.append(list_resistance[j][i])
             if self.pulsed_programming.distribution_type == 'linear':
                 j = 0
             elif self.pulsed_programming.distribution_type == 'full_spread':
                 j += 1
-
+        print(current_res)
         voltage = self.pulsed_programming.circuit.calculate_voltage(conductance)
         self.voltages_memristor[voltage] = [1/i.g for i in self.pulsed_programming.circuit.list_memristor]
         self.voltages.append(voltage)
