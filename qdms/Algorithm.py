@@ -157,29 +157,91 @@ def set_initial_g(g_target, circuit, current_res=0):
         circuit.list_memristor[current_res].g += delta_g
 
 
-def rec(delta_g, g_target, circuit, current_res):
+def rec(g_target, circuit, record, current_res):
     # print(1/circuit.list_memristor[current_res].g)
-
-    delta_res = 1 / (circuit.list_memristor[current_res].g + delta_g) - 1 / circuit.list_memristor[current_res].g
+    delta_g = g_target - circuit.current_conductance()
+    delta_res = (1 / (circuit.list_memristor[current_res].g + delta_g)) - record.get(current_res)[-1]
     # if delta_res < 0:
-    #     print(delta_res, delta_g, current_res)
+    #     print(round(record.get(current_res)[-1]), round(1 / (circuit.list_memristor[current_res].g + delta_g)), round(delta_res), current_res)
     if abs(delta_res) < 100 and delta_res != 0:
         adjust = 100 / delta_res
         circuit.list_memristor[current_res].g += delta_g * adjust
-        delta_g = g_target - circuit.current_conductance()
-        rec(delta_g, g_target, circuit, current_res - 1)
+        rec(g_target, circuit, record, current_res - 1)
         # circuit.list_memristor[current_res - 1].g -= delta_g * adjust - delta_g
     else:
         circuit.list_memristor[current_res].g += delta_g
 
 
-def set_g(g_target, circuit, current_res=0):
+def set_g(g_target, circuit, record, current_res=0):
     delta_g = g_target - circuit.current_conductance()
     if circuit.list_memristor[current_res].g + delta_g < 1 / circuit.memristor_model.r_off:
         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-        set_g(g_target, circuit, current_res + 1)
+        set_g(g_target, circuit, record, current_res + 1)
     else:
-        rec(delta_g, g_target, circuit, current_res)
+        rec(g_target, circuit, record, current_res)
+
+
+def set_g_2(g_target, circuit, record, current_res):
+    delta_g = g_target - circuit.current_conductance()
+    final_res = 1 / (circuit.list_memristor[current_res].g + delta_g)
+    delta_res = final_res - record.get(current_res)[-1]
+
+    if delta_res > 100:
+        print(f'Big delta res\t\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+        if final_res < circuit.memristor_model.r_off:
+            circuit.list_memristor[current_res].g += delta_g
+        else:
+            circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
+            set_g_2(g_target, circuit, record, current_res + 1)
+
+    elif 10 < delta_res < 100:
+        print(f'Little delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+        adjust = 100 / delta_res
+        if circuit.list_memristor[current_res].g + delta_g * adjust < circuit.memristor_model.r_off:
+            circuit.list_memristor[current_res].g += delta_g * adjust
+            set_g_2(g_target, circuit, record, current_res - 1)
+
+    elif -10 < delta_res < 10:
+        print(f'LITTLE delta res, skip\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+
+
+    #     else:
+    #         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
+    #         balance()
+    #         set_g_2(g_target, circuit, record, current_res)
+
+    # elif -100 <= delta_res < 0:
+    #     print(f'Little minus delta res\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+    #
+    # elif delta_res < -100:
+    # elif delta_res < 0:
+    #     print(f'Big minus delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+    #     if final_res > circuit.memristor_model.r_on:
+    #         circuit.list_memristor[current_res].g += delta_g
+    #     else:
+    #         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_on
+    #         set_g_2(g_target, circuit, record, current_res - 1)
+    # #
+
+    # if delta_res < 100 and delta_res != 0 and final_res <= circuit.memristor_model.r_off:
+    #     adjust = 100 / delta_res
+    #     final_res = 1 / (circuit.list_memristor[current_res].g + delta_g * adjust)
+    #     delta_res = final_res - record.get(current_res)[-1]
+    #     if final_res > circuit.memristor_model.r_off:
+    #         print(final_res)
+    #     circuit.list_memristor[current_res].g += delta_g * adjust
+    #     circuit.list_memristor[current_res - 1].g -= delta_g * adjust
+    # else:
+    #     circuit.list_memristor[current_res].g += delta_g
+
+
+def find_current_res(circuit):
+    counter = 0
+    for res in circuit.list_memristor:
+        if 1 / res.g < res.r_off:
+            return counter
+        counter += 1
+    return -1
 
 
 def ask_v_min_v_max(circuit):
@@ -193,23 +255,39 @@ def ask_v_min_v_max(circuit):
 
 
 memristor_ = qdms.Data_Driven()
-circuit_ = qdms.Circuit(memristor_, 9)
+circuit_ = qdms.Circuit(memristor_, 4)
+pulsed_programming_ = qdms.PulsedProgramming(circuit_, 5, distribution_type='full_spread')
+pulsed_programming_.simulate()
+memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_)
+memristor_simulation_.simulate()
+
+
 resolution = 0.001
-v_min, v_max = ask_v_min_v_max(circuit_)
+# v_min, v_max = ask_v_min_v_max(circuit_)
+v_min = 0.4
+v_max = 0.41
 print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round((v_max - v_min) / resolution)} values')
 
+record_ = {}
 num = (v_max - v_min) / resolution
 voltages_ = np.linspace(v_min, v_max, num=math.ceil(num))
 conductance_ = find_conductance(circuit_, voltages_)
 resistances_ = 1 / (np.array(conductance_))
 set_initial_g(1 / resistances_[0], circuit_)
 print(resistances_[0],1/circuit_.current_conductance(),[1/i.g for i in circuit_.list_memristor])
-
+for i in range(circuit_.number_of_memristor):
+    record_[i] = [1/circuit_.list_memristor[i].g]
 for g in list(1 / resistances_):
-    set_g(g, circuit_)
+    # set_g(g, circuit_, record_)
+    current_res = find_current_res(circuit_)
+    set_g_2(g, circuit_, record_, current_res)
+    for key in range(len(record_.keys())):
+        record_[key].append(1 / circuit_.list_memristor[key].g)
     print(round(1 / g) ,round(1/circuit_.current_conductance()),[ round(1/i.g) for i in circuit_.list_memristor])
     print()
 
+for key in record_.keys():
+    print([round(res) for res in record_.get(key)])
 
 # circuit_.list_memristor[0].g += delta_g_[0]
 # print(resistances_[0],1/circuit_.current_conductance(),[1/i.g for i in circuit_.list_memristor])

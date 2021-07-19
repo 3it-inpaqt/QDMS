@@ -44,6 +44,7 @@ class MemristorSimulation:
         self.pulsed_programming = pulsed_programming
         self.is_using_conductance = is_using_conductance
         self.voltages = []
+        self.voltages_memristor = {}
         self.resistances = []
         self.verbose = verbose
         self.resolution = 0
@@ -162,6 +163,7 @@ class MemristorSimulation:
                 j += 1
 
         voltage = self.pulsed_programming.circuit.calculate_voltage(conductance)
+        self.voltages_memristor[voltage] = [1/i.g for i in self.pulsed_programming.circuit.list_memristor]
         self.voltages.append(voltage)
         self.resistances.append(1 / conductance)
 
