@@ -260,7 +260,9 @@ pulsed_programming_ = qdms.PulsedProgramming(circuit_, 5, distribution_type='ful
 pulsed_programming_.simulate()
 memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_)
 memristor_simulation_.simulate()
-print(memristor_simulation_.voltages_memristor)
+memristor_simulation_.voltages_memristor = {k:memristor_simulation_.voltages_memristor[k] for k in sorted(memristor_simulation_.voltages_memristor)}
+for key in memristor_simulation_.voltages_memristor.keys():
+    print(f'{key}\t{memristor_simulation_.voltages_memristor.get(key)}')
 
 
 resolution = 0.001
