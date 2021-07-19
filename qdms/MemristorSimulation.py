@@ -122,8 +122,7 @@ class MemristorSimulation:
         self.resolution = np.mean(np.diff(self.voltages))
         self.std = np.std(np.diff(self.voltages))
 
-        memristor_simulation_.voltages_memristor = {k: memristor_simulation_.voltages_memristor[k] for k in
-                                                    sorted(memristor_simulation_.voltages_memristor)}
+        self.voltages_memristor = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
 
         return self.voltages
 
