@@ -45,7 +45,6 @@ class MemristorSimulation:
         self.is_using_conductance = is_using_conductance
         self.voltages = []
         self.voltages_memristor = {}
-        self.resistances = []
         self.verbose = verbose
         self.resolution = 0
         self.std = 0
@@ -114,16 +113,8 @@ class MemristorSimulation:
             # print(f'Simulation timer loop_rec: {self.timers[0]} s')
         if self.verbose:
             timer_start = time.time()
-        temp = []
-        for index in range(len(self.voltages)):
-            temp.append([self.voltages[index], self.resistances[index]])
-        temp = list(np.unique(temp, axis=0))
-        self.voltages, self.resistances = zip(*temp)
-        self.voltages = list(self.voltages)
-        self.resistances = list(self.resistances)
 
-        # self.voltages = list(np.unique(self.voltages))
-        # self.resistances = list(np.unique(self.resistances))
+        self.voltages = list(np.unique(self.voltages))
         if self.verbose:
             timer_end = time.time()
             self.timers.append(timer_end-timer_start)
@@ -150,7 +141,6 @@ class MemristorSimulation:
 
         """
         current_res = []
-        conductance = 0
         j = 0
         for i in current_states:
             current_res.append(list_resistance[j][i])
@@ -164,7 +154,6 @@ class MemristorSimulation:
         voltage = self.pulsed_programming.circuit.current_v_out()
         self.voltages_memristor[voltage] = [1/i.g for i in self.pulsed_programming.circuit.list_memristor]
         self.voltages.append(voltage)
-        self.resistances.append(1 / conductance)
 
     def loop_rec(self, list_resistance, counter, current_states):
         """
