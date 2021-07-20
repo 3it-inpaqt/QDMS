@@ -92,7 +92,6 @@ class MemristorSimulation:
         self.start_inner_loop_rec = 0
         self.end_loop_rec = 0
         self.end_inner_loop_rec = 0
-        self.list_resistance = []
 
     def __str__(self):
         str_out = "Here is the current parameter list for the memristor simulation"
@@ -168,7 +167,6 @@ class MemristorSimulation:
             res_states = [[int(lrs + i * ((hrs - lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
         elif self.distribution_type == 'full_spread':
             res_states = spread_resistor_list(lrs, hrs, self.nb_states, self.circuit.number_of_memristor)
-        print(res_states)
         return res_states
 
     def add_voltage(self, list_resistance, current_states):
