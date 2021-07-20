@@ -163,6 +163,7 @@ class PulsedProgramming:
 
         for key in voltage_target.keys():
             for conf in voltage_target.get(key):
+                print(conf)
                 self.simulate_list_memristor(conf)
 
     def simulate_list_memristor(self, list_resistance):
