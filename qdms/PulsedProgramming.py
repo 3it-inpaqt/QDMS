@@ -144,7 +144,7 @@ class PulsedProgramming:
             number_iteration = self.circuit.number_of_memristor
         return number_iteration
 
-    def simulate(self, voltage_target):
+    def simulate(self, voltages_target):
         """
         This function find all practical resistance (Ohm) depending on the states using fabien_convergence.
         The output is stored in self.res_states_practical
@@ -161,8 +161,17 @@ class PulsedProgramming:
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
 
-        for key in voltage_target.keys():
-            self.simulate_list_memristor(voltage_target.get(key))
+        index = 0
+        start_time = time.time()
+        for key in voltages_target.keys():
+            if index == 0:
+                start_time_ = time.time()
+            pulsed_programming.simulate_list_memristor(voltages_target.get(key))
+            if index == 50:
+                print(f'{time.time() - start_time_} s')
+                index = -1
+            index += 1
+        print(f'Total time: {time.time() - start_time}')
 
     def simulate_list_memristor(self, list_resistance):
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
