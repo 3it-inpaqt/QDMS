@@ -29,7 +29,7 @@ def algorithm(resolution, memristor_simulation):
         diff.append(list(voltages.keys())[i] - voltage_target[i])
     print(f'Max diff: {max(diff)} (V)\tPercentage of diff: {max(diff) / resolution * 100} %')
     print(f'Mean diff: {np.mean(diff)} (V)\tPercentage of diff: {np.mean(diff) / resolution * 100} %')
-
+    print()
     return voltages
 
 

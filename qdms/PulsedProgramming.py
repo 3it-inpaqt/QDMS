@@ -175,6 +175,7 @@ class PulsedProgramming:
                 index = 0
             index += 1
         print(f'Total time: {time.time() - start_time}')
+        print()
 
     def simulate_list_memristor(self, list_resistance):
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
