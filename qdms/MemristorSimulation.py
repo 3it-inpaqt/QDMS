@@ -78,8 +78,8 @@ class MemristorSimulation:
         if not isinstance(circuit, Circuit):
             print(f'Error: circuit object is not from Circuit class.')
             exit(1)
-        if self.distribution_type != 'full_spread' and self.distribution_type != 'linear' and self.distribution_type != 'half_spread':
-            print(f"Error: distribution type <{self.pulsed_programming.distribution_type}> invalid")
+        if distribution_type != 'full_spread' and distribution_type != 'linear' and distribution_type != 'half_spread':
+            print(f"Error: distribution type <{distribution_type}> invalid")
             exit(1)
         self.circuit = circuit
         self.nb_states = nb_states
