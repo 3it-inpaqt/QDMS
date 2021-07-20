@@ -2,43 +2,6 @@ import numpy as np
 import math
 
 
-def spread_resistor_list(lrs, hrs, nb_states, number):
-    """
-    This function help the create_res_states() function
-
-    Parameters
-    ----------
-    number : int
-        The number of distribution to create
-
-    lrs : float
-        Low Resistance State (LRS) (Ohm)
-
-    hrs : float
-         High Resistance State (HRS) (Ohm)
-
-    nb_states : int
-        The number of states used to program the memristor.
-
-    Returns
-    ----------
-    list_resistor : iterable[float]
-        list of resistor (Ohm)
-
-    """
-    list_resistor = []
-    for j in range(number):
-        # This equation can be optimized. It create a number of different resistance values.
-        temp = [int(lrs + i * ((hrs -
-                lrs) / (nb_states - 1)) +
-                ((-1) ** j) * ((j + 1) // 2) * ((hrs - lrs)
-                / ((nb_states - 1) * 4 * 2))) for i in range(nb_states)]
-        temp[0] = lrs
-        temp[-1] = hrs
-        list_resistor.append(temp)
-    return list_resistor
-
-
 class PulsedProgramming:
     """
     This class contains all the parameters for the Pulsed programming on a memristor model.
@@ -116,11 +79,12 @@ class PulsedProgramming:
         self.tolerance = tolerance
         self.max_voltage = max_voltage
         self.is_relative_tolerance = is_relative_tolerance
-        self.index_variability = 0
         self.variance_write = variance_write
-        self.variability_write = np.random.normal(0, variance_write, 1000)
         self.number_of_reading = number_of_reading
         self.max_pulse = max_pulse
+
+        self.index_variability = 0
+        self.variability_write = np.random.normal(0, variance_write, 1000)
 
         self.graph_resistance = []
         self.graph_voltages = []
@@ -199,15 +163,9 @@ class PulsedProgramming:
         if self.distribution_type != 'full_spread' and self.distribution_type != 'linear' and self.distribution_type != 'half_spread':
             print(f"Error: distribution type <{self.pulsed_programming.distribution_type}> invalid")
             exit(1)
-        if self.distribution_type == 'half_spread' and not is_square(self.circuit.number_of_memristor):
-            print(f'Error: distribution type <half_spread> is not compatible with <{self.circuit.number_of_memristor}> memristors')
-            exit(1)
 
         number_of_iteration = self.find_number_iteration()
         self.res_states_practical = [[None for _ in range(self.nb_states)] for _ in range(number_of_iteration)]
-
-        # temp = np.linspace(self.nb_states-1, 0, num=self.nb_states)
-        # temp = [int(i) for i in temp]
 
         for j in range(number_of_iteration):
             for i in range(self.nb_states):
@@ -220,7 +178,14 @@ class PulsedProgramming:
             self.circuit.memristor_model.g = 1 / self.circuit.memristor_model.r_on
         return self.res_states_practical
 
-    def log_convergence(self, target_res, max_pulse):
+    def simulate_list_memristor(self, list_resistance):
+        for i in range(len(self.memristor_simulation.circuit.list_memristor)):
+            if self.pulse_algorithm == 'fabien':
+                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
+            elif self.pulse_algorithm == 'log':
+                self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
+
+    def log_convergence(self, memristor, target_res):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
         for the i_state.
@@ -259,10 +224,8 @@ class PulsedProgramming:
         flag_finish = False
         counter_read = 0
 
-        # is_setting = False
-
         r_shift = 1
-        current_res = self.circuit.memristor_model.read()
+        current_res = memristor.read()
         while not flag_finish:
             if res_min < current_res < res_max:
                 action = 'read'
@@ -271,29 +234,29 @@ class PulsedProgramming:
 
             elif current_res > res_max:
                 action = 'set'
-                if r_shift < min_shift * (self.circuit.memristor_model.r_off - self.circuit.memristor_model.r_on):
+                if r_shift < min_shift * (memristor.r_off - memristor.r_on):
                     positive_voltage += a * np.log10(abs(target_res - current_res) / r_shift)
-                elif r_shift > max_shift * (self.circuit.memristor_model.r_off - self.circuit.memristor_model.r_on):
+                elif r_shift > max_shift * (memristor.r_off - memristor.r_on):
                     positive_voltage = voltage_set
                 if self.max_voltage != 0:
                     positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage else positive_voltage
-                self.write_resistance(self.circuit.memristor_model, positive_voltage, 200e-9)
+                self.write_resistance(memristor, positive_voltage, 200e-9)
                 self.graph_voltages.append([positive_voltage, counter, action])
 
             elif current_res < res_min:
                 action = 'reset'
-                if r_shift < min_shift * (self.circuit.memristor_model.r_off - self.circuit.memristor_model.r_on):
+                if r_shift < min_shift * (memristor.r_off - memristor.r_on):
                     negative_voltage -= a * np.log10(abs((target_res - current_res) / r_shift))
-                elif r_shift > max_shift * (self.circuit.memristor_model.r_off - self.circuit.memristor_model.r_on):
+                elif r_shift > max_shift * (memristor.r_off - memristor.r_on):
                     negative_voltage = voltage_reset
                 if self.max_voltage != 0:
                     negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
-                self.write_resistance(self.circuit.memristor_model, negative_voltage, 200e-9)
+                self.write_resistance(memristor, negative_voltage, 200e-9)
                 self.graph_voltages.append([negative_voltage, counter, action])
 
             if counter_read == self.number_of_reading:
                 flag_finish = not flag_finish
-            if counter >= max_pulse:
+            if counter >= self.max_pulse:
                 flag_finish = not flag_finish
                 print('Got max pulse')
 
@@ -301,10 +264,10 @@ class PulsedProgramming:
             counter += 1
 
             previous_res = current_res
-            current_res = self.circuit.memristor_model.read()
+            current_res = memristor.read()
             r_shift = abs(current_res - previous_res) if abs(current_res - previous_res) != 0 else 1
 
-    def fabien_convergence(self, target_res, max_pulse):
+    def fabien_convergence(self, memristor, target_res):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
         for the i_state.
@@ -337,7 +300,7 @@ class PulsedProgramming:
         counter_read = 0
 
         while not flag_finish:
-            current_res = self.circuit.memristor_model.read()
+            current_res = memristor.read()
 
             if res_min <= current_res <= res_max:
                 action = 'read'
@@ -347,7 +310,7 @@ class PulsedProgramming:
                 action = 'reset'
                 if self.max_voltage != 0:
                     negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
-                self.write_resistance(self.circuit.memristor_model, negative_voltage, 200e-9)
+                self.write_resistance(memristor, negative_voltage, 200e-9)
                 self.graph_voltages.append([negative_voltage, counter, action])
                 negative_voltage -= step
                 positive_voltage = voltage_set
@@ -355,14 +318,14 @@ class PulsedProgramming:
                 action = 'set'
                 if self.max_voltage != 0:
                     positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage  else positive_voltage
-                self.write_resistance(self.circuit.memristor_model, positive_voltage, 200e-9)
+                self.write_resistance(memristor, positive_voltage, 200e-9)
                 self.graph_voltages.append([positive_voltage, counter, action])
                 positive_voltage += step
                 negative_voltage = voltage_reset
 
             if counter_read == self.number_of_reading:
                 flag_finish = not flag_finish
-            if counter >= max_pulse:
+            if counter >= self.max_pulse:
                 flag_finish = not flag_finish
                 print('Got max pulse')
             self.graph_resistance.append([current_res, counter, action, flag_finish])
