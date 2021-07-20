@@ -146,6 +146,8 @@ class MemristorSimulation:
             self.timers.append(timer_end-timer_start)
 
         self.voltages_memristor = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
+        for i in self.circuit.list_memristor:
+            i.g = 1 / i.r_on
 
     def create_res_states(self):
         """
