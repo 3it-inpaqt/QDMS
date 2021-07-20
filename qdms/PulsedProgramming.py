@@ -169,7 +169,7 @@ class PulsedProgramming:
             if index == 1:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target.get(key))
-            print(f'Diff with key: {(key - self.memristor_simulation.circuit.current_v_out())/0.0001}')
+            print(f'Diff with key: {round((key - self.memristor_simulation.circuit.current_v_out())/0.0001 * 100, 2)} %')
             if index == 50:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
