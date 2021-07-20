@@ -165,15 +165,12 @@ class PulsedProgramming:
             self.simulate_list_memristor(voltage_target.get(key))
 
     def simulate_list_memristor(self, list_resistance):
-        print(list_resistance)
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
-            print(list_resistance[i])
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
             elif self.pulse_algorithm == 'log':
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
-        print()
-
+            print(1 / self.memristor_simulation.circuit.list_memristor[i].g - list_resistance[i])
     def log_convergence(self, memristor, target_res):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
