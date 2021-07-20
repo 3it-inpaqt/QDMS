@@ -162,9 +162,7 @@ class PulsedProgramming:
             exit(1)
 
         for key in voltage_target.keys():
-            for conf in voltage_target.get(key):
-                print(conf)
-                self.simulate_list_memristor(conf)
+            self.simulate_list_memristor(voltage_target.get(key))
 
     def simulate_list_memristor(self, list_resistance):
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
