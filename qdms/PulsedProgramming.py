@@ -160,9 +160,6 @@ class PulsedProgramming:
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
-        if self.distribution_type != 'full_spread' and self.distribution_type != 'linear' and self.distribution_type != 'half_spread':
-            print(f"Error: distribution type <{self.pulsed_programming.distribution_type}> invalid")
-            exit(1)
 
         for key in voltage_target.keys():
             for conf in voltage_target.get(key):
