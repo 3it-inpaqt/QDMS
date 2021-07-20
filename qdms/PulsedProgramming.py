@@ -170,7 +170,7 @@ class PulsedProgramming:
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
             elif self.pulse_algorithm == 'log':
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
-            print(1 / self.memristor_simulation.circuit.list_memristor[i].g - list_resistance[i])
+
     def log_convergence(self, memristor, target_res):
         """
         This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
