@@ -109,16 +109,10 @@ class PulsedProgramming:
         The max number of pulses.
     """
 
-    def __init__(self, circuit, nb_states, pulse_algorithm='fabien', distribution_type='linear', max_voltage=0,
-                 tolerance=0, is_relative_tolerance=False, variance_write=0, lrs=None, hrs=None, number_of_reading=1, max_pulse=20000):
-        self.circuit = circuit
-        self.nb_states = nb_states
-        self.distribution_type = distribution_type
+    def __init__(self, memristor_simulation, pulse_algorithm='fabien', max_voltage=0, tolerance=0, is_relative_tolerance=False,
+                 variance_write=0, number_of_reading=1, max_pulse=20000):
+        self.memristor_simulation = memristor_simulation
         self.pulse_algorithm = pulse_algorithm
-        self.lrs = lrs if lrs is not None else circuit.memristor_model.r_on
-        self.hrs = hrs if hrs is not None else circuit.memristor_model.r_off
-        self.res_states = self.create_res_states()
-        self.res_states_practical = []
         self.tolerance = tolerance
         self.max_voltage = max_voltage
         self.is_relative_tolerance = is_relative_tolerance
@@ -166,29 +160,6 @@ class PulsedProgramming:
 
         self.index_variability = self.index_variability + 1 if self.index_variability < len(self.variability_write) - 1 else 0
         memristor.g = 1 / (1 / memristor.g + (1 / memristor.g) * self.variability_write[self.index_variability])
-
-    def create_res_states(self):
-        """
-        This function creates the theoretical resistance distribution according to the distribution_type.
-
-        Parameters
-        ----------
-
-        Returns
-        ----------
-        res_states : list of list of float
-            list of resistor (Ohm)
-
-        """
-        res_states = []
-        if self.distribution_type == 'linear':
-            res_states = [[int(self.lrs + i * ((self.hrs - self.lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
-        elif self.distribution_type == 'half_spread':
-            res_states = spread_resistor_list(self.lrs, self.hrs, self.nb_states,
-                                              int(math.sqrt(self.circuit.number_of_memristor)))
-        elif self.distribution_type == 'full_spread':
-            res_states = spread_resistor_list(self.lrs, self.hrs, self.nb_states, self.circuit.number_of_memristor)
-        return res_states
 
     def find_number_iteration(self):
         """

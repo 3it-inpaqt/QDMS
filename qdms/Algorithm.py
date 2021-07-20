@@ -7,15 +7,11 @@ import time
 from bisect import bisect_left
 
 
-def algorithm(voltage_min, voltage_max, resolution):
+def algorithm(resolution, memristor_simulation):
     """
 
     Parameters
-    ----------
-    voltage_min : float
-        Minimum voltage for the stability diagram.
-    voltage_max : float
-        Maximum voltage for the stability diagram.
+    ----------.
     resolution : flaot
         Resolution of the stability diagram.
 
@@ -25,60 +21,21 @@ def algorithm(voltage_min, voltage_max, resolution):
         List of all the parameters needed to get a stability diagram with the input parameters.
 
     """
+    v_min, v_max = ask_v_min_v_max(circuit_)
+    voltage_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
+    print(
+        f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
+    voltage_table = list(memristor_simulation.voltages_memristor.keys())
+    voltages = find_correspondence(voltage_target, voltage_table)
 
-    return
+    diff = []
+    for i in range(len(list(voltages.keys()))):
+        print(f'{list(voltages.keys())[i]}\t{np.sort([round(i) for i in voltages.get(list(voltages.keys())[i])])}')
+        diff.append(list(voltages.keys())[i] - voltage_target[i])
+    print(f'Max diff: {max(diff)} (V)\tPercentage of diff: {max(diff) / resolution_ * 100} %')
+    print(f'Mean diff: {np.mean(diff)} (V)\tPercentage of diff: {np.mean(diff) / resolution_ * 100} %')
 
-
-# def find_min_max_voltage(memristor, target_voltage_min, target_voltage_max):
-#     v_in = 1e-3
-#     nb_memristor = 9
-#     flag_finish = False
-#     nb_iteration = 0
-#     while not flag_finish and nb_iteration < 1000:
-#         circuit = qdms.Circuit(memristor, nb_memristor, v_in=v_in)
-#         voltage_min, voltage_max = calculate_min_max_voltage(circuit)
-#         flag_finish, v_in = evaluate_finish(voltage_min, voltage_max, target_voltage_min, target_voltage_max, v_in)
-#         nb_iteration += 1
-#     return
-#
-#
-# def find_min_voltage(memristor, target_voltage_min):
-#     v_in = 1e-3
-#     nb_memristor = 9
-#     flag_finish = False
-#     nb_iteration = 0
-#     p_found_min = False
-#     while not flag_finish and nb_iteration < 1000:
-#         circuit = qdms.Circuit(memristor, nb_memristor, v_in=v_in)
-#         voltage_min, voltage_max = calculate_min_max_voltage(circuit)
-#         found_min = True if voltage_min < target_voltage_min else False
-#
-#         if found_min and not p_found_min:
-#             pass
-#         if found_min:
-#             v_in += v_in / 10
-#
-#         nb_iteration += 1
-#         p_found_min = found_min
-#     return
-
-#
-# def evaluate_finish(voltage_min, voltage_max, target_voltage_min, target_voltage_max, v_in):
-#     found_min = True if voltage_min < target_voltage_min else False
-#     found_max = True if voltage_max > target_voltage_max else False
-#     flag_finish = False
-#     if found_max and found_min:
-#         print(f'Found value!\tmin: {round(voltage_min, 3)}\tmax: {round(voltage_max, 3)}\twith v_in: {v_in}')
-#         flag_finish = True
-#     elif found_min:
-#         v_in += v_in/10
-#     elif found_max:
-#         v_in -= v_in/10
-#     else:
-#         print('Target value to large')
-#         flag_finish = True
-#     print(f'min: {round(voltage_min, 3)}\tmax: {round(voltage_max, 3)}\tv_in: {round(v_in, 5)}\tflag_finish: {flag_finish}')
-#     return flag_finish, v_in
+    return voltages
 
 
 def switch_v_in_v_min(circuit, voltage_min):
@@ -180,7 +137,8 @@ def set_g(g_target, circuit, record, current_res=0):
         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
         set_g(g_target, circuit, record, current_res + 1)
     else:
-        rec(g_target, circuit, record, current_res)
+        # rec(g_target, circuit, record, current_res)
+        circuit.list_memristor[current_res].g += delta_g
 
 
 def set_g_2(g_target, circuit, record, current_res):
@@ -207,23 +165,22 @@ def set_g_2(g_target, circuit, record, current_res):
         print(f'LITTLE delta res, skip\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
 
 
-    #     else:
-    #         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-    #         balance()
-    #         set_g_2(g_target, circuit, record, current_res)
+        # else:
+        #     circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
+        #     balance()
+        #     set_g_2(g_target, circuit, record, current_res)
 
-    # elif -100 <= delta_res < 0:
-    #     print(f'Little minus delta res\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+    elif -100 <= delta_res < 0:
+        print(f'Little minus delta res\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+
+    elif delta_res < -100:
+        print(f'Big minus delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
+        if final_res > circuit.memristor_model.r_on:
+            circuit.list_memristor[current_res].g += delta_g
+        else:
+            circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_on
+            set_g_2(g_target, circuit, record, current_res - 1)
     #
-    # elif delta_res < -100:
-    # elif delta_res < 0:
-    #     print(f'Big minus delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-    #     if final_res > circuit.memristor_model.r_on:
-    #         circuit.list_memristor[current_res].g += delta_g
-    #     else:
-    #         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_on
-    #         set_g_2(g_target, circuit, record, current_res - 1)
-    # #
 
     # if delta_res < 100 and delta_res != 0 and final_res <= circuit.memristor_model.r_off:
     #     adjust = 100 / delta_res
@@ -275,38 +232,26 @@ def take_closest(myList, myNumber):
         return before
 
 
+def find_correspondence(voltage_target, voltage_table):
+    voltages = {}
+    time_start = time.time()
+    for voltage_t in voltage_target:
+        # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
+        v = take_closest(voltage_table, voltage_t)
+        voltages[v] = memristor_simulation_.voltages_memristor.get(v)
+    print(f'Total time {time.time() - time_start}')
+    return voltages
+
+
 memristor_ = qdms.Data_Driven()
 circuit_ = qdms.Circuit(memristor_, 9)
 pulsed_programming_ = qdms.PulsedProgramming(circuit_, 5, distribution_type='full_spread', tolerance=1, is_relative_tolerance=True)
 pulsed_programming_.simulate()
 memristor_simulation_ = qdms.MemristorSimulation(pulsed_programming_, verbose=True)
 memristor_simulation_.simulate()
-# for key in memristor_simulation_.voltages_memristor.keys():
-#     print(f'{key}\t{memristor_simulation_.voltages_memristor.get(key)}')
+resolution_ = 0.0001
+voltages_ = algorithm(resolution_, memristor_simulation_)
 
-
-resolution = 0.0001
-v_min = 0.2
-v_max = 0.3
-v_min, v_max = ask_v_min_v_max(circuit_)
-voltages_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
-print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltages_target))} values')
-
-voltages = {}
-time_start = time.time()
-for voltages_t in voltages_target:
-    # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
-    v = take_closest(list(memristor_simulation_.voltages_memristor.keys()), voltages_t)
-    voltages[v] = memristor_simulation_.voltages_memristor.get(v)
-print(f'Total time {time.time() - time_start}')
-
-list_key = list(voltages.keys())
-diff = []
-for i in range(len(list_key)):
-    print(f'{list_key[i]}\t{voltages.get(list_key[i])}')
-    diff.append(list_key[i] - voltages_target[i])
-print(f'Max diff: {max(diff)} (V)\tPercentage of diff: {max(diff) / resolution * 100} %')
-print(f'Mean diff: {np.mean(diff)} (V)\tPercentage of diff: {np.mean(diff) / resolution * 100} %')
 
 
 # record_ = {}
