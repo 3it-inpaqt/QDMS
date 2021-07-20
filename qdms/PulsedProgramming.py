@@ -161,16 +161,18 @@ class PulsedProgramming:
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
 
-        index = 0
+        conf_done = index = 0
+
         start_time = time.time()
         for key in voltages_target.keys():
             if index == 0:
                 start_time_ = time.time()
             pulsed_programming.simulate_list_memristor(voltages_target.get(key))
             if index == 50:
-                print(f'{time.time() - start_time_} s')
+                print(f'Conf done: {conf_done}\tTook: {time.time() - start_time_} s\tLeft: {(time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50}')
                 index = -1
             index += 1
+            conf_done += 1
         print(f'Total time: {time.time() - start_time}')
 
     def simulate_list_memristor(self, list_resistance):
