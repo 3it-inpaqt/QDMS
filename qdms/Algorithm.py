@@ -4,7 +4,7 @@ import time
 from bisect import bisect_left
 
 
-def algorithm(resolution, memristor_simulation):
+def algorithm(resolution, memristor_simulation, diff_flag=False):
     """
 
     Parameters
@@ -23,13 +23,14 @@ def algorithm(resolution, memristor_simulation):
     print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
     voltages = find_correspondence(voltage_target, memristor_simulation.voltages_memristor)
 
-    diff = []
-    for i in range(len(list(voltages.keys()))):
-        # print(f'{list(voltages.keys())[i]}\t{np.sort([round(i) for i in voltages.get(list(voltages.keys())[i])])}')
-        diff.append(list(voltages.keys())[i] - voltage_target[i])
-    print(f'Max diff: {max(diff)} (V)\tPercentage of diff: {max(diff) / resolution * 100} %')
-    print(f'Mean diff: {np.mean(diff)} (V)\tPercentage of diff: {np.mean(diff) / resolution * 100} %')
-    print()
+    if diff_flag:
+        diff = []
+        for i in range(len(list(voltages.keys()))):
+            # print(f'{list(voltages.keys())[i]}\t{np.sort([round(i) for i in voltages.get(list(voltages.keys())[i])])}')
+            diff.append(list(voltages.keys())[i] - voltage_target[i])
+        print(f'Max diff: {max(diff)} (V)\t% of diff: {max(diff) / resolution * 100} %')
+        print(f'Mean diff: {np.mean(diff)} (V)\t% of diff: {np.mean(diff) / resolution * 100} %')
+        print()
     return voltages
 
 
