@@ -208,7 +208,7 @@ class PulsedProgramming:
             res_max = target_res + self.tolerance
             res_min = target_res - self.tolerance
 
-        counter = len(self.graph_resistance)
+        counter = 0
         action = 'read'
         flag_finish = False
         counter_read = 0
@@ -283,7 +283,7 @@ class PulsedProgramming:
             res_max = target_res + self.tolerance
             res_min = target_res - self.tolerance
 
-        counter = len(self.graph_resistance)
+        counter = 0
         action = 'read'
         flag_finish = False
         counter_read = 0
