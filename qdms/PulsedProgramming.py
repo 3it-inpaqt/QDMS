@@ -184,6 +184,9 @@ class PulsedProgramming:
         for key in diff_voltage.keys():
             print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)}')
 
+        print(f'Mean diff: {np.mean(list(diff_voltage.key()))}')
+        print(f'Min diff: {np.min(list(diff_voltage.key()))}\tMax diff: {np.max(list(diff_voltage.key()))}')
+
     def simulate_list_memristor(self, list_resistance):
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             if self.pulse_algorithm == 'fabien':
