@@ -32,7 +32,7 @@ def algorithm(resolution, memristor_simulation, diff_flag=False):
         diff = []
         for i in range(len(list(voltages.keys()))):
             # print(f'{list(voltages.keys())[i]}\t{np.sort([round(i) for i in voltages.get(list(voltages.keys())[i])])}')
-            diff.append(list(voltages.keys())[i] - voltage_target[i])
+            diff.append(abs(list(voltages.keys())[i] - voltage_target[i]))
         print(f'Max diff: {max(diff)} (V)\t% of diff: {max(diff) / resolution * 100} %')
         print(f'Mean diff: {np.mean(diff)} (V)\t% of diff: {np.mean(diff) / resolution * 100} %')
         print()
