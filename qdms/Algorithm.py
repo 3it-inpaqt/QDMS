@@ -79,7 +79,7 @@ def find_correspondence(voltage_target, voltage_table):
     for voltage_t in voltage_target:
         # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
         v = take_closest(list(voltage_table.keys()), voltage_t)
-        voltages[v] = voltage_table.get(v)
+        voltages[v] = np.sort(voltage_table.get(v))
     print(f'Total time {time.time() - time_start}')
     return voltages
 
