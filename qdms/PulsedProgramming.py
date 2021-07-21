@@ -161,8 +161,8 @@ class PulsedProgramming:
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
-        voltages_target_list = list(voltages_target.keys())
-        resolution = voltages_target_list[1] - voltages_target_list[0]
+        # voltages_target_list = list(voltages_target.keys())
+        # resolution = voltages_target_list[1] - voltages_target_list[0]
         index = 1
         conf_done = 0
         start_time = time.time()
@@ -185,6 +185,7 @@ class PulsedProgramming:
             print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)}')
 
     def simulate_list_memristor(self, list_resistance):
+        list_resistance = list_resistance.sort()
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
