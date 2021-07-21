@@ -168,7 +168,7 @@ def save_memristor_simulation_hdf5(memristor_sim, path):
         f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
         f.create_dataset("nb_states", data=memristor_sim.nb_states)
         f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
-        f.create_dataset("keys", data=memristor_sim.voltages_memristor.keys())
+        f.create_dataset("keys", data=list(memristor_sim.voltages_memristor.keys()))
         f.create_dataset("values", data=memristor_sim.voltages_memristor.values())
         f.create_dataset("verbose", data=memristor_sim.verbose)
         f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
