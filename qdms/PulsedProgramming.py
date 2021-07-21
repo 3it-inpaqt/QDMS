@@ -161,7 +161,8 @@ class PulsedProgramming:
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
             exit(1)
-        resolution = voltages_target[1] - voltages_target[0]
+        voltages_target_list = list(voltages_target.keys())
+        resolution = voltages_target_list[1] - voltages_target_list[0]
         index = 1
         conf_done = 0
         start_time = time.time()
@@ -169,7 +170,7 @@ class PulsedProgramming:
             if index == 1:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target.get(key))
-            print(f'Diff with key: {round((key - self.memristor_simulation.circuit.current_v_out())/resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
+            print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out())/resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
             if index == 50:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
