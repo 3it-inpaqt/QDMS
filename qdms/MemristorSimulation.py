@@ -167,7 +167,7 @@ class MemristorSimulation:
 
         """
         lrs = self.circuit.memristor_model.r_on
-        hrs = self.circuit.memristor_model.r_off
+        hrs = self.circuit.memristor_model.r_off - 100
         res_states = []
         if self.distribution_type == 'linear':
             res_states = [[int(lrs + i * ((hrs - lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
