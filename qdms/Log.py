@@ -140,7 +140,6 @@ def save_circuit_hdf5(circuit, path):
 
 def save_pulsed_programming_hdf5(pulsed_programming, path):
     with h5py.File(f'{path}\\pulsed_programming_data.hdf5', 'w') as f:
-        f.create_dataset("memristor_simulation", data=pulsed_programming.memristor_simulation)
         f.create_dataset("pulse_algorithm", data=pulsed_programming.pulse_algorithm)
         f.create_dataset("max_voltage", data=pulsed_programming.max_voltage)
         f.create_dataset("tolerance", data=pulsed_programming.tolerance)
@@ -167,7 +166,6 @@ def save_memristor_simulation_hdf5(memristor_sim, path):
     filename = 'memristor_sim_data'
     with h5py.File(f'{path}\\{filename}.hdf5', 'w') as f:
         f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
-        f.create_dataset("circuit", data=memristor_sim.circuit)
         f.create_dataset("nb_states", data=memristor_sim.nb_states)
         f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
         f.create_dataset("voltages_memristor", data=memristor_sim.voltages_memristor)
