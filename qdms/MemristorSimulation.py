@@ -48,31 +48,36 @@ class MemristorSimulation:
 
     Parameters
     ----------
-    pulsed_programming : PulsedProgramming.PulsedProgramming
-       The pulsed programming of the circuit that will be simulated.
+    circuit : Circuit.Circuit
+        The circuit object.
+
+    nb_states : int
+        The number of states wanted.
+
+    list_resistance : iterable[iterable[float]]
+        Contains the targets resistance (Ohm).
+
+    distribution_type : string
+        The distribution type can add controlled variability to the voltages output by targeting individual resistance
+        values for the memristor's states. A plot of the distribution is output in Resist folder. The possibilities are:
+            'linear' : The states are chosen in a linear manner.
+            'full_spread' : All the memristor have a different distribution.
 
     is_using_conductance : bool
         If true, the distribution of the resistance used will be found with conductance instead of resistance. Linear
         distribution will therefore be non-linear.
 
-    voltages : list of float
-        Contains all the voltages output by the simulation (V)
-
-    resistances : list of float
-        Contains the resistances link to the voltage.
-
     verbose : bool
         If true, the simulation will output parameter description and timer on how much time left to the simulation.
+
+    voltages_memristor : dict
+        Dictionary where the key is the voltage output and the package is the resistance value of each memristor
 
     timers : list of float
         Contains the different timers of the simulation. (s)
 
     start_loop_rec, start_inner_loop_rec, self.end_loop_rec, end_inner_loop_rec : float
         Different timers used in the recursive loop (s)
-
-    list_resistance : list of list of float
-        Contains the different resistance used in the simulation. (Ohm)
-        ex: [[10, 20, 30], [10, 25, 30], [10, 15, 30]]
     """
     def __init__(self, circuit, nb_states, distribution_type='linear', is_using_conductance=False, verbose=False):
         if not isinstance(circuit, Circuit):
@@ -106,13 +111,6 @@ class MemristorSimulation:
     def presentation(self):
         """
         This function print the main parameters of the memristor simulation.
-
-        Parameters
-        ----------
-
-        Returns
-        ----------
-
         """
         print("-------------------------")
         print('New architecture:\t' + str(self.circuit.is_new_architecture))
@@ -123,15 +121,7 @@ class MemristorSimulation:
 
     def simulate(self):
         """
-        Function to simulate all the possible voltages of the circuit.
-
-        Parameters
-        ----------
-
-        Returns
-        ----------
-        self.voltages : list of float
-            Contains all the possible voltages
+        Function to simulate all the possible voltages of the circuit and is stored in self.voltages.
         """
 
         if self.verbose:
@@ -157,17 +147,13 @@ class MemristorSimulation:
         """
         This function creates the theoretical resistance distribution according to the distribution_type.
 
-        Parameters
-        ----------
-
         Returns
         ----------
         res_states : list of list of float
             list of resistor (Ohm)
-
         """
         lrs = self.circuit.memristor_model.r_on
-        hrs = self.circuit.memristor_model.r_off - 100
+        hrs = self.circuit.memristor_model.r_off
         res_states = []
         if self.distribution_type == 'linear':
             res_states = [[int(lrs + i * ((hrs - lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
@@ -219,11 +205,6 @@ class MemristorSimulation:
 
         current_states : iterable[int]
             Contains the states of all loops from the recursive loop.
-
-        Returns
-        ----------
-        self.voltages : list of float
-            Contains all the possible voltages (V)
         """
         if counter == self.circuit.number_of_memristor - 1 and self.verbose:
             self.end_loop_rec = time.time()

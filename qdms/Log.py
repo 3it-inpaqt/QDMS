@@ -126,6 +126,7 @@ def save_memristor_hdf5(memristor, path):
         f.create_dataset("b_p", data=memristor.b_p)
         f.create_dataset("b_n", data=memristor.b_n)
         f.create_dataset("g", data=memristor.g)
+        f.create_dataset("is_variability_on", data=memristor.is_variability_on)
 
 
 def save_circuit_hdf5(circuit, path):
@@ -139,13 +140,8 @@ def save_circuit_hdf5(circuit, path):
 
 def save_pulsed_programming_hdf5(pulsed_programming, path):
     with h5py.File(f'{path}\\pulsed_programming_data.hdf5', 'w') as f:
-        f.create_dataset("nb_states", data=pulsed_programming.nb_states)
-        f.create_dataset("distribution_type", data=pulsed_programming.distribution_type)
+        f.create_dataset("memristor_simulation", data=pulsed_programming.memristor_simulation)
         f.create_dataset("pulse_algorithm", data=pulsed_programming.pulse_algorithm)
-        f.create_dataset("lrs", data=pulsed_programming.lrs)
-        f.create_dataset("hrs", data=pulsed_programming.hrs)
-        f.create_dataset("res_states", data=pulsed_programming.res_states)
-        f.create_dataset("res_states_practical", data=pulsed_programming.res_states_practical)
         f.create_dataset("max_voltage", data=pulsed_programming.max_voltage)
         f.create_dataset("tolerance", data=pulsed_programming.tolerance)
         f.create_dataset("index_variability", data=pulsed_programming.index_variability)
@@ -167,21 +163,17 @@ def save_pulsed_programming_hdf5(pulsed_programming, path):
         f.create_dataset("is_relative_tolerance", data=pulsed_programming.is_relative_tolerance)
 
 
-def save_memristor_simulation_hdf5(memristor_sim, path, light=False):
-    if light:
-        filename = 'memristor_sim_data_light'
-    else:
-        filename = 'memristor_sim_data'
+def save_memristor_simulation_hdf5(memristor_sim, path):
+    filename = 'memristor_sim_data'
     with h5py.File(f'{path}\\{filename}.hdf5', 'w') as f:
         f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
-        if not light:
-            f.create_dataset("voltages", data=memristor_sim.voltages)
-            f.create_dataset("resistances", data=memristor_sim.resistances)
+        f.create_dataset("circuit", data=memristor_sim.circuit)
+        f.create_dataset("nb_states", data=memristor_sim.nb_states)
+        f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
+        f.create_dataset("voltages_memristor", data=memristor_sim.voltages_memristor)
         f.create_dataset("verbose", data=memristor_sim.verbose)
         f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
         f.create_dataset("timers", data=memristor_sim.timers)
-        f.create_dataset("resolution", data=memristor_sim.resolution)
-        f.create_dataset("std", data=memristor_sim.std)
 
 
 def save_qd_simulation_hdf5(memristor_sim, path):
@@ -275,24 +267,21 @@ def load_everything_hdf5(path, memristor=None, circuit=None, pulsed_programming=
         print(f'Circuit loaded: {time.time()-start}')
         start = time.time()
 
-    if isinstance(pulsed_programming, int):
-        pulsed_programming = None
-    elif pulsed_programming is None and circuit is not None:
-        pulsed_programming = load_pulsed_programming_hdf5(path + '\\pulsed_programming_data.hdf5', circuit)
-    if verbose:
-        print(f'Pulsed programming loaded: {time.time()-start}')
-        start = time.time()
-
     if isinstance(memristor_sim, int):
         memristor_sim = None
     elif memristor_sim is None and pulsed_programming is not None:
-        if light:
-            filename = 'memristor_sim_data_light'
-        else:
-            filename = 'memristor_sim_data'
-        memristor_sim = load_memristor_simulation_hdf5(path + f'\\{filename}.hdf5', pulsed_programming)
+        filename = 'memristor_sim_data'
+        memristor_sim = load_memristor_simulation_hdf5(path + f'\\{filename}.hdf5', circuit)
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
+        start = time.time()
+
+    if isinstance(pulsed_programming, int):
+        pulsed_programming = None
+    elif pulsed_programming is None and circuit is not None:
+        pulsed_programming = load_pulsed_programming_hdf5(path + '\\pulsed_programming_data.hdf5', memristor_sim)
+    if verbose:
+        print(f'Pulsed programming loaded: {time.time()-start}')
         start = time.time()
 
     if isinstance(qd_simulation, int):
@@ -325,6 +314,7 @@ def load_memristor_hdf5(path):
         b_p = np.array(file.get('b_p'))
         b_n = np.array(file.get('b_n'))
         g = np.array(file.get('g'))
+        is_variability_on = np.array(file.get('is_variability_on'))
 
     memristor = None
     if memristor_model == str(b"<class 'qdms.Data_Driven.Data_Driven'>"):
@@ -346,6 +336,7 @@ def load_memristor_hdf5(path):
         memristor.b_p = b_p
         memristor.b_n = b_n
         memristor.g = g
+        memristor.is_variability_on = is_variability_on
 
     else:
         print(f'Log.load_memristor: memristor model <{memristor_model}> unknown')
@@ -382,7 +373,7 @@ def load_circuit_hdf5(path, memristor):
     return circuit
 
 
-def load_pulsed_programming_hdf5(path, circuit):
+def load_pulsed_programming_hdf5(path, memristor_simulation):
     """
     This function load a file created by save_pulsed_programming_hdf5() and return the object.
 
@@ -391,8 +382,8 @@ def load_pulsed_programming_hdf5(path, circuit):
     path : string
         The path to the file to load.
 
-    circuit : Circuit.Circuit
-        The circuit object composing the pulsed programming.
+    memristor_simulation : MemristorSimulation
+        The memristor simulation object composing the pulsed programming.
 
     Returns
     ----------
@@ -400,13 +391,7 @@ def load_pulsed_programming_hdf5(path, circuit):
         The pulsed_programming object.
     """
     with h5py.File(f'{path}', 'r') as file:
-        nb_states = np.array(file.get('nb_states'))
-        distribution_type = str(np.array(file.get('distribution_type'))).lstrip("b\'").rstrip("\'")
         pulse_algorithm = str(np.array(file.get('pulse_algorithm'))).lstrip("b\'").rstrip("\'")
-        lrs = np.array(file.get('lrs'))
-        hrs = np.array(file.get('hrs'))
-        res_states = [list(a) for a in np.array(file.get('res_states'))]
-        res_states_practical = [list(a) for a in np.array(file.get('res_states_practical'))]
         max_voltage = np.array(file.get('max_voltage'))
         tolerance = np.array(file.get('tolerance'))
         index_variability = np.array(file.get('index_variability'))
@@ -427,13 +412,8 @@ def load_pulsed_programming_hdf5(path, circuit):
         max_pulse = np.array(file.get('max_pulse'))
         is_relative_tolerance = np.array(file.get('is_relative_tolerance'))
 
-    pulsed_programming = PulsedProgramming(circuit, nb_states)
-    pulsed_programming.distribution_type = distribution_type
+    pulsed_programming = PulsedProgramming(memristor_simulation)
     pulsed_programming.pulse_algorithm = pulse_algorithm
-    pulsed_programming.lrs = lrs
-    pulsed_programming.hrs = hrs
-    pulsed_programming.res_states = res_states
-    pulsed_programming.res_states_practical = res_states_practical
     pulsed_programming.max_voltage = max_voltage
     pulsed_programming.tolerance = tolerance
     pulsed_programming.index_variability = index_variability
@@ -448,7 +428,7 @@ def load_pulsed_programming_hdf5(path, circuit):
     return pulsed_programming
 
 
-def load_memristor_simulation_hdf5(path, pulsed_programming):
+def load_memristor_simulation_hdf5(path, circuit):
     """
     This function load a file created by save_memristor_simulation_hdf5() and return the object.
 
@@ -457,8 +437,8 @@ def load_memristor_simulation_hdf5(path, pulsed_programming):
     path : string
         The path to the file to load.
 
-    pulsed_programming : PulsedProgramming.PulsedProgramming
-        The pulsed_programming object.
+    circuit : Circuit
+        The circuit object.
 
     Returns
     ----------
@@ -467,23 +447,20 @@ def load_memristor_simulation_hdf5(path, pulsed_programming):
     """
     with h5py.File(f'{path}', 'r') as file:
         is_using_conductance = np.array(file.get('is_using_conductance'))
-        voltages = list(np.array(file.get('voltages')))
-        resistances = list(np.array(file.get('resistances')))
         verbose = np.array(file.get('verbose'))
+        nb_states = np.array(file.get('nb_states'))
+        distribution_type = np.array(file.get('distribution_type'))
+        voltages_memristor = file.get('voltages_memristor')
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
         timers = list(np.array(file.get('timers')))
-        resolution = np.array(file.get('resolution'))
-        std = np.array(file.get('std'))
 
-    memristor_simulation = MemristorSimulation(pulsed_programming)
+    memristor_simulation = MemristorSimulation(circuit, nb_states)
     memristor_simulation.is_using_conductance = is_using_conductance
-    memristor_simulation.voltages = voltages
-    memristor_simulation.verbose = verbose
+    memristor_simulation.distribution_type = distribution_type
+    memristor_simulation.voltages_memristor = voltages_memristor
     memristor_simulation.list_resistance = list_resistance
+    memristor_simulation.verbose = verbose
     memristor_simulation.timers = timers
-    memristor_simulation.resistances = resistances
-    memristor_simulation.resolution = resolution
-    memristor_simulation.std = std
 
     return memristor_simulation
 

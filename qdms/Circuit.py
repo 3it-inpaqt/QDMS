@@ -75,10 +75,16 @@ class Circuit:
         return voltage
 
     def current_conductance(self):
+        """
+        This function return the current conductance of the circuit.
+        """
         g = 0
         for res in self.list_memristor:
             g += res.g
         return g
 
     def current_v_out(self):
+        """
+        This function return the current voltage output of the circuit.
+        """
         return self.calculate_voltage(self.current_conductance())

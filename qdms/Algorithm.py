@@ -6,16 +6,21 @@ from bisect import bisect_left
 
 def algorithm(resolution, memristor_simulation, diff_flag=False):
     """
-
     Parameters
     ----------.
     resolution : flaot
         Resolution of the stability diagram.
 
+    memristor_simulation: MemristorSimulation
+        The memristor simulation object
+
+    diff_flag : bool
+        if True, will output the difference between the target and the result
+
     Returns
     -------
-    parameters : list
-        List of all the parameters needed to get a stability diagram with the input parameters.
+    voltages : dict
+        Dictionary where the key is the voltage output and the package is the resistance value of each memristor
 
     """
     v_min, v_max = ask_v_min_v_max(memristor_simulation.circuit)
@@ -35,6 +40,18 @@ def algorithm(resolution, memristor_simulation, diff_flag=False):
 
 
 def calculate_min_max_voltage(circuit):
+    """
+    Parameters
+    ----------.
+    circuit : Circuit
+        Circuit object
+
+    Returns
+    -------
+    voltage_min, voltage_max : float
+        The voltage minimum and maximum possible with this circuit
+
+    """
     r_min = circuit.memristor_model.r_on
     r_max = circuit.memristor_model.r_off
     g_min = circuit.number_of_memristor * 1 / r_max
@@ -45,6 +62,18 @@ def calculate_min_max_voltage(circuit):
 
 
 def ask_v_min_v_max(circuit):
+    """
+    Parameters
+    ----------.
+    circuit : Circuit
+        Circuit object
+
+    Returns
+    -------
+    voltage_min, voltage_max : float
+        The voltage minimum and maximum chose by the user
+
+    """
     v_min, v_max = calculate_min_max_voltage(circuit)
     voltage_min = voltage_max = -1
     while not v_min <= voltage_min <= v_max:
@@ -74,6 +103,22 @@ def take_closest(myList, myNumber):
 
 
 def find_correspondence(voltage_target, voltage_table):
+    """
+    Parameters
+    ----------.
+    voltage_target : list of float
+        The list of wanted voltages
+
+    voltage_table : list of float
+        The list of possible voltages from the memristor_simulation
+
+    Returns
+    -------
+    voltages : dict
+        Dictionary where the key is the voltage output and the package is the resistance value of each memristor, sorted.
+
+
+    """
     voltages = {}
     time_start = time.time()
     for voltage_t in voltage_target:
@@ -82,150 +127,3 @@ def find_correspondence(voltage_target, voltage_table):
         voltages[v] = np.sort(voltage_table.get(v))
     print(f'Total time {time.time() - time_start}')
     return voltages
-
-
-###########
-# DEPRECATED
-# def find_conductance(circuit, voltages):
-#     conductance = []
-#     for voltage in voltages:
-#         if circuit.is_new_architecture:
-#             res = (voltage * circuit.R_L) / circuit.v_in
-#         else:
-#             res = (circuit.gain_resistance * circuit.v_in) / voltage
-#         conductance.append(1 / res)
-#     return conductance
-#
-#
-# def change_conductance_simple(g_target, circuit, record_, current_res=0):
-#     delta_g = g_target - circuit.current_conductance()
-#
-#     circuit.list_memristor[current_res].g += delta_g
-#
-#     diff_g = circuit.list_memristor[current_res].g - 1 / circuit.list_memristor[current_res].r_off
-#     if diff_g < 0:
-#         circuit.list_memristor[current_res].g = 1 / circuit.list_memristor[current_res].r_off
-#         if not current_res + 1 == len(circuit.list_memristor):
-#             change_conductance_simple(g_target, circuit, record_, current_res + 1)
-#         else:
-#             print('Impossible to get the wanted conductance')
-#
-#     res = 1 / circuit.list_memristor[current_res].g
-#     # tolerance = 50
-#     tolerance = circuit.memristor_model.variability(res) * 10
-#     for state_res in record_[current_res]:
-#         if state_res - tolerance < res < state_res + tolerance:
-#             circuit.list_memristor[current_res].g = 1 / state_res
-#
-#
-# def set_initial_g(g_target, circuit, current_res=0):
-#     delta_g = g_target - circuit.current_conductance()
-#     if circuit.list_memristor[current_res].g + delta_g < 1 / circuit.memristor_model.r_off:
-#         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-#         set_initial_g(g_target, circuit, current_res + 1)
-#     else:
-#         circuit.list_memristor[current_res].g += delta_g
-#
-#
-# def rec(g_target, circuit, record, current_res):
-#     # print(1/circuit.list_memristor[current_res].g)
-#     delta_g = g_target - circuit.current_conductance()
-#     delta_res = (1 / (circuit.list_memristor[current_res].g + delta_g)) - record.get(current_res)[-1]
-#     # if delta_res < 0:
-#     #     print(round(record.get(current_res)[-1]), round(1 / (circuit.list_memristor[current_res].g + delta_g)), round(delta_res), current_res)
-#     if abs(delta_res) < 100 and delta_res != 0:
-#         adjust = 100 / delta_res
-#         circuit.list_memristor[current_res].g += delta_g * adjust
-#         rec(g_target, circuit, record, current_res - 1)
-#         # circuit.list_memristor[current_res - 1].g -= delta_g * adjust - delta_g
-#     else:
-#         circuit.list_memristor[current_res].g += delta_g
-#
-#
-# def set_g(g_target, circuit, record, current_res=0):
-#     delta_g = g_target - circuit.current_conductance()
-#     if circuit.list_memristor[current_res].g + delta_g < 1 / circuit.memristor_model.r_off:
-#         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-#         set_g(g_target, circuit, record, current_res + 1)
-#     else:
-#         # rec(g_target, circuit, record, current_res)
-#         circuit.list_memristor[current_res].g += delta_g
-#
-#
-# def set_g_2(g_target, circuit, record, current_res):
-#     delta_g = g_target - circuit.current_conductance()
-#     final_res = 1 / (circuit.list_memristor[current_res].g + delta_g)
-#     delta_res = final_res - record.get(current_res)[-1]
-#
-#     if delta_res > 100:
-#         print(f'Big delta res\t\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-#         if final_res < circuit.memristor_model.r_off:
-#             circuit.list_memristor[current_res].g += delta_g
-#         else:
-#             circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-#             set_g_2(g_target, circuit, record, current_res + 1)
-#
-#     elif 10 < delta_res < 100:
-#         print(f'Little delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-#         adjust = 100 / delta_res
-#         if circuit.list_memristor[current_res].g + delta_g * adjust < circuit.memristor_model.r_off:
-#             circuit.list_memristor[current_res].g += delta_g * adjust
-#             set_g_2(g_target, circuit, record, current_res - 1)
-#
-#     elif -10 < delta_res < 10:
-#         print(f'LITTLE delta res, skip\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-
-
-        # else:
-        #     circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_off
-        #     balance()
-        #     set_g_2(g_target, circuit, record, current_res)
-
-    # elif -100 <= delta_res < 0:
-    #     print(f'Little minus delta res\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-    #
-    # elif delta_res < -100:
-    #     print(f'Big minus delta res\t\t{delta_res}\t{[round(1 / i.g) for i in circuit.list_memristor]}')
-    #     if final_res > circuit.memristor_model.r_on:
-    #         circuit.list_memristor[current_res].g += delta_g
-    #     else:
-    #         circuit.list_memristor[current_res].g = 1 / circuit.memristor_model.r_on
-    #         set_g_2(g_target, circuit, record, current_res - 1)
-    #
-
-    # if delta_res < 100 and delta_res != 0 and final_res <= circuit.memristor_model.r_off:
-    #     adjust = 100 / delta_res
-    #     final_res = 1 / (circuit.list_memristor[current_res].g + delta_g * adjust)
-    #     delta_res = final_res - record.get(current_res)[-1]
-    #     if final_res > circuit.memristor_model.r_off:
-    #         print(final_res)
-    #     circuit.list_memristor[current_res].g += delta_g * adjust
-    #     circuit.list_memristor[current_res - 1].g -= delta_g * adjust
-    # else:
-    #     circuit.list_memristor[current_res].g += delta_g
-
-# def switch_v_in_v_min(circuit, voltage_min):
-#     r_min = circuit.memristor_model.r_on
-#     g_max = circuit.number_of_memristor * 1 / r_min
-#
-#     if circuit.is_new_architecture:
-#         v_in = (voltage_min * circuit.R_L) / (1/g_max)
-#     else:
-#         v_in = voltage_min / (g_max * circuit.gain_resistance)
-#     circuit.v_in = v_in
-#
-#
-# def switch_v_in(circuit, voltage_min, voltage_max):
-#     r_min = circuit.memristor_model.r_on
-#     r_max = circuit.memristor_model.r_off
-#     g_min = circuit.number_of_memristor * 1 / r_max
-#     g_max = circuit.number_of_memristor * 1 / r_min
-#
-#     if circuit.is_new_architecture:
-#         v_in_min = (voltage_min * circuit.R_L) / (1/g_max)
-#         v_in_max = (voltage_max * circuit.R_L) / (1/g_min)
-#     else:
-#         v_in_min = voltage_min / (g_max * circuit.gain_resistance)
-#         v_in_max = voltage_max / (g_min * circuit.gain_resistance)
-#     v_in = np.mean([v_in_min, v_in_max])
-#     circuit.v_in = v_in

@@ -10,12 +10,6 @@ class PulsedProgramming:
 
     Parameters
     ----------
-    circuit : Circuit.Circuit
-        The circuit object.
-
-    nb_states : int
-        The number of states wanted in the pulse programming.
-
     max_voltage : float
         The max voltage (V) of a pulse. If 0, no limit is apply.
 
@@ -23,12 +17,6 @@ class PulsedProgramming:
         The pulse algorithm use. Those are the available choices (Sources in the methods). Default is 'fabien'.
         'fabien' : Use fabien_convergence()
         'log' : Use a log_convergence()
-
-    res_states : iterable[iterable[float]]
-        Contains the targets resistance (Ohm) of the pulsed programming.
-
-    res_states_practical : list of list of float
-        Contains the actual resistance (Ohm) obtained by the pulsed programming.
 
     tolerance : float
         The tolerance_value input is an int that represent the absolute tolerance (Ohm) from the res_states the
@@ -51,20 +39,6 @@ class PulsedProgramming:
 
     graph_voltages : List[Union[float, int]]
         Contains all voltages of the simulation. It's used in the creation of plots.
-
-    distribution_type : string
-        The distribution type can add controlled variability to the voltages output by targeting individual resistance
-        values for the memristor's states. A plot of the distribution is output in Resist folder. The possibilities are:
-            'linear' : The states are chosen in a linear manner.
-            'full_spread' : All the memristor have a different distribution.
-
-    lrs : float
-        Low Resistance State (LRS) (Ohm) used for the programming. It should be higher or equal than
-        circuit.memristor_model.r_on. Default is r_off.
-
-    hrs : float
-         High Resistance State (HRS) (Ohm) used for the programming. It should be lower or equal than
-         circuit.memristor_model.r_off. Default is r_off.
 
     number_of_reading : int
         The number of correct value read before passing to the next state.
@@ -130,9 +104,6 @@ class PulsedProgramming:
         """
         This function find the number of iteration needed to create the resistance list depending on the distribution type
 
-        Parameters
-        ----------
-
         Returns
         ----------
         number_iteration : int
@@ -147,16 +118,12 @@ class PulsedProgramming:
 
     def simulate(self, voltages_target):
         """
-        This function find all practical resistance (Ohm) depending on the states using fabien_convergence.
-        The output is stored in self.res_states_practical
+        This function will set the memristors to the resistance wanted in each voltages_target package.
 
         Parameters
         ----------
-
-        Returns
-        ----------
-        res_states_practical : list of list of float
-            Returns the practical value found.
+        voltages_target : dict
+            Dictionary where the key is the voltage output and the package is the resistance value of each memristor
         """
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
@@ -189,6 +156,14 @@ class PulsedProgramming:
         print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
 
     def simulate_list_memristor(self, list_resistance):
+        """
+        This function will set the memristors to the resistance wanted list_resistance.
+
+        Parameters
+        ----------
+        list_resistance : list
+            list of the wanted resistance for the memristor.
+        """
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
@@ -197,23 +172,16 @@ class PulsedProgramming:
 
     def log_convergence(self, memristor, target_res):
         """
-        This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
-        for the i_state.
+        This function run the pulsed programming with a variable voltage to set the target_res for the memristor.
         From : https://arxiv.org/abs/2103.09931
 
         Parameters
         ----------
-        i_state : int
-            The target state to find.
+        memristor : Memristor
+            The memristor object
 
-        res_states : iterable[float]
-            List of target resistance.
-
-        max_pulse : int
-            The max number of pulses.
-
-        Returns
-        ----------
+        target_res : float
+            The target resistance
         """
         positive_voltage = voltage_set = 0.5
         negative_voltage = voltage_reset = -0.5
@@ -279,20 +247,16 @@ class PulsedProgramming:
 
     def fabien_convergence(self, memristor, target_res):
         """
-        This function run the pulsed programming with a variable voltage to find the resistance (Ohm)
-        for the i_state.
+        This function run the pulsed programming with a variable voltage to set the target_res for the memristor.
         From : https://iopscience.iop.org/article/10.1088/0957-4484/23/7/075201
 
         Parameters
         ----------
+        memristor : Memristor
+            The memristor object
+
         target_res : float
-            The target resistance (Ohm)
-
-        max_pulse : int
-            The max number of pulses.
-
-        Returns
-        ----------
+            The target resistance
         """
         step = 0.005
         positive_voltage = voltage_set = 0.5
