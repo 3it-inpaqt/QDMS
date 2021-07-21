@@ -182,7 +182,7 @@ class PulsedProgramming:
         print()
 
         for key in diff_voltage.keys():
-            print(f'{key}\t{diff_voltage.get(key)}')
+            print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)}')
 
     def simulate_list_memristor(self, list_resistance):
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
