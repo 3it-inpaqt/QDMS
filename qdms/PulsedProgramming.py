@@ -185,7 +185,7 @@ class PulsedProgramming:
             print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)}')
 
     def simulate_list_memristor(self, list_resistance):
-        list_resistance = list_resistance.sort()
+        list_resistance = np.sort(list_resistance)
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
