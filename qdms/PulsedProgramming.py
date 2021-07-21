@@ -171,7 +171,7 @@ class PulsedProgramming:
             if index == 1:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target.get(key))
-            diff_voltage[key - self.memristor_simulation.circuit.current_v_out()] = [round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]
+            diff_voltage[key - self.memristor_simulation.circuit.current_v_out()] = [1 / self.memristor_simulation.circuit.current_conductance() ,[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]]
             # print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out()) / resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
             if index == 50:
                 conf_done += index
@@ -182,7 +182,7 @@ class PulsedProgramming:
         print()
 
         for key in diff_voltage.keys():
-            print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)}')
+            print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)[0]} (Ohm)\t{diff_voltage.get(key)[1]}')
 
         print(f'Mean diff: {np.mean(list(diff_voltage.keys()))}')
         print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
