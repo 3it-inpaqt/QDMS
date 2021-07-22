@@ -190,7 +190,7 @@ class PulsedProgramming:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
                 self.tolerance, self.is_relative_tolerance = 5, False
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
-                self.tolerance, self.is_relative_tolerance = 0.1, False
+                self.tolerance, self.is_relative_tolerance = 0.05, False
                 self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
