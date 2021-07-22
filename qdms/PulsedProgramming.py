@@ -185,14 +185,76 @@ class PulsedProgramming:
         delta_g = np.sum([1/i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             i += 1
-            res = list_resistance[-i]
-            if self.memristor_simulation.circuit.memristor_model.r_on <= 1/(1/res + delta_g) <= self.memristor_simulation.circuit.memristor_model.r_off:
+            final_res = 1 / (1 / list_resistance[-i] + delta_g)
+            if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
-                self.tolerance, self.is_relative_tolerance = 2, False
-                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
+                self.tolerance, self.is_relative_tolerance = 5, False
+                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
+                self.tolerance, self.is_relative_tolerance = 0.1, False
+                self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
                 break
+
+    def small_convergence(self, memristor, target_res):
+        """
+        This function run the pulsed programming with a variable voltage to set the target_res for the memristor with a
+        really small increment.
+
+        Parameters
+        ----------
+        memristor : Memristor
+            The memristor object
+
+        target_res : float
+            The target resistance
+        """
+        step = 0.001
+        positive_voltage = voltage_set = 0.1
+        negative_voltage = voltage_reset = -0.1
+        if self.is_relative_tolerance:
+            res_max = target_res + self.tolerance * target_res / 100
+            res_min = target_res - self.tolerance * target_res / 100
+        else:
+            res_max = target_res + self.tolerance
+            res_min = target_res - self.tolerance
+
+        counter = 0
+        action = 'read'
+        flag_finish = False
+        counter_read = 0
+
+        while not flag_finish:
+            current_res = memristor.read()
+
+            if res_min <= current_res <= res_max:
+                action = 'read'
+                counter_read += 1
+                self.graph_voltages.append([0.2, counter, action])
+            elif current_res < res_min:
+                action = 'reset'
+                if self.max_voltage != 0:
+                    negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
+                self.write_resistance(memristor, negative_voltage, 200e-9)
+                self.graph_voltages.append([negative_voltage, counter, action])
+                negative_voltage -= step
+                positive_voltage = voltage_set
+            elif current_res > res_max:
+                action = 'set'
+                if self.max_voltage != 0:
+                    positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage  else positive_voltage
+                self.write_resistance(memristor, positive_voltage, 200e-9)
+                self.graph_voltages.append([positive_voltage, counter, action])
+                positive_voltage += step
+                negative_voltage = voltage_reset
+
+            if counter_read == self.number_of_reading:
+                flag_finish = not flag_finish
+            if counter >= self.max_pulse:
+                flag_finish = not flag_finish
+                print('Got max pulse')
+            self.graph_resistance.append([current_res, counter, action, flag_finish])
+            counter += 1
 
     def log_convergence(self, memristor, target_res):
         """
