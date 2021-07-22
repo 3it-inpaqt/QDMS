@@ -173,6 +173,7 @@ class PulsedProgramming:
 
         print(1 / self.memristor_simulation.circuit.current_conductance() - 1/np.sum([1/i for i in list_resistance]))
         print()
+
     def balance(self, list_resistance):
         """
         This function will set the memristors to the resistance wanted list_resistance.
@@ -188,13 +189,13 @@ class PulsedProgramming:
             final_res = 1 / (1 / list_resistance[-i] + delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
-                print(final_res, self.memristor_simulation.circuit.list_memristor[-i])
+                print(final_res, 1/self.memristor_simulation.circuit.list_memristor[-i].g)
                 self.tolerance, self.is_relative_tolerance = 5, False
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
-                print(final_res, self.memristor_simulation.circuit.list_memristor[-i])
+                print(final_res, 1/self.memristor_simulation.circuit.list_memristor[-i].g)
                 self.tolerance, self.is_relative_tolerance = 0.05, False
                 self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
-                print(final_res, self.memristor_simulation.circuit.list_memristor[-i])
+                print(final_res, 1/self.memristor_simulation.circuit.list_memristor[-i].g)
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
                 break
