@@ -171,7 +171,7 @@ class PulsedProgramming:
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
         self.balance(list_resistance)
 
-    print(1 / self.memristor_simulation.circuit.current_conductance() - 1/np.sum([1/i for i in list_resistance]))
+        print(1 / self.memristor_simulation.circuit.current_conductance() - 1/np.sum([1/i for i in list_resistance]))
 
     def balance(self, list_resistance):
         """
