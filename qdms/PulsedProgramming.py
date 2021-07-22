@@ -189,7 +189,8 @@ class PulsedProgramming:
                 self.tolerance, self.is_relative_tolerance = 2, False
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
-                print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
+                # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
+                print(1/self.memristor_simulation.circuit.current_conductance())
                 break
 
     def log_convergence(self, memristor, target_res):
