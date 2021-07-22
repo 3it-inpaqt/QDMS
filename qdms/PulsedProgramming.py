@@ -181,7 +181,10 @@ class PulsedProgramming:
             list of the wanted resistance for the memristor.
         """
         delta_g = np.sum([1/i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()
-        print([1/(1/res + delta_g) - res for res in list_resistance])
+        for res in reversed(list_resistance):
+            if self.memristor_simulation.circuit.memristor_model.r_on <= 1/(1/res + delta_g) <= self.memristor_simulation.circuit.memristor_model.r_off:
+                print(1/(1/res + delta_g) - res)
+                break
 
     def log_convergence(self, memristor, target_res):
         """
