@@ -195,7 +195,7 @@ class PulsedProgramming:
                 # self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
                 self.memristor_simulation.circuit.list_memristor[i].g = final_g
-                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
+                print(f'{1/final_g}\t{1 / self.memristor_simulation.circuit.list_memristor[i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
                 # self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
                 break
