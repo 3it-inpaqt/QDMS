@@ -181,9 +181,15 @@ class PulsedProgramming:
             list of the wanted resistance for the memristor.
         """
         delta_g = np.sum([1/i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()
-        for res in reversed(list_resistance):
+        for i in range(self.memristor_simulation.circuit.number_of_memristor):
+            i += 1
+            res = list_resistance[-i]
             if self.memristor_simulation.circuit.memristor_model.r_on <= 1/(1/res + delta_g) <= self.memristor_simulation.circuit.memristor_model.r_off:
                 print(1/(1/res + delta_g) - res)
+                if self.pulse_algorithm == 'fabien':
+                    self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
+                elif self.pulse_algorithm == 'log':
+                    self.log_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
                 break
 
     def log_convergence(self, memristor, target_res):
