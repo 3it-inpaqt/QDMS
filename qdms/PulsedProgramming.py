@@ -185,6 +185,7 @@ class PulsedProgramming:
         delta_g = self.memristor_simulation.circuit.current_conductance() - np.sum([1/i for i in list_resistance])
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             i += 1
+            print(list_resistance, list_resistance[-1])
             final_res = 1 / ((1 / list_resistance[-i]) - delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
