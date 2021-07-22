@@ -195,7 +195,7 @@ def save_qd_simulation_hdf5(memristor_sim, path):
 
 
 def load_everything_hdf5(path, memristor=None, circuit=None, pulsed_programming=None, memristor_sim=None,
-                    qd_simulation=None, verbose=False, light=False):
+                    qd_simulation=None, verbose=False):
     """
     This function load a full simulation from a directory path, considering the orignal name created by save_everything_hdf5().
     If memristor_sim, qd_simulation, pulsed_programming, circuit, memristor are not None, than the loaded data will be
@@ -237,11 +237,11 @@ def load_everything_hdf5(path, memristor=None, circuit=None, pulsed_programming=
     circuit : Circuit.Circuit
         Circuit.
 
-    pulsed_programming : PulsedProgramming.PulsedProgramming
-        The pulsed programming.
-
     memristor_sim : MemristorSimulation.MemristorSimulation
         The memristor simulation.
+
+    pulsed_programming : PulsedProgramming.PulsedProgramming
+        The pulsed programming.
 
     qd_simulation : QDSimulation
         The quantum dot simulation.
@@ -268,16 +268,15 @@ def load_everything_hdf5(path, memristor=None, circuit=None, pulsed_programming=
 
     if isinstance(memristor_sim, int):
         memristor_sim = None
-    elif memristor_sim is None and pulsed_programming is not None:
-        filename = 'memristor_sim_data'
-        memristor_sim = load_memristor_simulation_hdf5(path + f'\\{filename}.hdf5', circuit)
+    elif memristor_sim is None and circuit is not None:
+        memristor_sim = load_memristor_simulation_hdf5(path + f'\\memristor_sim_data.hdf5', circuit)
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
         start = time.time()
 
     if isinstance(pulsed_programming, int):
         pulsed_programming = None
-    elif pulsed_programming is None and circuit is not None:
+    elif pulsed_programming is None and memristor_sim is not None:
         pulsed_programming = load_pulsed_programming_hdf5(path + '\\pulsed_programming_data.hdf5', memristor_sim)
     if verbose:
         print(f'Pulsed programming loaded: {time.time()-start}')
@@ -290,7 +289,7 @@ def load_everything_hdf5(path, memristor=None, circuit=None, pulsed_programming=
     if verbose:
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
-    return memristor, circuit, pulsed_programming, memristor_sim, qd_simulation
+    return memristor, circuit, memristor_sim, pulsed_programming, qd_simulation
 
 
 def load_memristor_hdf5(path):
