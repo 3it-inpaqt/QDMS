@@ -169,6 +169,20 @@ class PulsedProgramming:
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
             elif self.pulse_algorithm == 'log':
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
+        self.balance(list_resistance)
+
+    def balance(self, list_resistance):
+        """
+        This function will set the memristors to the resistance wanted list_resistance.
+
+        Parameters
+        ----------
+        list_resistance : list
+            list of the wanted resistance for the memristor.
+        """
+        print([1/i.g for i in self.memristor_simulation.circuit.list_memristor], list_resistance)
+
+
 
     def log_convergence(self, memristor, target_res):
         """
