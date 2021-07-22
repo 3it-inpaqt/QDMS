@@ -186,10 +186,10 @@ class PulsedProgramming:
             res = list_resistance[-i]
             if self.memristor_simulation.circuit.memristor_model.r_on <= 1/(1/res + delta_g) <= self.memristor_simulation.circuit.memristor_model.r_off:
                 print(1/(1/res + delta_g) - res)
-                if self.pulse_algorithm == 'fabien':
-                    self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
-                elif self.pulse_algorithm == 'log':
-                    self.log_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
+                p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
+                self.tolerance, self.is_relative_tolerance = 2, False
+                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], 1/(1/res + delta_g))
+                self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 break
 
     def log_convergence(self, memristor, target_res):
