@@ -182,10 +182,9 @@ class PulsedProgramming:
         list_resistance : list
             list of the wanted resistance for the memristor.
         """
-        delta_g = np.sum([1/i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()
+        delta_g = self.memristor_simulation.circuit.current_conductance() - np.sum([1/i for i in list_resistance])
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
-            i += 1
-            final_res = 1 / (1 / list_resistance[-i] + delta_g)
+            final_res = 1 / (1 / reversed(list_resistance)[i] + delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
                 print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{1 / np.sum([1 / i for i in list_resistance])}\t{1 / self.memristor_simulation.circuit.current_conductance()}')
