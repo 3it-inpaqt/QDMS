@@ -182,20 +182,23 @@ class PulsedProgramming:
         list_resistance : list
             list of the wanted resistance for the memristor.
         """
-        delta_g = self.memristor_simulation.circuit.current_conductance() - np.sum([1/i for i in list_resistance])
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             i += 1
-            print(list_resistance, list_resistance[-i])
-            final_res = 1 / ((1 / list_resistance[-i]) - delta_g)
+            final_res = 1 / ((1 / list_resistance[-i]) - self.memristor_simulation.circuit.current_conductance() - np.sum([1 / i for i in list_resistance]))
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
                 print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{1 / np.sum([1 / i for i in list_resistance])}\t{1 / self.memristor_simulation.circuit.current_conductance()}')
+
                 self.tolerance, self.is_relative_tolerance = 5, False
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
                 print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{1 / np.sum([1 / i for i in list_resistance])}\t{1 / self.memristor_simulation.circuit.current_conductance()}')
-                self.tolerance, self.is_relative_tolerance = 0.05, False
+
+                self.tolerance, self.is_relative_tolerance = 0.5, False
+                final_res = 1 / ((1 / list_resistance[-i]) - self.memristor_simulation.circuit.current_conductance() - np.sum([1 / i for i in list_resistance]))
                 self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
                 print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{1 / np.sum([1 / i for i in list_resistance])}\t{1 / self.memristor_simulation.circuit.current_conductance()}')
+
+                final_res = 1 / ((1 / list_resistance[-i]) - self.memristor_simulation.circuit.current_conductance() - np.sum([1 / i for i in list_resistance]))
                 self.memristor_simulation.circuit.list_memristor[-i].g = 1/final_res
                 print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{1 / np.sum([1 / i for i in list_resistance])}\t{1 / self.memristor_simulation.circuit.current_conductance()}')
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
