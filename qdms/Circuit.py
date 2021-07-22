@@ -80,7 +80,7 @@ class Circuit:
         """
         g = 0
         for res in self.list_memristor:
-            g += res.g
+            g += 1 / res.read()
         return g
 
     def current_v_out(self):
