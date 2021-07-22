@@ -200,6 +200,7 @@ class PulsedProgramming:
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 # print(1/(1/res + delta_g) - 1 / self.memristor_simulation.circuit.list_memristor[-i].g)
                 break
+        print(self.memristor_simulation.circuit.current_conductance() - np.sum([1 / i for i in list_resistance]))
 
     def small_convergence(self, memristor, target_res):
         """
