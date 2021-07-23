@@ -175,7 +175,7 @@ class PulsedProgramming:
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
             elif self.pulse_algorithm == 'log':
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
-        self.balance(list_resistance)
+        self.balance(list_resistance, precision)
 
     def balance(self, list_resistance, precision):
         """
