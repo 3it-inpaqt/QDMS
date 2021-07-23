@@ -48,7 +48,7 @@ class PulsedProgramming:
     """
 
     def __init__(self, memristor_simulation, pulse_algorithm='fabien', max_voltage=0, tolerance=0, is_relative_tolerance=False,
-                 variance_write=0, number_of_reading=1, max_pulse=20000):
+                 variance_write=0, number_of_reading=1, max_pulse=20000, verbose=False):
         self.memristor_simulation = memristor_simulation
         self.pulse_algorithm = pulse_algorithm
         self.tolerance = tolerance
@@ -57,6 +57,7 @@ class PulsedProgramming:
         self.variance_write = variance_write
         self.number_of_reading = number_of_reading
         self.max_pulse = max_pulse
+        self.verbose = verbose
 
         self.index_variability = 0
         self.variability_write = np.random.normal(0, variance_write, 1000)
@@ -144,19 +145,21 @@ class PulsedProgramming:
 
             diff_voltage[abs(key - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 2), round(1 / self.memristor_simulation.circuit.current_conductance(), 2) ,[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]]
             # print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out()) / resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
-            if index == 50:
+            if index == 50 and self.verbose:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
                 index = 0
             index += 1
-        print(f'Total time: {time.time() - start_time}')
-        print()
 
-        for key in diff_voltage.keys():
-            print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)[0]}\t{diff_voltage.get(key)[1]} (Ohm)\t{diff_voltage.get(key)[2]}')
+        if self.verbose:
+            print(f'Total time: {time.time() - start_time}')
+            print()
 
-        print(f'Mean diff: {np.mean(list(diff_voltage.keys()))}')
-        print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
+            for key in diff_voltage.keys():
+                print(f'{round(key*1000, 4)} mV\t{diff_voltage.get(key)[0]}\t{diff_voltage.get(key)[1]} (Ohm)\t{diff_voltage.get(key)[2]}')
+
+            print(f'Mean diff: {np.mean(list(diff_voltage.keys()))}')
+            print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
 
     def simulate_list_memristor(self, list_resistance, precision):
         """
@@ -197,7 +200,7 @@ class PulsedProgramming:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
-                self.tolerance, self.is_relative_tolerance = 5, False
+                self.tolerance, self.is_relative_tolerance = 10, False
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
