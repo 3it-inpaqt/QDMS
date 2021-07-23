@@ -117,7 +117,7 @@ class PulsedProgramming:
             number_iteration = self.circuit.number_of_memristor
         return number_iteration
 
-    def simulate(self, voltages_target, precision):
+    def simulate(self, voltages_target, precision=None):
         """
         This function will set the memristors to the resistance wanted in each voltages_target package.
 
@@ -144,7 +144,6 @@ class PulsedProgramming:
             self.simulate_list_memristor(voltages_target.get(key), precision)
 
             diff_voltage[abs(key - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
-            # print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out()) / resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
             if index == 50 and self.verbose:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
@@ -201,12 +200,12 @@ class PulsedProgramming:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
-                if precision[0][0] != 0:
+                if precision[0][0] != 0 or precision is not None:
                     self.tolerance, self.is_relative_tolerance = precision[0][0], precision[0][1]
                     self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
                     # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
-                if precision[1][0] != 0:
+                if precision[1][0] != 0 or precision is not None:
                     self.tolerance, self.is_relative_tolerance = precision[1][0], precision[1][1]
                     self.small_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
                     # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
