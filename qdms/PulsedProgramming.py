@@ -188,18 +188,18 @@ class PulsedProgramming:
             final_res = 1 / (self.memristor_simulation.circuit.list_memristor[-(i+1)].g + delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
-                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
+                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
                 self.tolerance, self.is_relative_tolerance = 5, False
-                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
+                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
 
-                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
+                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
                 self.tolerance, self.is_relative_tolerance = 0.5, False
-                self.small_convergence(self.memristor_simulation.circuit.list_memristor[-i], final_res)
+                self.small_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
 
-                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-i].g}\t{np.sum([1 / i for i in list_resistance]) - self.memristor_simulation.circuit.current_conductance()}')
+                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
                 self.memristor_simulation.circuit.list_memristor[-(i+1)].g = 1 / final_res
 
-                print(f'{1/final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
+                print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 break
 
