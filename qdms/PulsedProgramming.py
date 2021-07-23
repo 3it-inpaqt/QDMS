@@ -142,7 +142,7 @@ class PulsedProgramming:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target.get(key), precision)
 
-            diff_voltage[key - self.memristor_simulation.circuit.current_v_out()] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 2), round(1 / self.memristor_simulation.circuit.current_conductance(), 2) ,[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]]
+            diff_voltage[abs(key - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 2), round(1 / self.memristor_simulation.circuit.current_conductance(), 2) ,[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]]
             # print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out()) / resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
             if index == 50:
                 conf_done += index
