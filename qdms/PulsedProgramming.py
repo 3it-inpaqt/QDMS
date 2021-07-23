@@ -116,7 +116,7 @@ class PulsedProgramming:
             number_iteration = self.circuit.number_of_memristor
         return number_iteration
 
-    def simulate(self, voltages_target):
+    def simulate(self, voltages_target, precision):
         """
         This function will set the memristors to the resistance wanted in each voltages_target package.
 
@@ -124,6 +124,9 @@ class PulsedProgramming:
         ----------
         voltages_target : dict
             Dictionary where the key is the voltage output and the package is the resistance value of each memristor
+
+        precision : float
+            Precision of the final balance in ohm
         """
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
             print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
@@ -137,7 +140,7 @@ class PulsedProgramming:
         for key in voltages_target.keys():
             if index == 1:
                 start_time_ = time.time()
-            self.simulate_list_memristor(voltages_target.get(key))
+            self.simulate_list_memristor(voltages_target.get(key), precision)
 
             diff_voltage[key - self.memristor_simulation.circuit.current_v_out()] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 2), round(1 / self.memristor_simulation.circuit.current_conductance(), 2) ,[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]]
             # print(f'Diff: {round((key - self.memristor_simulation.circuit.current_v_out()) / resolution * 100, 2)} %\t{format(key - self.memristor_simulation.circuit.current_v_out(),".2e")}\t{[round(1 / self.memristor_simulation.circuit.list_memristor[i].g - voltages_target.get(key)[i], 2) for i in range(self.memristor_simulation.circuit.number_of_memristor)]}')
@@ -155,7 +158,7 @@ class PulsedProgramming:
         print(f'Mean diff: {np.mean(list(diff_voltage.keys()))}')
         print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
 
-    def simulate_list_memristor(self, list_resistance):
+    def simulate_list_memristor(self, list_resistance, precision):
         """
         This function will set the memristors to the resistance wanted list_resistance.
 
@@ -163,6 +166,9 @@ class PulsedProgramming:
         ----------
         list_resistance : list
             list of the wanted resistance for the memristor.
+
+        precision : float
+            Precision of the final balance in ohm
         """
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
             if self.pulse_algorithm == 'fabien':
@@ -171,7 +177,7 @@ class PulsedProgramming:
                 self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
         self.balance(list_resistance)
 
-    def balance(self, list_resistance):
+    def balance(self, list_resistance, precision):
         """
         This function will set the memristors to the resistance wanted list_resistance.
 
@@ -179,6 +185,9 @@ class PulsedProgramming:
         ----------
         list_resistance : list
             list of the wanted resistance for the memristor.
+
+        precision : float
+            Precision of the final balance in ohm
         """
         final_g = np.sum([1 / i for i in list_resistance])
         delta_g = final_g - self.memristor_simulation.circuit.current_conductance()
@@ -192,7 +201,7 @@ class PulsedProgramming:
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
-                self.tolerance, self.is_relative_tolerance = 0.5, False
+                self.tolerance, self.is_relative_tolerance = precision, False
                 self.small_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
                 # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
