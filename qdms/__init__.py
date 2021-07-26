@@ -3,7 +3,6 @@
 
 from . import HelperFunction
 from .Data_Driven import Data_Driven
-from .Stanford_PKU import Stanford_PKU
 from .Circuit import Circuit
 from .PulsedProgramming import PulsedProgramming
 from .MemristorSimulation import MemristorSimulation
