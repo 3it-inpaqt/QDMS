@@ -141,7 +141,8 @@ class MemristorSimulation:
             print()
 
         self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
-        self.voltages_memristor = np.array([[k, [v_ for v_ in v]] for k, v in self.voltages_memristor_dict.items()])
+        dt = np.dtype([('voltages', np.float64), ('resistance', np.float64, (self.circuit.number_of_memristor,))])
+        self.voltages_memristor = np.array([[k, v] for k, v in self.voltages_memristor_dict.items()], dtype=dt)
 
         self.voltages_memristor_dict.clear()
         for i in self.circuit.list_memristor:
