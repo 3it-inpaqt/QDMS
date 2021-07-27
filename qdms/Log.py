@@ -450,7 +450,7 @@ def load_memristor_simulation_hdf5(path, circuit):
         distribution_type = np.array(file.get('distribution_type'))
         keys = file.get('keys')
         values = file.get('values')
-        voltages_memristor = dict()
+        voltages_memristor = dict(zip(keys, values))
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
         timers = list(np.array(file.get('timers')))
 
