@@ -123,27 +123,26 @@ class PulsedProgramming:
 
         Parameters
         ----------
-        voltages_target : dict
-            Dictionary where the key is the voltage output and the package is the resistance value of each memristor
+        voltages_target : list
+            list of [voltage, [res1, res2, res3]]
 
         precision : list
             [[macro_tune, is_relative_variability], [fine_tune, is_relative_variability]] for the balance() method.
         """
         if self.pulse_algorithm != 'fabien' and self.pulse_algorithm != 'log':
-            print(f'Pulse algorithm not supported: {self.pulse_algorithm}')
-            exit(1)
+            raise(Exception(f'Pulse algorithm not supported: {self.pulse_algorithm}'))
         # voltages_target_list = list(voltages_target.keys())
         # resolution = voltages_target_list[1] - voltages_target_list[0]
         index = 1
         conf_done = 0
         start_time = time.time()
         diff_voltage = {}
-        for key in voltages_target.keys():
+        for v in voltages_target:
             if index == 1:
                 start_time_ = time.time()
-            self.simulate_list_memristor(voltages_target.get(key), precision)
+            self.simulate_list_memristor(v[1], precision)
 
-            diff_voltage[abs(key - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target.get(key)]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
+            diff_voltage[abs(v[0] - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in v[1]]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
             if index == 50 and self.verbose:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
@@ -213,7 +212,7 @@ class PulsedProgramming:
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 break
 
-    def small_convergence(self, memristor, target_res):
+    def small_convergence(self, memristor, target_res, is_plotting):
         """
         This function run the pulsed programming with a variable voltage to set the target_res for the memristor with a
         really small increment.
@@ -269,7 +268,7 @@ class PulsedProgramming:
                 flag_finish = not flag_finish
             if counter >= self.max_pulse:
                 flag_finish = not flag_finish
-                print('Got max pulse')
+                print(f'Got max pulse {self.max_pulse}')
             self.graph_resistance.append([current_res, counter, action, flag_finish])
             counter += 1
 

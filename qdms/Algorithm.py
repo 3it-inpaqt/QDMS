@@ -26,7 +26,7 @@ def algorithm(resolution, memristor_simulation, diff_flag=False):
     v_min, v_max = ask_v_min_v_max(memristor_simulation.circuit)
     voltage_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
     print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
-    voltages = find_correspondence(voltage_target, memristor_simulation.voltages_memristor)
+    voltages = find_correspondence(voltage_target, [l[1] for l in memristor_simulation.voltages_memristor])
 
     if diff_flag:
         diff = []
@@ -121,9 +121,9 @@ def find_correspondence(voltage_target, voltage_table):
     """
     voltages = {}
     time_start = time.time()
-    for voltage_t in voltage_target:
+    for i in range(len(voltage_target)):
         # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
-        v = take_closest(list(voltage_table.keys()), voltage_t)
-        voltages[v] = np.sort(voltage_table.get(v))
+        v = take_closest(voltage_table, voltage_target[i])
+        voltages[v] = np.sort(voltage_table)
     print(f'Total time {time.time() - time_start}')
     return voltages
