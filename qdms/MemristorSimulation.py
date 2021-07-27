@@ -82,10 +82,9 @@ class MemristorSimulation:
     def __init__(self, circuit, nb_states, distribution_type='linear', is_using_conductance=False, verbose=False):
         if not isinstance(circuit, Circuit):
             print(f'Error: circuit object is not from Circuit class.')
-            exit(1)
+            raise TypeError
         if distribution_type != 'full_spread' and distribution_type != 'linear' and distribution_type != 'half_spread':
-            print(f"Error: distribution type <{distribution_type}> invalid")
-            exit(1)
+            raise Exception(f"Error: distribution type <{distribution_type}> invalid")
         self.circuit = circuit
         self.nb_states = nb_states
         self.distribution_type = distribution_type
@@ -189,7 +188,7 @@ class MemristorSimulation:
 
         for i in range(self.circuit.number_of_memristor):
             self.circuit.list_memristor[i].g = 1 / current_res[i]
-        self.voltages_memristor[self.circuit.current_v_out()] = [1/i.g for i in self.circuit.list_memristor]
+        self.voltages_memristor[str(self.circuit.current_v_out())] = [1/i.g for i in self.circuit.list_memristor]
 
     def loop_rec(self, list_resistance, counter, current_states):
         """
