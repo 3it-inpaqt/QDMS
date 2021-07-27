@@ -140,7 +140,8 @@ class MemristorSimulation:
             self.timers.append(timer_end-timer_start)
             print()
 
-        self.voltages_memristor_dict = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
+        self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor)}
+
         for k, v in self.voltages_memristor_dict.items():
             self.voltages_memristor.append([k, v])
 
