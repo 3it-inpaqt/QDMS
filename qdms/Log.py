@@ -176,7 +176,7 @@ def save_memristor_simulation_hdf5(memristor_sim, path):
         f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
         f.create_dataset("timers", data=memristor_sim.timers)
 
-
+6
 def save_qd_simulation_hdf5(memristor_sim, path):
     with h5py.File(f'{path}\\qd_simulation_data.hdf5', 'w') as f:
         stability_diagram = np.array(memristor_sim.stability_diagram)
@@ -453,7 +453,8 @@ def load_memristor_simulation_hdf5(path, circuit):
         timer = time.time()
         voltages_memristor = {}
         print(file["voltages_memristor"])
-        print(file["voltages_memristor"].items())
+        voltages_memristor = file["voltages_memristor"].items()
+        print(voltages_memristor)
         print(time.time() - timer)
         print()
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
