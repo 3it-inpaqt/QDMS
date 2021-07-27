@@ -70,7 +70,7 @@ class MemristorSimulation:
     verbose : bool
         If true, the simulation will output parameter description and timer on how much time left to the simulation.
 
-    voltages_memristor : dict
+    voltages_memristor : list
         Dictionary where the key is the voltage output and the package is the resistance value of each memristor
 
     timers : list of float
@@ -91,7 +91,7 @@ class MemristorSimulation:
         self.distribution_type = distribution_type
         self.list_resistance = self.create_res_states()
         self.is_using_conductance = is_using_conductance
-        self.voltages_memristor = {}
+        self.voltages_memristor = []
         self.verbose = verbose
 
         # Inner parameters
@@ -100,6 +100,7 @@ class MemristorSimulation:
         self.start_inner_loop_rec = 0
         self.end_loop_rec = 0
         self.end_inner_loop_rec = 0
+        self.voltages_memristor_dict = {}
 
     def __str__(self):
         str_out = "Here is the current parameter list for the memristor simulation"
@@ -139,7 +140,10 @@ class MemristorSimulation:
             self.timers.append(timer_end-timer_start)
             print()
 
-        self.voltages_memristor = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
+        self.voltages_memristor_dict = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
+        for k, v in self.voltages_memristor_dict.items():
+            self.voltages_memristor.append([k, v])
+
         for i in self.circuit.list_memristor:
             i.g = 1 / i.r_on
 
