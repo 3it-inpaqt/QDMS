@@ -143,7 +143,7 @@ class MemristorSimulation:
         self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
 
         for k, v in self.voltages_memristor_dict.items():
-            self.voltages_memristor.append([k, v])
+            np.append(self.voltages_memristor, [k, v])
 
         self.voltages_memristor_dict.clear()
         for i in self.circuit.list_memristor:
