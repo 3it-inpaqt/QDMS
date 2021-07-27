@@ -444,10 +444,7 @@ def load_memristor_simulation_hdf5(path, circuit):
         verbose = np.array(file.get('verbose'))
         nb_states = np.array(file.get('nb_states'))
         distribution_type = np.array(file.get('distribution_type'))
-        timer = time.time()
         voltages_memristor = np.array(file.get('voltages_memristor'))
-        print(time.time() - timer)
-        print()
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
         timers = list(np.array(file.get('timers')))
 
