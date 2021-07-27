@@ -6,6 +6,7 @@ import time
 import copy
 import h5py
 import ast
+import pandas
 
 from .Data_Driven import Data_Driven
 from .PulsedProgramming import PulsedProgramming
@@ -169,9 +170,7 @@ def save_memristor_simulation_hdf5(memristor_sim, path):
         f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
         f.create_dataset("nb_states", data=memristor_sim.nb_states)
         f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
-        voltages_memristor = f.create_group("voltages_memristor")
-        for k, v in memristor_sim.voltages_memristor.items():
-            voltages_memristor.create_dataset(str(k), data=v)
+        f.create_dataset('voltages_memristor', data=pandas.DataFrame(memristor_sim.voltages_memristor, index=0))
         f.create_dataset("verbose", data=memristor_sim.verbose)
         f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
         f.create_dataset("timers", data=memristor_sim.timers)
@@ -451,9 +450,7 @@ def load_memristor_simulation_hdf5(path, circuit):
         nb_states = np.array(file.get('nb_states'))
         distribution_type = np.array(file.get('distribution_type'))
         timer = time.time()
-        print(file["voltages_memristor"])
-        voltages_memristor = dict(file["voltages_memristor"].items())
-        print(voltages_memristor)
+        voltages_memristor = file.get["voltages_memristor"].to_dict('list')
         print(time.time() - timer)
         print()
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
