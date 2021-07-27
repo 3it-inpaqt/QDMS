@@ -91,7 +91,7 @@ class MemristorSimulation:
         self.distribution_type = distribution_type
         self.list_resistance = self.create_res_states()
         self.is_using_conductance = is_using_conductance
-        self.voltages_memristor = []
+        self.voltages_memristor = np.array()
         self.verbose = verbose
 
         # Inner parameters
@@ -145,6 +145,7 @@ class MemristorSimulation:
         for k, v in self.voltages_memristor_dict.items():
             self.voltages_memristor.append([k, v])
 
+        self.voltages_memristor_dict.clear()
         for i in self.circuit.list_memristor:
             i.g = 1 / i.r_on
 
