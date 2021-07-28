@@ -7,7 +7,8 @@ from .Circuit import Circuit
 from .PulsedProgramming import PulsedProgramming
 from .MemristorSimulation import MemristorSimulation
 from .QDSimulation import QDSimulation
-from . import Log
+from . import Log_hdf5
+from . import Log_pickle
 from . import Plot
 from . import Algorithm
 

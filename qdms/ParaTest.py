@@ -7,8 +7,8 @@ from Plot import plot_everything
 from Data_Driven import Data_Driven
 from PulsedProgramming import PulsedProgramming
 from HelperFunction import *
-from Log import save_everything_hdf5
-from Log import save_memristor_simulation_hdf5
+from Log_hdf5 import save_everything_hdf5
+from Log_hdf5 import save_memristor_simulation_hdf5
 import os
 import time
 
