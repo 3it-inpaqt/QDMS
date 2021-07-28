@@ -1,7 +1,9 @@
 import os
 import numpy as np
 import time
+import bz2
 import pickle
+import _pickle as cPickle
 
 from .Data_Driven import Data_Driven
 from .PulsedProgramming import PulsedProgramming
