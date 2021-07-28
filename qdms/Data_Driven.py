@@ -61,7 +61,6 @@ class Data_Driven(Memristor):
         return 2.161e-4 * res
 
     def set_parameter(self, parameter_model):
-        print(parameter_model.upper())
         if parameter_model.upper() == 'N1257R':
             r_off = 3590
             r_on = 1000

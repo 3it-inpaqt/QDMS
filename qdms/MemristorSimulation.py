@@ -81,10 +81,9 @@ class MemristorSimulation:
     """
     def __init__(self, circuit, nb_states, distribution_type='linear', is_using_conductance=False, verbose=False):
         if not isinstance(circuit, Circuit):
-            print(f'Error: circuit object is not from Circuit class.')
-            raise TypeError
+            raise TypeError(f'Error: circuit object is not from Circuit class.')
         if distribution_type != 'full_spread' and distribution_type != 'linear' and distribution_type != 'half_spread':
-            raise(Exception(f"Error: distribution type <{distribution_type}> invalid"))
+            raise Exception(f"Error: distribution type <{distribution_type}> invalid")
         self.circuit = circuit
         self.nb_states = nb_states
         self.distribution_type = distribution_type
@@ -102,22 +101,19 @@ class MemristorSimulation:
         self.end_inner_loop_rec = 0
         self.voltages_memristor_dict = {}
 
-    def __str__(self):
-        str_out = "Here is the current parameter list for the memristor simulation"
-        str_out += "\n-------------------------------------\n"
-        str_out += 'Is using conductance:\t\t' + str(self.is_using_conductance) + '\n'
-        str_out += "-------------------------------------\n"
-        return str_out
-
     def presentation(self):
         """
         This function print the main parameters of the memristor simulation.
         """
         print("-------------------------")
         print('New architecture:\t' + str(self.circuit.is_new_architecture))
-        print('Number of memristor: ' + str(self.circuit.number_of_memristor))
+        print('Number of memristor:\t' + str(self.circuit.number_of_memristor))
         print(f'Number of states:\t{self.nb_states}')
-        print('Memristor model:\t' + str(type(self.circuit.memristor_model)))
+        if isinstance(self.circuit.memristor_model, Data_Driven):
+            print(f'Memristor model:\t{type(self.circuit.memristor_model)}\t{self.circuit.memristor_model.parameter_model}')
+        else:
+            print(f'Memristor model:\t{type(self.circuit.memristor_model)}')
+        print(f'Distribution type:\t{self.distribution_type}')
         print("-------------------------")
 
     def simulate(self):
