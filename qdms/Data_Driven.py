@@ -61,7 +61,7 @@ class Data_Driven(Memristor):
         return 2.161e-4 * res
 
     def set_parameter(self, parameter_model):
-        if parameter_model == 'N1257R'.capitalize():
+        if parameter_model.capitalize() == 'N1257R':
             r_off = 3590
             r_on = 1000
             self.A_p = 600.100775
@@ -78,7 +78,7 @@ class Data_Driven(Memristor):
             self.b_p = 2.71689828
             self.b_n = 2.71689828
 
-        elif parameter_model == 'O921C'.capitalize():
+        elif parameter_model.capitalize() == 'O921C':
             r_off = 12759.285080891
             r_on = 1895.117222714
             self.A_p = 134.391352437019
