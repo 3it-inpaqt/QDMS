@@ -117,7 +117,7 @@ def create_save_directory(path, directory_name):
 def save_memristor_pickle(memristor, path):
     if not os.path.isdir(path):
         os.mkdir(path)
-    compressed_pickle(f'{path}\\memristor_model', memristor.memristor_model)
+    compressed_pickle(f'{path}\\memristor_model', type(memristor))
     compressed_pickle(f'{path}\\time_series_resolution', memristor.time_series_resolution)
     compressed_pickle(f'{path}\\r_off', memristor.r_off)
     compressed_pickle(f'{path}\\r_on', memristor.r_on)
@@ -300,26 +300,25 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
 
 
 def load_memristor_pickle(path):
-    with h5py.File(f'{path}', 'r') as file:
-        memristor_model = str(np.array(file.get('memristor_model')))
-        time_series_resolution = np.array(file.get('time_series_resolution'))
-        r_off = np.array(file.get('r_off'))
-        r_on = np.array(file.get('r_on'))
-        A_p = np.array(file.get('A_p'))
-        A_n = np.array(file.get('A_n'))
-        t_p = np.array(file.get('t_p'))
-        t_n = np.array(file.get('t_n'))
-        k_p = np.array(file.get('k_p'))
-        k_n = np.array(file.get('k_n'))
-        r_n = list(np.array(file.get('r_n')))
-        r_p = list(np.array(file.get('r_p')))
-        eta = np.array(file.get('eta'))
-        a_p = np.array(file.get('a_p'))
-        a_n = np.array(file.get('a_n'))
-        b_p = np.array(file.get('b_p'))
-        b_n = np.array(file.get('b_n'))
-        g = np.array(file.get('g'))
-        is_variability_on = np.array(file.get('is_variability_on'))
+    memristor_model = decompress_pickle(f'{path}\\memristor_model.pickle')
+    time_series_resolution = decompress_pickle(f'{path}\\time_series_resolution.pickle')
+    r_off = decompress_pickle(f'{path}\\r_off.pickle')
+    r_on = decompress_pickle(f'{path}\\r_on.pickle')
+    A_p = decompress_pickle(f'{path}\\A_p.pickle')
+    A_n = decompress_pickle(f'{path}\\A_n.pickle')
+    t_p = decompress_pickle(f'{path}\\t_p.pickle')
+    t_n = decompress_pickle(f'{path}\\t_n.pickle')
+    k_p = decompress_pickle(f'{path}\\k_p.pickle')
+    k_n = decompress_pickle(f'{path}\\k_n.pickle')
+    r_n = decompress_pickle(f'{path}\\r_n.pickle')
+    r_p = decompress_pickle(f'{path}\\r_p.pickle')
+    eta = decompress_pickle(f'{path}\\eta.pickle')
+    a_p = decompress_pickle(f'{path}\\a_p.pickle')
+    a_n = decompress_pickle(f'{path}\\a_n.pickle')
+    b_p = decompress_pickle(f'{path}\\b_p.pickle')
+    b_n = decompress_pickle(f'{path}\\b_n.pickle')
+    g = decompress_pickle(f'{path}\\g.pickle')
+    is_variability_on = decompress_pickle(f'{path}\\is_variability_on.pickle')
 
     memristor = None
     if memristor_model == str(b"<class 'qdms.Data_Driven.Data_Driven'>"):
