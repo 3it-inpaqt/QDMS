@@ -102,6 +102,14 @@ def take_closest(myList, myNumber):
         return before
 
 
+def find_nearest(array, value):
+    idx = np.searchsorted(array, value, side="left")
+    if idx > 0 and (idx == len(array) or math.fabs(value - array[idx-1]) < math.fabs(value - array[idx])):
+        return array[idx-1]
+    else:
+        return array[idx]
+
+
 def find_correspondence(voltage_target, voltage_table):
     """
     Parameters
@@ -124,7 +132,7 @@ def find_correspondence(voltage_target, voltage_table):
     for i in range(len(voltage_target)):
         # v = min(memristor_simulation_.voltages_memristor, key=lambda x:(abs(x - voltages_t)))
         print(voltage_table)
-        v = take_closest(voltage_table, voltage_target[i])
+        v = find_nearest(voltage_table, voltage_target[i])
         voltages[v] = np.sort(voltage_table)
     print(f'Total time {time.time() - time_start}')
     return voltages
