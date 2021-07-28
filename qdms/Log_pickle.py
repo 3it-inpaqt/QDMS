@@ -130,6 +130,7 @@ def save_memristor_pickle(memristor, path):
     compressed_pickle(f'{path}\\k_p', memristor.k_p)
     compressed_pickle(f'{path}\\k_n', memristor.k_n)
     compressed_pickle(f'{path}\\r_p', memristor.r_p)
+    compressed_pickle(f'{path}\\r_n', memristor.r_n)
     compressed_pickle(f'{path}\\eta', memristor.eta)
     compressed_pickle(f'{path}\\a_p', memristor.a_p)
     compressed_pickle(f'{path}\\a_n', memristor.a_n)
