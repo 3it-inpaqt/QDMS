@@ -26,7 +26,7 @@ def algorithm(resolution, memristor_simulation, diff_flag=False):
     v_min, v_max = ask_v_min_v_max(memristor_simulation.circuit)
     voltage_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
     print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
-    voltages = find_correspondence(voltage_target, memristor_simulation.voltages, memristor_simulation.memristor)
+    voltages = find_correspondence(voltage_target, memristor_simulation.voltages_memristor)
 
     if diff_flag:
         diff = []
@@ -105,12 +105,12 @@ def take_closest(myList, myNumber):
 def find_nearest(array, value):
     idx = np.searchsorted(array, value, side="left")
     if idx > 0 and (idx == len(array) or math.fabs(value - array[idx-1]) < math.fabs(value - array[idx])):
-        return idx-1
+        return array[idx-1]
     else:
-        return idx
+        return array[idx]
 
 
-def find_correspondence(voltage_target, voltage_table, memristor_table):
+def find_correspondence(voltage_target, voltage_table):
     """
     Parameters
     ----------.
@@ -130,8 +130,7 @@ def find_correspondence(voltage_target, voltage_table, memristor_table):
     voltages = {}
     time_start = time.time()
     for i in range(len(voltage_target)):
-        print(voltage_table)
-        idx = find_nearest(voltage_table, voltage_target[i])
-        voltages[voltage_table[idx]] = np.sort(memristor_table[idx])
+        v = find_nearest(list(voltage_table.keys()), voltage_target[i])
+        voltages[v] = np.sort(voltage_table[v])
     print(f'Total time {time.time() - time_start}')
     return voltages
