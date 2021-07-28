@@ -62,7 +62,7 @@ class Data_Driven(Memristor):
 
     def set_parameter(self, parameter_model):
         print(parameter_model.capitalize())
-        if parameter_model.capitalize() == 'N1257R':
+        if parameter_model.casefold() == 'N1257R':
             r_off = 3590
             r_on = 1000
             self.A_p = 600.100775
