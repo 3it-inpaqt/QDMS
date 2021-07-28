@@ -61,8 +61,8 @@ class Data_Driven(Memristor):
         return 2.161e-4 * res
 
     def set_parameter(self, parameter_model):
-        print(parameter_model.casefold())
-        if parameter_model.casefold() == 'N1257R':
+        print(parameter_model.upper())
+        if parameter_model.upper() == 'N1257R':
             r_off = 3590
             r_on = 1000
             self.A_p = 600.100775
@@ -79,7 +79,7 @@ class Data_Driven(Memristor):
             self.b_p = 2.71689828
             self.b_n = 2.71689828
 
-        elif parameter_model.casefold() == 'O921C':
+        elif parameter_model.upper() == 'O921C':
             r_off = 12759.285080891
             r_on = 1895.117222714
             self.A_p = 134.391352437019
