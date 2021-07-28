@@ -144,7 +144,7 @@ class PulsedProgramming:
             if index == 1:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target[v], precision)
-            self.voltage_output[self.memristor_simulation.circuit.current_v_out()] = [1/i.g for i in self.memristor_simulation.circuit.list_memristor]
+            self.voltage_output[self.memristor_simulation.circuit.current_v_out()] = [i.read() for i in self.memristor_simulation.circuit.list_memristor]
             diff_voltage[abs(v - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target[v]]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
             if index == 50 and self.verbose:
                 conf_done += index
