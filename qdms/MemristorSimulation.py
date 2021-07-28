@@ -126,9 +126,10 @@ class MemristorSimulation:
             self.presentation()
 
         if self.distribution_type == 'linear':
-            self.simulate_linear()
-        else:
-            self.simulate_full_spread()
+            # self.simulate_linear()
+            self.simulate_loop()
+        elif self.distribution_type == 'full_spread':
+            self.simulate_loop()
 
         self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
         self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(np.float64))
@@ -150,7 +151,7 @@ class MemristorSimulation:
             print(f'Total time elapsed: {round(time.time() - timer_start, 2)}s')
             print()
 
-    def simulate_full_spread(self):
+    def simulate_loop(self):
         current_states = []
         for _ in range(self.circuit.number_of_memristor):
             current_states.append(-1)
