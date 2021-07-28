@@ -1,3 +1,4 @@
+import itertools
 import math
 import time
 import numpy as np
@@ -121,9 +122,23 @@ class MemristorSimulation:
         """
         Function to simulate all the possible voltages of the circuit and is stored in self.voltages.
         """
-
         if self.verbose:
             self.presentation()
+
+        if self.distribution_type == 'linear':
+            self.simulate_linear()
+        else:
+            self.simulate_full_spread()
+
+        for i in self.circuit.list_memristor:
+            i.g = 1 / i.r_on
+
+    def simulate_linear(self):
+        print(list_resistance[0])
+        res_values = list(itertools.combinations_with_replacement(self.list_resistance[0], self.circuit.number_of_memristor))
+        print(res_values)
+
+    def simulate_full_spread(self):
         current_states = []
         for _ in range(self.circuit.number_of_memristor):
             current_states.append(-1)
@@ -140,10 +155,7 @@ class MemristorSimulation:
         self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
         self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(np.float64))
         self.memristor = np.array(list(self.voltages_memristor_dict.values()), dtype=np.dtype((np.float64, (self.circuit.number_of_memristor,))))
-
         self.voltages_memristor_dict.clear()
-        for i in self.circuit.list_memristor:
-            i.g = 1 / i.r_on
 
     def create_res_states(self):
         """
