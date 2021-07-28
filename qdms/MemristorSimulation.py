@@ -90,7 +90,8 @@ class MemristorSimulation:
         self.distribution_type = distribution_type
         self.list_resistance = self.create_res_states()
         self.is_using_conductance = is_using_conductance
-        self.voltages_memristor = np.array([])
+        self.voltages = np.array([])
+        self.memristor = np.array([])
         self.verbose = verbose
 
         # Inner parameters
@@ -140,8 +141,8 @@ class MemristorSimulation:
             print()
 
         self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
-        dt = np.dtype([('voltages', np.float64), ('resistance', np.float64, (self.circuit.number_of_memristor,))])
-        self.voltages_memristor = np.array([(k, v) for k, v in self.voltages_memristor_dict.items()], dtype=dt)
+        self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(('voltages', np.float64)))
+        self.memristor = np.array(list(self.voltages_memristor_dict.values()), dtype=np.dtype(('resistance', np.float64, (self.circuit.number_of_memristor,))))
 
         self.voltages_memristor_dict.clear()
         for i in self.circuit.list_memristor:

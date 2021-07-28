@@ -165,7 +165,8 @@ def save_memristor_simulation_hdf5(memristor_sim, path):
         f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
         f.create_dataset("nb_states", data=memristor_sim.nb_states)
         f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
-        f.create_dataset("voltages_memristor", data=memristor_sim.voltages_memristor)
+        f.create_dataset("voltages", data=memristor_sim.voltages)
+        f.create_dataset("memristor", data=memristor_sim.memristor)
         f.create_dataset("verbose", data=memristor_sim.verbose)
         f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
         f.create_dataset("timers", data=memristor_sim.timers)
@@ -444,14 +445,16 @@ def load_memristor_simulation_hdf5(path, circuit):
         verbose = np.array(file.get('verbose'))
         nb_states = np.array(file.get('nb_states'))
         distribution_type = np.array(file.get('distribution_type'))
-        voltages_memristor = np.array(file.get('voltages_memristor'))
+        voltages = np.array(file.get('voltages'))
+        memristor = np.array(file.get('memristor'))
         list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
         timers = list(np.array(file.get('timers')))
 
     memristor_simulation = MemristorSimulation(circuit, nb_states)
     memristor_simulation.is_using_conductance = is_using_conductance
     memristor_simulation.distribution_type = distribution_type
-    memristor_simulation.voltages_memristor = voltages_memristor
+    memristor_simulation.memristor = memristor
+    memristor_simulation.voltages = voltages
     memristor_simulation.list_resistance = list_resistance
     memristor_simulation.verbose = verbose
     memristor_simulation.timers = timers
