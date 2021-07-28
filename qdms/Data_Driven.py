@@ -27,9 +27,9 @@ class Data_Driven(Memristor):
         k_p model parameter.
     k_n : float
         k_n model parameter.
-    r_p : float
+    r_p : list of float
         r_p voltage-dependent resistive boundary function coefficients.
-    r_n : float
+    r_n : list of float
         r_n voltage-dependent resistive boundary function coefficients.
     eta : int
         Switching direction to stimulus polarity.
@@ -45,53 +45,60 @@ class Data_Driven(Memristor):
         If true, a variability will be apply on reading.
     """
 
-    def __init__(self, is_variability_on=False):
-        time_series_resolution = 1e-9
-        # r_off = 1.7e4
-        # r_on = 1280
+    def __init__(self, parameter_model='O921C', is_variability_on=False):
+        self.A_p = self.A_n = self.t_p = self.t_n = self.k_p = self.k_n = self.eta = self.a_p = self.a_n = self.b_p = self.b_n = 0
+        self.r_p = self.r_n = None
 
-        r_off = 3590
-        r_on = 1000
-
-        # args = memtorch.bh.unpack_parameters(locals())
+        r_off, r_on = self.set_parameter(parameter_model)
         super(Data_Driven, self).__init__(
-            r_off, r_on, time_series_resolution, 0, 0
+            r_off, r_on, 1e-9, 0, 0
         )
-        # self.A_p = 743.47
-        # self.A_n = 68012.28374
-        # self.t_p = 6.51
-        # self.t_n = 0.31645
-        # self.k_p = 5.11e-4
-        # self.k_n = 1.17e-3
-        # self.r_p = [16719, 0]
-        # self.r_n = [29304.82557, 23692.77225]
-        # self.eta = 1
-        # self.a_p = 0.24
-        # self.a_n = 0.24
-        # self.b_p = 3
-        # self.b_n = 3
-
-        self.A_p = 600.100775
-        self.A_n = -34.5988399
-        self.t_p = -0.0212028
-        self.t_n = -0.05343997
-        self.k_p = 5.11e-4
-        self.k_n = 1.17e-3
-        self.r_p = [2699.2336, -672.930205]
-        self.r_n = [-1222.10682, -2656.27349]
-        self.eta = 1
-        self.a_p = 0.32046175
-        self.a_n = 0.32046175
-        self.b_p = 2.71689828
-        self.b_n = 2.71689828
-
         self.g = 1 / self.r_on
-
         self.is_variability_on = is_variability_on
 
     @staticmethod
     def variability(res):
         return 2.161e-4 * res
+
+    def set_parameter(self, parameter_model):
+        if parameter_model == 'N1257R'.casefold():
+            r_off = 3590
+            r_on = 1000
+            self.A_p = 600.100775
+            self.A_n = -34.5988399
+            self.t_p = -0.0212028
+            self.t_n = -0.05343997
+            self.k_p = 5.11e-4
+            self.k_n = 1.17e-3
+            self.r_p = [2699.2336, -672.930205]
+            self.r_n = [-1222.10682, -2656.27349]
+            self.eta = 1
+            self.a_p = 0.32046175
+            self.a_n = 0.32046175
+            self.b_p = 2.71689828
+            self.b_n = 2.71689828
+
+        elif parameter_model == 'O921C'.casefold():
+            r_off = 12759.285080891
+            r_on = 1895.117222714
+            self.A_p = 134.391352437019
+            self.A_n = -60.836774343766194
+            self.t_p = -0.05
+            self.t_n = -0.010820376861176992
+            self.k_p = 5.11e-4
+            self.k_n = 1.17e-3
+            self.r_p = [24579.55408725577, -13931.612038277426]
+            self.r_n = [26698.390117950614, 13390.241870805712]
+            self.eta = 1
+            self.a_p = 0.7395554112462469
+            self.a_n = 0.7395554112462469
+            self.b_p = 1.2384430017628405
+            self.b_n = 1.2384430017628405
+
+        else:
+            raise(Exception(f'Parameter model for Data_Driven {parameter_model} is unknown.'))
+
+        return r_off, r_on
 
     def read(self):
         res = 1 / self.g
