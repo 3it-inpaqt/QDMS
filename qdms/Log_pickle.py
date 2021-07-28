@@ -346,7 +346,7 @@ def load_memristor_pickle(path):
         memristor.is_variability_on = is_variability_on
 
     else:
-        print(f'Log.load_memristor: memristor model <{memristor_model}> unknown')
+        raise Exception(f'Log.load_memristor: memristor model <{memristor_model}> unknown')
     return memristor
 
 
