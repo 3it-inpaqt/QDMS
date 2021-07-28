@@ -128,6 +128,7 @@ class MemristorSimulation:
         if self.distribution_type == 'linear':
             self.simulate_linear()
         elif self.distribution_type == 'linear_test':
+            self.distribution_type = 'linear'
             self.simulate_loop()
         elif self.distribution_type == 'full_spread':
             self.simulate_loop()
