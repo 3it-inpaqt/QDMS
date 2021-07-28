@@ -58,6 +58,7 @@ class PulsedProgramming:
         self.number_of_reading = number_of_reading
         self.max_pulse = max_pulse
         self.verbose = verbose
+        self.voltage_output = {}
 
         self.index_variability = 0
         self.variability_write = np.random.normal(0, variance_write, 1000)
@@ -69,6 +70,7 @@ class PulsedProgramming:
         print(self.pulse_algorithm)
         print(self.tolerance)
         print(self.max_voltage)
+        print(self.voltage_output)
         print(self.is_relative_tolerance)
         print(self.variance_write)
         print(self.number_of_reading)
@@ -142,7 +144,7 @@ class PulsedProgramming:
             if index == 1:
                 start_time_ = time.time()
             self.simulate_list_memristor(voltages_target[v], precision)
-
+            self.voltage_output[self.memristor_simulation.circuit.current_v_out] = [1/i.g for i in self.memristor_simulation.circuit.list_memristor]
             diff_voltage[abs(v - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target[v]]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
             if index == 50 and self.verbose:
                 conf_done += index
