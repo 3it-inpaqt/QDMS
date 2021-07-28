@@ -123,8 +123,8 @@ def save_memristor_pickle(memristor, path):
     compressed_pickle(f'{path}\\time_series_resolution', memristor.time_series_resolution)
     compressed_pickle(f'{path}\\r_off', memristor.r_off)
     compressed_pickle(f'{path}\\r_on', memristor.r_on)
-    compressed_pickle(f'{path}\\A_p', memristor.A_p)
-    compressed_pickle(f'{path}\\A_n', memristor.A_n)
+    compressed_pickle(f'{path}\\A_p_', memristor.A_p)
+    compressed_pickle(f'{path}\\A_n_', memristor.A_n)
     compressed_pickle(f'{path}\\t_p', memristor.t_p)
     compressed_pickle(f'{path}\\t_n', memristor.t_n)
     compressed_pickle(f'{path}\\k_p', memristor.k_p)
@@ -307,8 +307,8 @@ def load_memristor_pickle(path):
     time_series_resolution = decompress_pickle(f'{path}\\time_series_resolution.pbz2')
     r_off = decompress_pickle(f'{path}\\r_off.pbz2')
     r_on = decompress_pickle(f'{path}\\r_on.pbz2')
-    A_p = decompress_pickle(f'{path}\\A_p.pbz2')
-    A_n = decompress_pickle(f'{path}\\A_n.pbz2')
+    A_p = decompress_pickle(f'{path}\\A_p_.pbz2')
+    A_n = decompress_pickle(f'{path}\\A_n_.pbz2')
     t_p = decompress_pickle(f'{path}\\t_p.pbz2')
     t_n = decompress_pickle(f'{path}\\t_n.pbz2')
     k_p = decompress_pickle(f'{path}\\k_p.pbz2')
@@ -323,7 +323,6 @@ def load_memristor_pickle(path):
     g = decompress_pickle(f'{path}\\g.pbz2')
     is_variability_on = decompress_pickle(f'{path}\\is_variability_on.pbz2')
 
-    memristor = None
     if str(memristor_model) == "<class 'qdms.Data_Driven.Data_Driven'>":
         memristor = Data_Driven()
         memristor.time_series_resolution = time_series_resolution
