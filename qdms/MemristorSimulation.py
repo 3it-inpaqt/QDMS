@@ -130,13 +130,25 @@ class MemristorSimulation:
         else:
             self.simulate_full_spread()
 
+        self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
+        self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(np.float64))
+        self.memristor = np.array(list(self.voltages_memristor_dict.values()), dtype=np.dtype((np.float64, (self.circuit.number_of_memristor,))))
+        self.voltages_memristor_dict.clear()
+
         for i in self.circuit.list_memristor:
             i.g = 1 / i.r_on
 
     def simulate_linear(self):
-        print(self.list_resistance[0])
+        if self.verbose:
+            timer_start = time.time()
         res_values = list(itertools.combinations_with_replacement(self.list_resistance[0], self.circuit.number_of_memristor))
-        print(res_values)
+        for current_res in res_values:
+            for i in range(self.circuit.number_of_memristor):
+                self.circuit.list_memristor[i].g = 1 / current_res[i]
+            self.voltages_memristor_dict[self.circuit.current_v_out()] = [1 / i.g for i in self.circuit.list_memristor]
+        if self.verbose:
+            print(f'Total time elapsed: {round(time.time() - timer_start, 2)}s')
+            print()
 
     def simulate_full_spread(self):
         current_states = []
@@ -151,11 +163,6 @@ class MemristorSimulation:
             timer_end = time.time()
             self.timers.append(timer_end-timer_start)
             print()
-
-        self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
-        self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(np.float64))
-        self.memristor = np.array(list(self.voltages_memristor_dict.values()), dtype=np.dtype((np.float64, (self.circuit.number_of_memristor,))))
-        self.voltages_memristor_dict.clear()
 
     def create_res_states(self):
         """
