@@ -151,58 +151,50 @@ def save_circuit_pickle(circuit, path):
 
 
 def save_pulsed_programming_pickle(pulsed_programming, path):
-    with h5py.File(f'{path}\\pulsed_programming_data.hdf5', 'w') as f:
-        f.create_dataset("pulse_algorithm", data=pulsed_programming.pulse_algorithm)
-        f.create_dataset("max_voltage", data=pulsed_programming.max_voltage)
-        f.create_dataset("tolerance", data=pulsed_programming.tolerance)
-        f.create_dataset("index_variability", data=pulsed_programming.index_variability)
-        f.create_dataset("variance_write", data=pulsed_programming.variance_write)
-        f.create_dataset("variability_write", data=pulsed_programming.variability_write)
-        f.create_dataset("number_of_reading", data=pulsed_programming.number_of_reading)
-        graph_resistance_1, graph_resistance_2, graph_resistance_3, graph_resistance_4 = zip(*pulsed_programming.graph_resistance)
-        graph_resistance_3 = [i.encode('utf8') for i in graph_resistance_3]
-        f.create_dataset("graph_resistance_1", data=graph_resistance_1)
-        f.create_dataset("graph_resistance_2", data=graph_resistance_2)
-        f.create_dataset("graph_resistance_3", data=graph_resistance_3)
-        f.create_dataset("graph_resistance_4", data=graph_resistance_4)
-        graph_voltages_1, graph_voltages_2, graph_voltages_3 = zip(*pulsed_programming.graph_voltages)
-        graph_voltages_3 = [i.encode('utf8') for i in graph_voltages_3]
-        f.create_dataset("graph_voltages_1", data=graph_voltages_1)
-        f.create_dataset("graph_voltages_2", data=graph_voltages_2)
-        f.create_dataset("graph_voltages_3", data=graph_voltages_3)
-        f.create_dataset("max_pulse", data=pulsed_programming.max_pulse)
-        f.create_dataset("is_relative_tolerance", data=pulsed_programming.is_relative_tolerance)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    compressed_pickle(f'{path}\\pulse_algorithm', pulsed_programming.pulse_algorithm)
+    compressed_pickle(f'{path}\\max_voltage', pulsed_programming.max_voltage)
+    compressed_pickle(f'{path}\\tolerance', pulsed_programming.tolerance)
+    compressed_pickle(f'{path}\\index_variability', pulsed_programming.index_variability)
+    compressed_pickle(f'{path}\\variance_write', pulsed_programming.variance_write)
+    compressed_pickle(f'{path}\\variability_write', pulsed_programming.variability_write)
+    compressed_pickle(f'{path}\\number_of_reading', pulsed_programming.number_of_reading)
+    compressed_pickle(f'{path}\\graph_resistance', pulsed_programming.graph_resistance)
+    compressed_pickle(f'{path}\\graph_voltages', pulsed_programming.graph_voltages)
+    compressed_pickle(f'{path}\\max_pulse', pulsed_programming.max_pulse)
+    compressed_pickle(f'{path}\\is_relative_tolerance', pulsed_programming.is_relative_tolerance)
 
 
 def save_memristor_simulation_pickle(memristor_sim, path):
-    filename = 'memristor_sim_data'
-    with h5py.File(f'{path}\\{filename}.hdf5', 'w') as f:
-        f.create_dataset("is_using_conductance", data=memristor_sim.is_using_conductance)
-        f.create_dataset("nb_states", data=memristor_sim.nb_states)
-        f.create_dataset("distribution_type", data=memristor_sim.distribution_type)
-        f.create_dataset("voltages", data=memristor_sim.voltages.astype('d'))
-        f.create_dataset("memristor", data=memristor_sim.memristor.astype('h'))
-        f.create_dataset("verbose", data=memristor_sim.verbose)
-        f.create_dataset("list_resistance", data=memristor_sim.list_resistance)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    compressed_pickle(f'{path}\\is_using_conductance', memristor_sim.is_using_conductance)
+    compressed_pickle(f'{path}\\nb_states', memristor_sim.nb_states)
+    compressed_pickle(f'{path}\\distribution_type', memristor_sim.distribution_type)
+    compressed_pickle(f'{path}\\voltages', memristor_sim.voltages)
+    compressed_pickle(f'{path}\\memristor', memristor_sim.memristor)
+    compressed_pickle(f'{path}\\verbose', memristor_sim.verbose)
+    compressed_pickle(f'{path}\\list_resistance', memristor_sim.list_resistance)
 
 
 def save_qd_simulation_pickle(memristor_sim, path):
-    with h5py.File(f'{path}\\qd_simulation_data.hdf5', 'w') as f:
-        stability_diagram = np.array(memristor_sim.stability_diagram)
-        f.create_dataset("stability_diagram", data=stability_diagram.astype(np.float64))
-        f.create_dataset("voltages", data=memristor_sim.voltages)
-        f.create_dataset("Cg1", data=memristor_sim.Cg1)
-        f.create_dataset("Cg2", data=memristor_sim.Cg2)
-        f.create_dataset("CL", data=memristor_sim.CL)
-        f.create_dataset("CR", data=memristor_sim.CR)
-        f.create_dataset("parameter_model", data=memristor_sim.parameter_model)
-        f.create_dataset("T", data=memristor_sim.T)
-        f.create_dataset("Cm", data=memristor_sim.Cm)
-        f.create_dataset("kB", data=memristor_sim.kB)
-        f.create_dataset("N_min", data=memristor_sim.N_min)
-        f.create_dataset("N_max", data=memristor_sim.N_max)
-        f.create_dataset("n_dots", data=memristor_sim.n_dots)
-        f.create_dataset("verbose", data=memristor_sim.verbose)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    compressed_pickle(f'{path}\\stability_diagram', memristor_sim.stability_diagram)
+    compressed_pickle(f'{path}\\voltages', memristor_sim.voltages)
+    compressed_pickle(f'{path}\\Cg1', memristor_sim.Cg1)
+    compressed_pickle(f'{path}\\Cg2', memristor_sim.Cg2)
+    compressed_pickle(f'{path}\\CL', memristor_sim.CL)
+    compressed_pickle(f'{path}\\CR', memristor_sim.CR)
+    compressed_pickle(f'{path}\\parameter_model', memristor_sim.parameter_model)
+    compressed_pickle(f'{path}\\T', memristor_sim.T)
+    compressed_pickle(f'{path}\\Cm', memristor_sim.Cm)
+    compressed_pickle(f'{path}\\kB', memristor_sim.kB)
+    compressed_pickle(f'{path}\\N_min', memristor_sim.N_min)
+    compressed_pickle(f'{path}\\N_max', memristor_sim.N_max)
+    compressed_pickle(f'{path}\\n_dots', memristor_sim.n_dots)
+    compressed_pickle(f'{path}\\verbose', memristor_sim.verbose)
 
 
 def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programming=None, memristor_sim=None,
@@ -396,27 +388,17 @@ def load_pulsed_programming_pickle(path, memristor_simulation):
     pulsed_programming : PulsedProgramming.PulsedProgramming
         The pulsed_programming object.
     """
-    with h5py.File(f'{path}', 'r') as file:
-        pulse_algorithm = str(np.array(file.get('pulse_algorithm'))).lstrip("b\'").rstrip("\'")
-        max_voltage = np.array(file.get('max_voltage'))
-        tolerance = np.array(file.get('tolerance'))
-        index_variability = np.array(file.get('index_variability'))
-        variance_write = np.array(file.get('variance_write'))
-        variability_write = np.array(file.get('variability_write'))
-        number_of_reading = np.array(file.get('number_of_reading'))
-        graph_resistance_1 = np.array(file.get('graph_resistance_1'))
-        graph_resistance_2 = np.array(file.get('graph_resistance_2'))
-        graph_resistance_3 = np.array(file.get('graph_resistance_3'))
-        graph_resistance_4 = np.array(file.get('graph_resistance_4'))
-        graph_resistance = list(zip(graph_resistance_1, graph_resistance_2, [str(a).lstrip("b\'").rstrip("\'") for a in graph_resistance_3], graph_resistance_4))
-        graph_resistance = [list(a) for a in graph_resistance]
-        graph_voltages_1 = np.array(file.get('graph_voltages_1'))
-        graph_voltages_2 = np.array(file.get('graph_voltages_2'))
-        graph_voltages_3 = np.array(file.get('graph_voltages_3'))
-        graph_voltages = list(zip(graph_voltages_1, graph_voltages_2, [str(a).lstrip("b\'").rstrip("\'") for a in graph_voltages_3]))
-        graph_voltages = [list(a) for a in graph_voltages]
-        max_pulse = np.array(file.get('max_pulse'))
-        is_relative_tolerance = np.array(file.get('is_relative_tolerance'))
+    pulse_algorithm = decompress_pickle(f'{path}\\pulse_algorithm.pbz2')
+    max_voltage = decompress_pickle(f'{path}\\max_voltage.pbz2')
+    tolerance = decompress_pickle(f'{path}\\tolerance.pbz2')
+    index_variability = decompress_pickle(f'{path}\\index_variability.pbz2')
+    variance_write = decompress_pickle(f'{path}\\variance_write.pbz2')
+    variability_write = decompress_pickle(f'{path}\\variability_write.pbz2')
+    number_of_reading = decompress_pickle(f'{path}\\number_of_reading.pbz2')
+    graph_resistance = decompress_pickle(f'{path}\\graph_resistance.pbz2')
+    graph_voltages = decompress_pickle(f'{path}\\graph_voltages.pbz2')
+    max_pulse = decompress_pickle(f'{path}\\max_pulse.pbz2')
+    is_relative_tolerance = decompress_pickle(f'{path}\\is_relative_tolerance.pbz2')
 
     pulsed_programming = PulsedProgramming(memristor_simulation)
     pulsed_programming.pulse_algorithm = pulse_algorithm
@@ -451,14 +433,13 @@ def load_memristor_simulation_pickle(path, circuit):
     memristor_simulation : MemristorSimulation.MemristorSimulation
         The memristor_simulation object.
     """
-    with h5py.File(f'{path}', 'r') as file:
-        is_using_conductance = np.array(file.get('is_using_conductance'))
-        verbose = np.array(file.get('verbose'))
-        nb_states = np.array(file.get('nb_states'))
-        distribution_type = np.array(file.get('distribution_type'))
-        voltages = np.array(file.get('voltages'))
-        memristor = np.array(file.get('memristor'))
-        list_resistance = [list(a) for a in np.array(file.get('list_resistance'))]
+    is_using_conductance = decompress_pickle(f'{path}\\is_using_conductance.pbz2')
+    verbose = decompress_pickle(f'{path}\\verbose.pbz2')
+    nb_states = decompress_pickle(f'{path}\\nb_states.pbz2')
+    voltages = decompress_pickle(f'{path}\\voltages.pbz2')
+    memristor = decompress_pickle(f'{path}\\memristor.pbz2')
+    list_resistance = decompress_pickle(f'{path}\\list_resistance.pbz2')
+    distribution_type = decompress_pickle(f'{path}\\distribution_type.pbz2')
 
     memristor_simulation = MemristorSimulation(circuit, nb_states)
     memristor_simulation.is_using_conductance = is_using_conductance
@@ -485,24 +466,24 @@ def load_qd_simulation_pickle(path):
     qd_simulation : QDSimulation.QDSimulation
         The qd_simulation object.
     """
-    with h5py.File(f'{path}', 'r') as file:
-        stability_diagram = list(np.array(file.get('stability_diagram')))
-        voltages = np.array(file.get('voltages'))
-        Cg1 = np.array(file.get('Cg1'))
-        Cg2 = np.array(file.get('Cg2'))
-        CL = np.array(file.get('CL'))
-        CR = np.array(file.get('CR'))
-        parameter_model = str(np.array(file.get('parameter_model'))).lstrip("b\'").rstrip("\'")
-        T = np.array(file.get('T'))
-        Cm = np.array(file.get('Cm'))
-        kB = np.array(file.get('kB'))
-        N_min = np.array(file.get('N_min'))
-        N_max = np.array(file.get('N_max'))
-        n_dots = np.array(file.get('n_dots'))
-        verbose = np.array(file.get('verbose'))
+    stability_diagram = decompress_pickle(f'{path}\\stability_diagram.pbz2')
+    voltages = decompress_pickle(f'{path}\\voltages.pbz2')
+    Cg1 = decompress_pickle(f'{path}\\Cg1.pbz2')
+    Cg2 = decompress_pickle(f'{path}\\Cg2.pbz2')
+    CL = decompress_pickle(f'{path}\\CL.pbz2')
+    CR = decompress_pickle(f'{path}\\CR.pbz2')
+    parameter_model = decompress_pickle(f'{path}\\parameter_model.pbz2')
+    T = decompress_pickle(f'{path}\\T.pbz2')
+    Cm = decompress_pickle(f'{path}\\Cm.pbz2')
+    kB = decompress_pickle(f'{path}\\kB.pbz2')
+    N_min = decompress_pickle(f'{path}\\N_min.pbz2')
+    N_max = decompress_pickle(f'{path}\\N_max.pbz2')
+    n_dots = decompress_pickle(f'{path}\\n_dots.pbz2')
+    verbose = decompress_pickle(f'{path}\\verbose.pbz2')
 
     qd_simulation = QDSimulation(voltages)
     qd_simulation.stability_diagram = stability_diagram
+    qd_simulation.voltages = voltages
     qd_simulation.Cg1 = Cg1
     qd_simulation.Cg2 = Cg2
     qd_simulation.CL = CL
