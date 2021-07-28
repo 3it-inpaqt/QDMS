@@ -324,7 +324,7 @@ def load_memristor_pickle(path):
     is_variability_on = decompress_pickle(f'{path}\\is_variability_on.pbz2')
 
     memristor = None
-    if memristor_model == str(b"<class 'qdms.Data_Driven.Data_Driven'>"):
+    if memristor_model == "<class 'qdms.Data_Driven.Data_Driven'>":
         memristor = Data_Driven()
         memristor.time_series_resolution = time_series_resolution
         memristor.r_off = r_off
