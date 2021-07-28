@@ -64,27 +64,27 @@ def save_everything_pickle(path, directory_name, memristor_sim=None, qd_simulati
             print('\n##########################\n'
                   'Start saving')
             start = time.time()
-        save_memristor_pickle(memristor, path + '\\' + directory_name)
+        save_memristor_pickle(memristor, f'{path}\\{directory_name}\\memristor')
         if verbose:
             print(f'Memristor: {time.time()-start}')
             start = time.time()
     if circuit is not None:
-        save_circuit_pickle(circuit,  path + '\\' + directory_name)
+        save_circuit_pickle(circuit, f'{path}\\{directory_name}\\circuit')
         if verbose:
             print(f'Circuit: {time.time()-start}')
             start = time.time()
     if pulsed_programming is not None:
-        save_pulsed_programming_pickle(pulsed_programming,  path + '\\' + directory_name)
+        save_pulsed_programming_pickle(pulsed_programming, f'{path}\\{directory_name}\\pulsed_programming')
         if verbose:
             print(f'Pulsed programming: {time.time()-start}')
             start = time.time()
     if memristor_sim is not None:
-        save_memristor_simulation_pickle(memristor_sim,  path + '\\' + directory_name)
+        save_memristor_simulation_pickle(memristor_sim, f'{path}\\{directory_name}\\memristor_sim')
         if verbose:
             print(f'Memristor simulation: {time.time()-start}')
             start = time.time()
     if qd_simulation is not None:
-        save_qd_simulation_pickle(qd_simulation,  path + '\\' + directory_name)
+        save_qd_simulation_pickle(qd_simulation, f'{path}\\{directory_name}\\qd_sim')
         if verbose:
             print(f'QD simulation: {time.time()-start}')
 
@@ -163,6 +163,7 @@ def save_pulsed_programming_pickle(pulsed_programming, path):
     compressed_pickle(f'{path}\\graph_resistance', pulsed_programming.graph_resistance)
     compressed_pickle(f'{path}\\graph_voltages', pulsed_programming.graph_voltages)
     compressed_pickle(f'{path}\\max_pulse', pulsed_programming.max_pulse)
+    compressed_pickle(f'{path}\\is_relative_tolerance', pulsed_programming.is_relative_tolerance)
     compressed_pickle(f'{path}\\is_relative_tolerance', pulsed_programming.is_relative_tolerance)
 
 
