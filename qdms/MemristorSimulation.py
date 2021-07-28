@@ -84,8 +84,8 @@ class MemristorSimulation:
     def __init__(self, circuit, nb_states, distribution_type='linear', is_using_conductance=False, verbose=False):
         if not isinstance(circuit, Circuit):
             raise TypeError(f'Error: circuit object is not from Circuit class.')
-        if distribution_type != 'full_spread' and distribution_type != 'linear' and distribution_type != 'half_spread':
-            raise Exception(f"Error: distribution type <{distribution_type}> invalid")
+        # if distribution_type != 'full_spread' and distribution_type != 'linear':
+        #     raise Exception(f"Error: distribution type <{distribution_type}> invalid")
         self.circuit = circuit
         self.nb_states = nb_states
         self.distribution_type = distribution_type
