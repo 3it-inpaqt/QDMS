@@ -124,8 +124,8 @@ class PulsedProgramming:
 
         Parameters
         ----------
-        voltages_target : list
-            list of [voltage, [res1, res2, res3]]
+        voltages_target : dict
+            dict with keys as voltage and package as list of resistance
 
         precision : list
             [[macro_tune, is_relative_variability], [fine_tune, is_relative_variability]] for the balance() method.
@@ -138,12 +138,12 @@ class PulsedProgramming:
         conf_done = 0
         start_time = time.time()
         diff_voltage = {}
-        for v in voltages_target:
+        for v in list(voltages_target.keys()):
             if index == 1:
                 start_time_ = time.time()
-            self.simulate_list_memristor(v[1], precision)
+            self.simulate_list_memristor(voltages_target[v], precision)
 
-            diff_voltage[abs(v[0] - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in v[1]]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
+            diff_voltage[abs(v - self.memristor_simulation.circuit.current_v_out())] = [round(1 / np.sum([1/res for res in voltages_target[v]]), 4), round(1 / self.memristor_simulation.circuit.current_conductance(), 4)]
             if index == 50 and self.verbose:
                 conf_done += index
                 print(f'Conf done: {conf_done}\tTook: {round(time.time() - start_time_, 2)} s\tTime left: {round((time.time() - start_time_) * (len(voltages_target.keys()) - conf_done) / 50, 2)} s')
