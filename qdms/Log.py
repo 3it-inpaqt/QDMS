@@ -455,7 +455,6 @@ def load_memristor_simulation_hdf5(path, circuit):
     memristor_simulation.voltages = voltages
     memristor_simulation.list_resistance = list_resistance
     memristor_simulation.verbose = verbose
-    memristor_simulation.timers = timers
 
     return memristor_simulation
 
