@@ -72,7 +72,7 @@ class MemristorSimulation:
     verbose : bool
         If true, the simulation will output parameter description and timer on how much time left to the simulation.
 
-    voltages_memristor : list
+    voltages_memristor : dict
         Dictionary where the key is the voltage output and the package is the resistance value of each memristor
 
     timers : list of float
@@ -91,8 +91,7 @@ class MemristorSimulation:
         self.distribution_type = distribution_type
         self.list_resistance = self.create_res_states()
         self.is_using_conductance = is_using_conductance
-        self.voltages = np.array([])
-        self.memristor = np.array([])
+        self.voltages_memristor = {}
         self.verbose = verbose
 
         # Inner parameters
@@ -101,7 +100,6 @@ class MemristorSimulation:
         self.start_inner_loop_rec = 0
         self.end_loop_rec = 0
         self.end_inner_loop_rec = 0
-        self.voltages_memristor_dict = {}
 
     def presentation(self):
         """
@@ -142,10 +140,7 @@ class MemristorSimulation:
         elif self.distribution_type == 'full_spread':
             self.simulate_loop()
 
-        self.voltages_memristor_dict = {k: self.voltages_memristor_dict[k] for k in sorted(self.voltages_memristor_dict)}
-        self.voltages = np.array(list(self.voltages_memristor_dict.keys()), dtype=np.dtype(np.float64))
-        self.memristor = np.array(list(self.voltages_memristor_dict.values()), dtype=np.dtype((np.float64, (self.circuit.number_of_memristor,))))
-        self.voltages_memristor_dict.clear()
+        self.voltages_memristor = {k: self.voltages_memristor[k] for k in sorted(self.voltages_memristor)}
 
         for i in self.circuit.list_memristor:
             i.g = 1 / i.r_on
@@ -157,7 +152,7 @@ class MemristorSimulation:
         for current_res in res_values:
             for i in range(self.circuit.number_of_memristor):
                 self.circuit.list_memristor[i].g = 1 / current_res[i]
-            self.voltages_memristor_dict[self.circuit.current_v_out()] = [1 / i.g for i in self.circuit.list_memristor]
+            self.voltages_memristor[self.circuit.current_v_out()] = [1 / i.g for i in self.circuit.list_memristor]
         if self.verbose:
             print(f'Total time elapsed: {round(time.time() - timer_start, 2)}s')
             print()
@@ -222,7 +217,7 @@ class MemristorSimulation:
 
         for i in range(self.circuit.number_of_memristor):
             self.circuit.list_memristor[i].g = 1 / current_res[i]
-        self.voltages_memristor_dict[self.circuit.current_v_out()] = [1/i.g for i in self.circuit.list_memristor]
+        self.voltages_memristor[self.circuit.current_v_out()] = [1/i.g for i in self.circuit.list_memristor]
 
     def loop_rec(self, list_resistance, counter, current_states):
         """

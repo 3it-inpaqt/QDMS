@@ -172,8 +172,7 @@ def save_memristor_simulation_pickle(memristor_sim, path):
     compressed_pickle(f'{path}\\is_using_conductance', memristor_sim.is_using_conductance)
     compressed_pickle(f'{path}\\nb_states', memristor_sim.nb_states)
     compressed_pickle(f'{path}\\distribution_type', memristor_sim.distribution_type)
-    compressed_pickle(f'{path}\\voltages', memristor_sim.voltages)
-    compressed_pickle(f'{path}\\memristor', memristor_sim.memristor)
+    compressed_pickle(f'{path}\\voltages_memristor', memristor_sim.voltages_memristor)
     compressed_pickle(f'{path}\\verbose', memristor_sim.verbose)
     compressed_pickle(f'{path}\\list_resistance', memristor_sim.list_resistance)
 
@@ -436,16 +435,14 @@ def load_memristor_simulation_pickle(path, circuit):
     is_using_conductance = decompress_pickle(f'{path}\\is_using_conductance.pbz2')
     verbose = decompress_pickle(f'{path}\\verbose.pbz2')
     nb_states = decompress_pickle(f'{path}\\nb_states.pbz2')
-    voltages = decompress_pickle(f'{path}\\voltages.pbz2')
-    memristor = decompress_pickle(f'{path}\\memristor.pbz2')
+    voltages_memristor = decompress_pickle(f'{path}\\voltages_memristor.pbz2')
     list_resistance = decompress_pickle(f'{path}\\list_resistance.pbz2')
     distribution_type = decompress_pickle(f'{path}\\distribution_type.pbz2')
 
     memristor_simulation = MemristorSimulation(circuit, nb_states)
     memristor_simulation.is_using_conductance = is_using_conductance
     memristor_simulation.distribution_type = distribution_type
-    memristor_simulation.memristor = memristor
-    memristor_simulation.voltages = voltages
+    memristor_simulation.voltages_memristor = voltages_memristor
     memristor_simulation.list_resistance = list_resistance
     memristor_simulation.verbose = verbose
 
