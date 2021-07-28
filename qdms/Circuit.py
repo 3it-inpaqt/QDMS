@@ -43,15 +43,14 @@ class Circuit:
         for _ in range(number_of_memristor):
             self.list_memristor.append(copy.deepcopy(memristor_model))
 
-    def __str__(self):
-        str_out = "Here is the current parameter list for the circuit"
-        str_out += "\n-------------------------------------\n"
-        str_out += 'Number of memristor:' + str(self.number_of_memristor) + '\n'
-        str_out += 'v_in (V):\t\t\t' + str(self.v_in) + '\n'
-        str_out += 'Resistance load:\t' + str(self.R_L) + '\n'
-        str_out += 'Gain:\t\t\t\t' + str(self.gain_resistance) + '\n'
-        str_out += "-------------------------------------\n"
-        return str_out
+    def print(self):
+        print(self.memristor_model)
+        print(self.number_of_memristor)
+        print(self.gain_resistance)
+        print(self.v_in)
+        print(self.R_L)
+        print(self.is_new_architecture)
+        print(self.list_memristor)
 
     def calculate_voltage(self, conductance):
         """

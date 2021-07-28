@@ -36,6 +36,24 @@ class Memristor(ABC):
         self.g = None
         self.finite_states = None
 
+    def print(self):
+        print(self.time_series_resolution)
+        print(self.r_off)
+        print(self.r_on)
+        print(self.A_p)
+        print(self.A_n)
+        print(self.t_p)
+        print(self.t_n)
+        print(self.k_p)
+        print(self.k_n)
+        print(self.r_p)
+        print(self.r_n)
+        print(self.eta)
+        print(self.a_p)
+        print(self.a_n)
+        print(self.b_p)
+        print(self.b_n)
+
     @abstractmethod
     def read(self):
         """

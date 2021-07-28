@@ -81,28 +81,20 @@ class QDSimulation:
         self.n_dots = n_dots
         self.verbose = verbose
 
-    def __str__(self):
-        str_out = str('Here is the current parameter list for the QD simulation\n')
-        str_out += str('-------------------------------------\n')
-        str_out += str('Temperature (K):\t' + str(self.T))
-        str_out += str('\n')
-        str_out += str('Cg1 (F):\t' + str(self.Cg1))
-        str_out += str('\n')
-        str_out += str('Cg2 (F):\t' + str(self.Cg2))
-        str_out += str('\n')
-        str_out += str('CL (F):\t' + str(self.CL))
-        str_out += str('\n')
-        str_out += str('CR (F):\t' + str(self.CR))
-        str_out += str('\n')
-        str_out += str('Cm:\t' + str(self.Cm))
-        str_out += str('\n')
-        str_out += str('Nmin:\t' + str(self.N_min))
-        str_out += str('\n')
-        str_out += str('Nmax:\t' + str(self.N_max))
-        str_out += str('\n')
-        str_out += str('Number of dots:\t' + str(self.n_dots))
-        str_out += str('\n-------------------------------------\n')
-        return str_out
+    def print(self):
+        print(self.stability_diagram)
+        print(self.voltages)
+        print(self.Cg1)
+        print(self.Cg2)
+        print(self.CL)
+        print(self.CR)
+        print(self.T)
+        print(self.Cm)
+        print(self.kB)
+        print(self.N_min)
+        print(self.N_max)
+        print(self.n_dots)
+        print(self.verbose)
 
     def set_parameter_model(self, parameter_model):
         self.parameter_model = parameter_model

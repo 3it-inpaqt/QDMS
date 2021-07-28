@@ -118,6 +118,15 @@ class MemristorSimulation:
         print(f'Distribution type:\t{self.distribution_type}')
         print("-------------------------")
 
+    def print(self):
+        print(self.nb_states)
+        print(self.distribution_type)
+        print(self.list_resistance)
+        print(self.is_using_conductance)
+        print(self.voltages)
+        print(self.memristor)
+        print(self.verbose)
+
     def simulate(self):
         """
         Function to simulate all the possible voltages of the circuit and is stored in self.voltages.

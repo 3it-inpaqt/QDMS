@@ -65,16 +65,17 @@ class PulsedProgramming:
         self.graph_resistance = []
         self.graph_voltages = []
 
-    def __str__(self):
-        str_out = "Here is the current parameter list for pulsed programming"
-        str_out += "\n-------------------------------------\n"
-        str_out += 'Memristor:\t\t\t\t' + str(type(self.circuit.memristor_model)) + '\n'
-        str_out += 'Nb_states:\t\t\t\t' + str(self.nb_states) + '\n'
-        str_out += 'Tolerance (Ohm):\t\t' + str(self.tolerance) + '\n'
-        str_out += 'Variance write:\t' + str(self.variance_write) + '\n'
-        str_out += 'Max voltage (V):\t\t' + str(self.max_voltage) + '\n'
-        str_out += "-------------------------------------\n"
-        return str_out
+    def print(self):
+        print(self.pulse_algorithm)
+        print(self.tolerance)
+        print(self.max_voltage)
+        print(self.is_relative_tolerance)
+        print(self.variance_write)
+        print(self.number_of_reading)
+        print(self.max_pulse)
+        print(self.verbose)
+        print(self.graph_resistance)
+        print(self.graph_voltages)
 
     def write_resistance(self, memristor, voltage, t_pulse):
         """

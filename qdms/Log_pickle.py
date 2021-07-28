@@ -141,12 +141,13 @@ def save_memristor_pickle(memristor, path):
 
 
 def save_circuit_pickle(circuit, path):
-    with h5py.File(f'{path}\\circuit_data.hdf5', 'w') as f:
-        f.create_dataset("number_of_memristor", data=circuit.number_of_memristor)
-        f.create_dataset("gain_resistance", data=circuit.gain_resistance)
-        f.create_dataset("v_in", data=circuit.v_in)
-        f.create_dataset("R_L", data=circuit.R_L)
-        f.create_dataset("is_new_architecture", data=circuit.is_new_architecture)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    compressed_pickle(f'{path}\\number_of_memristor', circuit.number_of_memristor)
+    compressed_pickle(f'{path}\\gain_resistance', circuit.gain_resistance)
+    compressed_pickle(f'{path}\\v_in', circuit.v_in)
+    compressed_pickle(f'{path}\\R_L', circuit.R_L)
+    compressed_pickle(f'{path}\\is_new_architecture', circuit.is_new_architecture)
 
 
 def save_pulsed_programming_pickle(pulsed_programming, path):
@@ -263,7 +264,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(memristor, int):
         memristor = None
     elif memristor is None:
-        memristor = load_memristor_pickle(path + '\\memristor_data.hdf5')
+        memristor = load_memristor_pickle(path + '\\memristor_data')
     if verbose:
         print(f'Memristor loaded: {time.time()-start}')
         start = time.time()
@@ -271,7 +272,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(circuit, int):
         circuit = None
     elif circuit is None and memristor is not None:
-        circuit = load_circuit_pickle(path + '\\circuit_data.hdf5', memristor)
+        circuit = load_circuit_pickle(path + '\\circuit_data', memristor)
     if verbose:
         print(f'Circuit loaded: {time.time()-start}')
         start = time.time()
@@ -279,7 +280,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(memristor_sim, int):
         memristor_sim = None
     elif memristor_sim is None and circuit is not None:
-        memristor_sim = load_memristor_simulation_pickle(path + f'\\memristor_sim_data.hdf5', circuit)
+        memristor_sim = load_memristor_simulation_pickle(path + f'\\memristor_sim_data', circuit)
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
         start = time.time()
@@ -287,7 +288,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(pulsed_programming, int):
         pulsed_programming = None
     elif pulsed_programming is None and memristor_sim is not None:
-        pulsed_programming = load_pulsed_programming_pickle(path + '\\pulsed_programming_data.hdf5', memristor_sim)
+        pulsed_programming = load_pulsed_programming_pickle(path + '\\pulsed_programming_data', memristor_sim)
     if verbose:
         print(f'Pulsed programming loaded: {time.time()-start}')
         start = time.time()
@@ -295,7 +296,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(qd_simulation, int):
         qd_simulation = None
     elif qd_simulation is None:
-        qd_simulation = load_qd_simulation_pickle(path + '\\qd_simulation_data.hdf5')
+        qd_simulation = load_qd_simulation_pickle(path + '\\qd_simulation_data')
     if verbose:
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
@@ -366,12 +367,11 @@ def load_circuit_pickle(path, memristor):
     circuit : Circuit.Circuit
         The circuit object.
     """
-    with h5py.File(f'{path}', 'r') as file:
-        number_of_memristor = np.array(file.get('number_of_memristor'))
-        gain_resistance = np.array(file.get('gain_resistance'))
-        v_in = np.array(file.get('v_in'))
-        R_L = np.array(file.get('R_L'))
-        is_new_architecture = np.array(file.get('is_new_architecture'))
+    number_of_memristor = decompress_pickle(f'{path}\\number_of_memristor.pbz2')
+    gain_resistance = decompress_pickle(f'{path}\\gain_resistance.pbz2')
+    v_in = decompress_pickle(f'{path}\\v_in.pbz2')
+    R_L = decompress_pickle(f'{path}\\R_L.pbz2')
+    is_new_architecture = decompress_pickle(f'{path}\\is_new_architecture.pbz2')
 
     circuit = Circuit(memristor_model=memristor, number_of_memristor=number_of_memristor, is_new_architecture=is_new_architecture
                       , v_in=v_in, gain_resistance=gain_resistance, R_L=R_L)
