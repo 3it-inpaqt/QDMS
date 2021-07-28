@@ -213,7 +213,7 @@ class PulsedProgramming:
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 break
 
-    def small_convergence(self, memristor, target_res, is_plotting):
+    def small_convergence(self, memristor, target_res):
         """
         This function run the pulsed programming with a variable voltage to set the target_res for the memristor with a
         really small increment.
