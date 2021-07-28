@@ -2,6 +2,7 @@ import math
 import time
 import numpy as np
 from .Circuit import Circuit
+from .Data_Driven import Data_Driven
 
 
 def spread_resistor_list(lrs, hrs, nb_states, number):
