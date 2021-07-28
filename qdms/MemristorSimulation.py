@@ -134,7 +134,7 @@ class MemristorSimulation:
             i.g = 1 / i.r_on
 
     def simulate_linear(self):
-        print(list_resistance[0])
+        print(self.list_resistance[0])
         res_values = list(itertools.combinations_with_replacement(self.list_resistance[0], self.circuit.number_of_memristor))
         print(res_values)
 
