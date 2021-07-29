@@ -129,8 +129,9 @@ def find_correspondence(voltage_target, voltage_table):
     """
     voltages = {}
     time_start = time.time()
+    voltages_ = list(voltage_table.keys())
     for i in range(len(voltage_target)):
-        v = find_nearest(list(voltage_table.keys()), voltage_target[i])
+        v = find_nearest(voltages_, voltage_target[i])
         voltages[v] = np.sort(voltage_table[v])
     print(f'Total time {time.time() - time_start}')
     return voltages
