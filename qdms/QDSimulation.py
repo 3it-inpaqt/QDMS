@@ -129,8 +129,7 @@ class QDSimulation:
             self.CL = 2.2 * self.Cg1
             self.CR = self.CL
         else:
-            print(f'Parameter model {self.parameter_model} not supported. Set to UNSW.')
-            self.set_parameter_model('UNSW')
+            raise Exception(f'Parameter model {self.parameter_model} not supported.')
 
     def simulate(self):
         """
@@ -155,11 +154,21 @@ class QDSimulation:
                                                 CL=self.CL, CR=self.CR, N_min=self.N_min, N_max=self.N_max,
                                                 kBT=2 * self.kB * self.T, e=1.602e-19, verbose=self.verbose)
 
-        else:
-            print(f'{self.n_dots} dots is not supported yet')
-
     def find_number_electron(self):
-        n_max = int(max(self.voltages) * 65)
-        n_min = int(min(self.voltages) * 65)
-        # print(n_min, n_max)
-        return n_min, n_max
+        if self.parameter_model == 'UNSW':
+            return int(min(self.voltages) * 65), int(max(self.voltages) * 65)
+
+        elif self.parameter_model == 'QuTech':
+            return int(min(self.voltages) * 30), int(max(self.voltages) * 35)
+
+        elif self.parameter_model == 'Princeton':
+            return int(min(self.voltages) * 155), int(max(self.voltages) * 155)
+
+        elif self.parameter_model == 'Sandia_national_lab':
+            return int(min(self.voltages) * 10), int(max(self.voltages) * 15)
+
+        elif self.parameter_model == 'CEA_LETI':
+            return int(min(self.voltages) * 60), int(max(self.voltages) * 125)
+
+        elif self.parameter_model == 'UCL':
+            return int(min(self.voltages) * 1), int(max(self.voltages) * 10)
