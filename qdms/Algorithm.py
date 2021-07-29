@@ -4,7 +4,7 @@ import time
 from bisect import bisect_left
 
 
-def Algorithm(resolution, memristor_simulation, diff_flag=False):
+def algorithm(resolution, memristor_simulation, diff_flag=False):
     """
     Parameters
     ----------.

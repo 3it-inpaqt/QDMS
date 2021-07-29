@@ -9,5 +9,5 @@ from .MemristorSimulation import MemristorSimulation
 from .QDSimulation import QDSimulation
 from . import Log
 from . import Plot
-from .Algorithm import Algorithm
+from .Algorithm import algorithm
 
