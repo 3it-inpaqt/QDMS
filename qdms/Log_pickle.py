@@ -256,7 +256,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(memristor, int):
         memristor = None
     elif memristor is None:
-        memristor = load_memristor_pickle(path + '\\memristor_data')
+        memristor = load_memristor_pickle(path + '\\memristor')
     if verbose:
         print(f'Memristor loaded: {time.time()-start}')
         start = time.time()
@@ -264,7 +264,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(circuit, int):
         circuit = None
     elif circuit is None and memristor is not None:
-        circuit = load_circuit_pickle(path + '\\circuit_data', memristor)
+        circuit = load_circuit_pickle(path + '\\circuit', memristor)
     if verbose:
         print(f'Circuit loaded: {time.time()-start}')
         start = time.time()
@@ -272,7 +272,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(memristor_sim, int):
         memristor_sim = None
     elif memristor_sim is None and circuit is not None:
-        memristor_sim = load_memristor_simulation_pickle(path + f'\\memristor_sim_data', circuit)
+        memristor_sim = load_memristor_simulation_pickle(path + f'\\memristor_sim', circuit)
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
         start = time.time()
@@ -280,7 +280,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(pulsed_programming, int):
         pulsed_programming = None
     elif pulsed_programming is None and memristor_sim is not None:
-        pulsed_programming = load_pulsed_programming_pickle(path + '\\pulsed_programming_data', memristor_sim)
+        pulsed_programming = load_pulsed_programming_pickle(path + '\\pulsed_programming', memristor_sim)
     if verbose:
         print(f'Pulsed programming loaded: {time.time()-start}')
         start = time.time()
@@ -288,7 +288,7 @@ def load_everything_pickle(path, memristor=None, circuit=None, pulsed_programmin
     if isinstance(qd_simulation, int):
         qd_simulation = None
     elif qd_simulation is None:
-        qd_simulation = load_qd_simulation_pickle(path + '\\qd_simulation_data')
+        qd_simulation = load_qd_simulation_pickle(path + '\\qd_simulation')
     if verbose:
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
