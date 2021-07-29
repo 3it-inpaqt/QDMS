@@ -82,8 +82,8 @@ class QDSimulation:
         self.verbose = verbose
 
     def print(self):
-        print(self.stability_diagram)
-        print(self.voltages)
+        print(np.array(self.stability_diagram))
+        print(np.array(self.voltages))
         print(self.Cg1)
         print(self.Cg2)
         print(self.CL)

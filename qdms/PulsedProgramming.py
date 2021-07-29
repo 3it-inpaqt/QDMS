@@ -76,8 +76,8 @@ class PulsedProgramming:
         print(self.number_of_reading)
         print(self.max_pulse)
         print(self.verbose)
-        print(self.graph_resistance)
-        print(self.graph_voltages)
+        print(np.array(self.graph_resistance))
+        print(np.array(self.graph_voltages))
 
     def write_resistance(self, memristor, voltage, t_pulse):
         """
