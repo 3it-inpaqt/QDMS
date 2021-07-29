@@ -16,7 +16,7 @@ def decompress_pickle(file):
     return data
 
 
-def save_everything_pickle(path, directory_name, memristor_sim=None, qd_simulation=None, pulsed_programming=None, circuit=None, memristor=None, verbose=False):
+def save_everything_pickle(path, memristor_sim=None, qd_simulation=None, pulsed_programming=None, circuit=None, memristor=None, verbose=False):
     """
     This function save all the parameters in a folder name SaveData.
 
@@ -40,42 +40,40 @@ def save_everything_pickle(path, directory_name, memristor_sim=None, qd_simulati
     path : string
         Where the the directory_name will be.
 
-    directory_name : string
-        The directory name where the data will be save
-
     verbose : bool
         Output in console the timers..
 
     Returns
     ----------
     """
-    create_save_directory(path, directory_name)
+    if not os.path.isdir(f'{path}'):
+        os.mkdir(f'{path}')
     if memristor is not None:
         if verbose:
             print('\n##########################\n'
                   'Start saving')
             start = time.time()
-        compressed_pickle(f'{path}\\{directory_name}\\memristor', memristor)
+        compressed_pickle(f'{path}\\memristor', memristor)
         if verbose:
             print(f'Memristor: {time.time()-start}')
             start = time.time()
     if circuit is not None:
-        compressed_pickle(f'{path}\\{directory_name}\\circuit', circuit)
+        compressed_pickle(f'{path}\\circuit', circuit)
         if verbose:
             print(f'Circuit: {time.time()-start}')
             start = time.time()
     if pulsed_programming is not None:
-        compressed_pickle(f'{path}\\{directory_name}\\pulsed_programming', pulsed_programming)
+        compressed_pickle(f'{path}\\pulsed_programming', pulsed_programming)
         if verbose:
             print(f'Pulsed programming: {time.time()-start}')
             start = time.time()
     if memristor_sim is not None:
-        compressed_pickle(f'{path}\\{directory_name}\\', memristor_sim)
+        compressed_pickle(f'{path}\\memristor_sim', memristor_sim)
         if verbose:
             print(f'Memristor simulation: {time.time()-start}')
             start = time.time()
     if qd_simulation is not None:
-        compressed_pickle(f'{path}\\{directory_name}\\qd_simulation', qd_simulation)
+        compressed_pickle(f'{path}\\qd_simulation', qd_simulation)
         if verbose:
             print(f'QD simulation: {time.time()-start}')
 
@@ -140,30 +138,3 @@ def load_everything_pickle(path, verbose=False):
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
     return memristor_, circuit_, memristor_sim_, pulsed_programming_, qd_simulation_
-
-
-def create_save_directory(path, directory_name):
-    """
-    This function makes the directory to save the data.
-
-    Parameters
-    ----------
-    path : string
-        Where the the directory_name will be.
-
-    directory_name : string
-        The directory name where the plots will be save
-
-    Returns
-    ----------
-    succes : bool
-        True if the directories were created successfully.
-    """
-    try:
-        if not os.path.isdir(f'{path}'):
-            os.mkdir(f'{path}')
-        os.mkdir(f'{path}\\{directory_name}')
-        return True
-    except OSError:
-        print('Error creating directories')
-        return False

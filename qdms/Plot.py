@@ -125,8 +125,9 @@ def create_result_plot(memristor_simulation, path=None, dpi=600):
     ax1 = fig.add_subplot()
     ax2 = ax1.twiny()
 
-    new_tick_locations = np.linspace(memristor_simulation.resistances[0], memristor_simulation.resistances[-1], num=6)
-    ax1.scatter(memristor_simulation.resistances, memristor_simulation.voltages, label=f'{memristor_simulation.pulsed_programming.circuit.number_of_memristor} memristor with {memristor_simulation.pulsed_programming.nb_states} states')
+    resistance_list = [np.sum(memristor_simulation.voltages_memristor[k]) for k in list(memristor_simulation.voltages_memristor.keys())]
+    new_tick_locations = np.linspace(resistance_list[0], resistance_list[-1], num=6)
+    ax1.scatter(resistance_list,list(memristor_simulation.voltages_memristor), label=f'{memristor_simulation.circuit.number_of_memristor} memristor with {memristor_simulation.nb_states} states')
 
     ax1.set_xlabel(r'Resistance R ($\Omega$)')
     ax1.set_ylabel('Voltage (V)')
@@ -149,14 +150,14 @@ def create_result_plot(memristor_simulation, path=None, dpi=600):
     plt.close('all')
 
 
-def create_resist_plot(pulsed_programming, path=None, dpi=600):
+def create_resist_plot(memristor_simulation, path=None, dpi=600):
     """
     This function creates plots from the simulation resistances and save them in Resist
 
     Parameters
     ----------
-    pulsed_programming : PulsedProgramming.PulsedProgramming
-        The pulsed programming
+    memristor_simulation : MemristorSimulation.MemristorSimulation
+        The memristor simulation
 
     path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
@@ -172,7 +173,7 @@ def create_resist_plot(pulsed_programming, path=None, dpi=600):
     # if simulation.is_using_conductance:
     #     for i in range(len(list_resist)):
     #         list_resist_temp[i] = [1/j for j in list_resist[i]]
-    list_resist = pulsed_programming.res_states_practical
+    list_resist = memristor_simulation.list_resistance
     plt.clf()
     f, ax = plt.subplots(1)
     ax.set_ylabel(r"Resistance R ($\Omega$)")

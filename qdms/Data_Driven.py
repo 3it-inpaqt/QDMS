@@ -46,7 +46,7 @@ class Data_Driven(Memristor):
     """
 
     def __init__(self, parameter_model='O921C', is_variability_on=False):
-        self.A_p = self.A_n = self.t_p = self.t_n = self.k_p = self.k_n = self.eta = self.a_p = self.a_n = self.b_p = self.b_n = 0
+        self.A_p = self.A_n = self.t_p = self.t_n = self.k_p = self.k_n = self.eta = self.a_p = self.a_n = self.b_p = self.b_n = self.variability_a = self.variability_b = 0
         self.r_p = self.r_n = None
         self.parameter_model = parameter_model.upper()
         r_off, r_on = self.set_parameter()
@@ -55,10 +55,6 @@ class Data_Driven(Memristor):
         )
         self.g = 1 / self.r_on
         self.is_variability_on = is_variability_on
-
-    @staticmethod
-    def variability(res):
-        return 2.161e-4 * res
 
     def set_parameter(self):
         if self.parameter_model == 'N1257R':
@@ -77,6 +73,8 @@ class Data_Driven(Memristor):
             self.a_n = 0.32046175
             self.b_p = 2.71689828
             self.b_n = 2.71689828
+            self.variability_a = 1.672e-5
+            self.variability_b = 6.645e-2
 
         elif self.parameter_model == 'O921C':
             r_off = 12759.285080891
@@ -94,11 +92,16 @@ class Data_Driven(Memristor):
             self.a_n = 0.7395554112462469
             self.b_p = 1.2384430017628405
             self.b_n = 1.2384430017628405
+            self.variability_a = 1.672e-5
+            self.variability_b = 6.645e-2
 
         else:
             raise(Exception(f'Parameter model for Data_Driven {self.parameter_model} is unknown.'))
 
         return r_off, r_on
+
+    def variability(self, res):
+        return self.variability_a * res + self.variability_b
 
     def read(self):
         res = 1 / self.g

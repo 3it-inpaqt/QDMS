@@ -114,9 +114,7 @@ class PulsedProgramming:
             number of iteration
         """
         number_iteration = 1
-        if self.distribution_type == 'half_spread':
-            number_iteration = int(math.sqrt(self.circuit.number_of_memristor))
-        elif self.distribution_type == 'full_spread':
+        if self.distribution_type == 'full_spread':
             number_iteration = self.circuit.number_of_memristor
         return number_iteration
 
@@ -177,10 +175,11 @@ class PulsedProgramming:
             [[macro_tune, is_relative_variability], [fine_tune, is_relative_variability]] for the balance() method.
         """
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
+            plot = True if i == 0 else False
             if self.pulse_algorithm == 'fabien':
-                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
+                self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i], plot=plot)
             elif self.pulse_algorithm == 'log':
-                self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i])
+                self.log_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i], plot=plot)
         self.balance(list_resistance, precision)
 
     def balance(self, list_resistance, precision):
@@ -217,7 +216,7 @@ class PulsedProgramming:
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative
                 break
 
-    def small_convergence(self, memristor, target_res):
+    def small_convergence(self, memristor, target_res, plot=False):
         """
         This function run the pulsed programming with a variable voltage to set the target_res for the memristor with a
         really small increment.
@@ -249,23 +248,26 @@ class PulsedProgramming:
             current_res = memristor.read()
 
             if res_min <= current_res <= res_max:
-                action = 'read'
                 counter_read += 1
-                self.graph_voltages.append([0.2, counter, action])
+                if plot:
+                    action = 'read'
+                    self.graph_voltages.append([0.2, counter, action])
             elif current_res < res_min:
-                action = 'reset'
                 if self.max_voltage != 0:
                     negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
                 self.write_resistance(memristor, negative_voltage, 200e-9)
-                self.graph_voltages.append([negative_voltage, counter, action])
+                if plot:
+                    action = 'reset'
+                    self.graph_voltages.append([negative_voltage, counter, action])
                 negative_voltage -= step
                 positive_voltage = voltage_set
             elif current_res > res_max:
-                action = 'set'
                 if self.max_voltage != 0:
                     positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage  else positive_voltage
                 self.write_resistance(memristor, positive_voltage, 200e-9)
-                self.graph_voltages.append([positive_voltage, counter, action])
+                if plot:
+                    action = 'set'
+                    self.graph_voltages.append([positive_voltage, counter, action])
                 positive_voltage += step
                 negative_voltage = voltage_reset
 
@@ -274,10 +276,11 @@ class PulsedProgramming:
             if counter >= self.max_pulse:
                 flag_finish = not flag_finish
                 print(f'Got max pulse {self.max_pulse}')
-            self.graph_resistance.append([current_res, counter, action, flag_finish])
+            if plot:
+                self.graph_resistance.append([current_res, counter, action, flag_finish])
             counter += 1
 
-    def log_convergence(self, memristor, target_res):
+    def log_convergence(self, memristor, target_res, plot=False):
         """
         This function run the pulsed programming with a variable voltage to set the target_res for the memristor.
         From : https://arxiv.org/abs/2103.09931
@@ -313,12 +316,12 @@ class PulsedProgramming:
         current_res = memristor.read()
         while not flag_finish:
             if res_min < current_res < res_max:
-                action = 'read'
                 counter_read += 1
-                self.graph_voltages.append([0.2, counter, action])
+                if plot:
+                    action = 'read'
+                    self.graph_voltages.append([0.2, counter, action])
 
             elif current_res > res_max:
-                action = 'set'
                 if r_shift < min_shift * (memristor.r_off - memristor.r_on):
                     positive_voltage += a * np.log10(abs(target_res - current_res) / r_shift)
                 elif r_shift > max_shift * (memristor.r_off - memristor.r_on):
@@ -326,10 +329,11 @@ class PulsedProgramming:
                 if self.max_voltage != 0:
                     positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage else positive_voltage
                 self.write_resistance(memristor, positive_voltage, 200e-9)
-                self.graph_voltages.append([positive_voltage, counter, action])
+                if plot:
+                    action = 'set'
+                    self.graph_voltages.append([positive_voltage, counter, action])
 
             elif current_res < res_min:
-                action = 'reset'
                 if r_shift < min_shift * (memristor.r_off - memristor.r_on):
                     negative_voltage -= a * np.log10(abs((target_res - current_res) / r_shift))
                 elif r_shift > max_shift * (memristor.r_off - memristor.r_on):
@@ -337,7 +341,9 @@ class PulsedProgramming:
                 if self.max_voltage != 0:
                     negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
                 self.write_resistance(memristor, negative_voltage, 200e-9)
-                self.graph_voltages.append([negative_voltage, counter, action])
+                if plot:
+                    action = 'reset'
+                    self.graph_voltages.append([negative_voltage, counter, action])
 
             if counter_read == self.number_of_reading:
                 flag_finish = not flag_finish
@@ -345,14 +351,15 @@ class PulsedProgramming:
                 flag_finish = not flag_finish
                 print('Got max pulse')
 
-            self.graph_resistance.append([current_res, counter, action, flag_finish])
+            if plot:
+                self.graph_resistance.append([current_res, counter, action, flag_finish])
             counter += 1
 
             previous_res = current_res
             current_res = memristor.read()
             r_shift = abs(current_res - previous_res) if abs(current_res - previous_res) != 0 else 1
 
-    def fabien_convergence(self, memristor, target_res):
+    def fabien_convergence(self, memristor, target_res, plot=False):
         """
         This function run the pulsed programming with a variable voltage to set the target_res for the memristor.
         From : https://iopscience.iop.org/article/10.1088/0957-4484/23/7/075201
@@ -384,23 +391,26 @@ class PulsedProgramming:
             current_res = memristor.read()
 
             if res_min <= current_res <= res_max:
-                action = 'read'
                 counter_read += 1
-                self.graph_voltages.append([0.2, counter, action])
+                if plot:
+                    action = 'read'
+                    self.graph_voltages.append([0.2, counter, action])
             elif current_res < res_min:
-                action = 'reset'
                 if self.max_voltage != 0:
                     negative_voltage = -self.max_voltage if negative_voltage <= -self.max_voltage else negative_voltage
                 self.write_resistance(memristor, negative_voltage, 200e-9)
-                self.graph_voltages.append([negative_voltage, counter, action])
+                if plot:
+                    action = 'reset'
+                    self.graph_voltages.append([negative_voltage, counter, action])
                 negative_voltage -= step
                 positive_voltage = voltage_set
             elif current_res > res_max:
-                action = 'set'
                 if self.max_voltage != 0:
                     positive_voltage = self.max_voltage if positive_voltage >= self.max_voltage  else positive_voltage
                 self.write_resistance(memristor, positive_voltage, 200e-9)
-                self.graph_voltages.append([positive_voltage, counter, action])
+                if plot:
+                    action = 'set'
+                    self.graph_voltages.append([positive_voltage, counter, action])
                 positive_voltage += step
                 negative_voltage = voltage_reset
 
@@ -409,5 +419,6 @@ class PulsedProgramming:
             if counter >= self.max_pulse:
                 flag_finish = not flag_finish
                 print('Got max pulse')
-            self.graph_resistance.append([current_res, counter, action, flag_finish])
+            if plot:
+                self.graph_resistance.append([current_res, counter, action, flag_finish])
             counter += 1
