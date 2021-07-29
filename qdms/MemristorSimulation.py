@@ -121,7 +121,7 @@ class MemristorSimulation:
         print(self.distribution_type)
         print(self.list_resistance)
         print(self.is_using_conductance)
-        print(self.voltages_memristor)
+        print(np.array(self.voltages_memristor))
         print(self.verbose)
 
     def simulate(self):
