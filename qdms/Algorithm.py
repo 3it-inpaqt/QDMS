@@ -4,7 +4,7 @@ import time
 from bisect import bisect_left
 
 
-def algorithm(resolution, memristor_simulation, diff_flag=False):
+def algorithm(resolution, memristor_simulation, verbose=False):
     """
     Parameters
     ----------.
@@ -26,9 +26,9 @@ def algorithm(resolution, memristor_simulation, diff_flag=False):
     v_min, v_max = ask_v_min_v_max(memristor_simulation.circuit)
     voltage_target = np.linspace(v_min, v_max, num=math.ceil((v_max - v_min) / resolution) + 1)
     print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
-    voltages = find_correspondence(voltage_target, memristor_simulation.voltages_memristor)
+    voltages = find_correspondence(voltage_target, memristor_simulation.voltages_memristor, verbose=verbose)
 
-    if diff_flag:
+    if verbose:
         diff = []
         for i in range(len(list(voltages.keys()))):
             # print(f'{list(voltages.keys())[i]}\t{np.sort([round(i) for i in voltages.get(list(voltages.keys())[i])])}')
@@ -110,7 +110,7 @@ def find_nearest(array, value):
         return array[idx]
 
 
-def find_correspondence(voltage_target, voltage_table):
+def find_correspondence(voltage_target, voltage_table, verbose=False):
     """
     Parameters
     ----------.
@@ -128,10 +128,15 @@ def find_correspondence(voltage_target, voltage_table):
 
     """
     voltages = {}
-    time_start = time.time()
+    if verbose:
+        time_start = time_loop = time.time()
     voltages_ = list(voltage_table.keys())
     for i in range(len(voltage_target)):
         v = find_nearest(voltages_, voltage_target[i])
         voltages[v] = np.sort(voltage_table[v])
-    print(f'Total time {time.time() - time_start}')
+        if i % 50 == 0:
+            print(f'Done: {i}\tLeft: {len(voltage_target - i)}\tTime left: {time_loop - time.time()}')
+            time_loop = time.time()
+    if verbose:
+        print(f'Total time {time.time() - time_start}')
     return voltages
