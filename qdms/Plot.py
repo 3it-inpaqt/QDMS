@@ -55,48 +55,55 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=No
               'Start plots')
         start = time.time()
     if 'result' in plots and memristor_sim is not None:
-        create_result_plot(memristor_sim, directory_name, dpi=dpi)
+        path = f'{directory_name}\\result' if directory_name is not None else None
+        create_result_plot(memristor_sim, path, dpi=dpi)
     if verbose:
         print(f'Result plot: {time.time()-start}')
         start = time.time()
 
     if 'resist' in plots and memristor_sim is not None:
-        create_resist_plot(pulsed_programming, directory_name, dpi=dpi)
+        path = f'{directory_name}\\resist' if directory_name is not None else None
+        create_resist_plot(pulsed_programming, path, dpi=dpi)
     if verbose:
         print(f'Resist plot: {time.time()-start}')
         start = time.time()
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
-        create_pulsed_programming_plot(pulsed_programming, directory_name, dpi=dpi)
+        path = f'{directory_name}\\pulsed_programming' if directory_name is not None else None
+        create_pulsed_programming_plot(pulsed_programming, path, dpi=dpi)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
 
     if 'amplitude' in plots and pulsed_programming is not None:
-        create_amplitude_plot(pulsed_programming, directory_name, dpi=dpi)
+        path = f'{directory_name}\\amplitude' if directory_name is not None else None
+        create_amplitude_plot(pulsed_programming, path, dpi=dpi)
     if verbose:
         print(f'Amplitude plot: {time.time()-start}')
         start = time.time()
 
     if 'gaussian' in plots and pulsed_programming is not None:
-        create_gaussian_distribution(pulsed_programming, directory_name, dpi=dpi)
+        path = f'{directory_name}\\gaussian' if directory_name is not None else None
+        create_gaussian_distribution(pulsed_programming, path, dpi=dpi)
     if verbose:
         print(f'Gaussian plot: {time.time() - start}')
         start = time.time()
 
     if 'stability' in plots and qd_sim is not None:
-        create_stability_diagram(qd_sim, directory_name, dpi=dpi)
+        path = f'{directory_name}\\stability' if directory_name is not None else None
+        create_stability_diagram(qd_sim, path, dpi=dpi)
     if verbose:
         print(f'Stability plot: {time.time()-start}')
         start = time.time()
 
     if 'honeycomb' in plots and qd_sim is not None:
-        create_honeycomb_diagram(qd_sim, directory_name, dpi=dpi)
+        path = f'{directory_name}\\honeycomb' if directory_name is not None else None
+        create_honeycomb_diagram(qd_sim, path, dpi=dpi)
     if verbose:
         print(f'Honeycomb plot: {time.time()-start}')
 
 
-def create_result_plot(memristor_simulation, directory_name=None, dpi=600):
+def create_result_plot(memristor_simulation, path=None, dpi=600):
     """
     This function creates plots from the simulation voltages and save them in Result
 
@@ -105,15 +112,16 @@ def create_result_plot(memristor_simulation, directory_name=None, dpi=600):
     memristor_simulation : MemristorSimulation.MemristorSimulation
         The memristor simulation object.
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     plt.clf()
     fig = plt.figure()
@@ -135,18 +143,17 @@ def create_result_plot(memristor_simulation, directory_name=None, dpi=600):
     ax2.set_xticklabels(tick_function(new_tick_locations))
     ax2.set_xlabel(r"Conductance G (S)")
 
-    filename = f'{memristor_simulation.pulsed_programming.circuit.number_of_memristor}_memristor_{memristor_simulation.pulsed_programming.nb_states}_states.jpg'
     plt.tight_layout()
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
 
     plt.close('all')
 
 
-def create_resist_plot(pulsed_programming, directory_name=None, dpi=600):
+def create_resist_plot(pulsed_programming, path=None, dpi=600):
     """
     This function creates plots from the simulation resistances and save them in Resist
 
@@ -155,15 +162,16 @@ def create_resist_plot(pulsed_programming, directory_name=None, dpi=600):
     pulsed_programming : PulsedProgramming.PulsedProgramming
         The pulsed programming
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
     # list_resist_temp = list_resist
     # if simulation.is_using_conductance:
     #     for i in range(len(list_resist)):
@@ -177,17 +185,15 @@ def create_resist_plot(pulsed_programming, directory_name=None, dpi=600):
     for i in range(len(list_resist)):
         list_resist[i].sort()
         ax.plot(list_resist[i], 'o')
-    filename = f'{pulsed_programming.circuit.number_of_memristor}_memristor_{pulsed_programming.nb_states}_states' \
-               f'_{pulsed_programming.distribution_type}.jpg'
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
     plt.close('all')
 
 
-def create_pulsed_programming_plot(pulsed_programming, directory_name=None, dpi=600):
+def create_pulsed_programming_plot(pulsed_programming, path=None, dpi=600):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -199,15 +205,16 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name=None, dpi=
     pulsed_programming : PulsedProgramming.PulsedProgramming
         The pulsed programming
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     ax = plt.axes()
 
@@ -297,16 +304,15 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name=None, dpi=
     ax2.set_xlabel(r"Time (ms)")
 
     plt.title('Pulsed programming of a memristor')
-    filename = f'{pulsed_programming.nb_states}_states_{pulsed_programming.distribution_type}_{pulsed_programming.pulse_algorithm}.jpg'
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
     plt.close('all')
 
 
-def create_amplitude_plot(pulsed_programming, directory_name=None, dpi=600):
+def create_amplitude_plot(pulsed_programming, path=None, dpi=600):
     """
     This function creates a plot from the amplitude of the pulses in the pulsed programming simulation.
 
@@ -315,15 +321,16 @@ def create_amplitude_plot(pulsed_programming, directory_name=None, dpi=600):
     pulsed_programming : PulsedProgramming.PulsedProgramming
         The pulsed programming
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     voltages_read = []
     voltages_set = []
@@ -353,16 +360,15 @@ def create_amplitude_plot(pulsed_programming, directory_name=None, dpi=600):
     plt.legend()
     plt.xlabel('Number of pulses')
     plt.ylabel('Voltage (V)')
-    filename = f'{pulsed_programming.pulse_algorithm}_{pulsed_programming.max_voltage}_V_max.jpg'
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
     plt.close('all')
 
 
-def create_gaussian_distribution(pulsed_programming, directory_name=None, dpi=600):
+def create_gaussian_distribution(pulsed_programming, path=None, dpi=600):
     """
     Output the gaussian distribution of the variability_read and variability_write.
 
@@ -371,15 +377,16 @@ def create_gaussian_distribution(pulsed_programming, directory_name=None, dpi=60
     pulsed_programming : PulsedProgramming.PulsedProgramming
         The pulsed programming
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     # Write
     if pulsed_programming.variance_write != 0:
@@ -391,16 +398,15 @@ def create_gaussian_distribution(pulsed_programming, directory_name=None, dpi=60
                  linewidth=2, color='r')
         plt.xlabel('Variability write (%)')
         plt.ylabel('Number of appearance')
-        filename = f'variability_write_gaussian_{pulsed_programming.variance_write}_variance.jpg'
         plt.tight_layout()
-        if directory_name is None:
+        if path is None:
             plt.show()
         else:
-            plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+            plt.savefig(fname=f'{path}', dpi=dpi)
         plt.close('all')
 
 
-def create_stability_diagram(qd_simulation, directory_name=None, dpi=600):
+def create_stability_diagram(qd_simulation, path=None, dpi=600):
     """
     This function creates the stability diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's uses scatter with the height represented as color.
@@ -410,15 +416,16 @@ def create_stability_diagram(qd_simulation, directory_name=None, dpi=600):
     qd_simulation : QDSimulation.QDSimulation
         The quantum dot simulation
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
     plt.figure()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
 
@@ -446,16 +453,15 @@ def create_stability_diagram(qd_simulation, directory_name=None, dpi=600):
     plt.title(f'Number of voltages: {len(qd_simulation.voltages)}')
     plt.xlabel(r'$V_{g1}$ (V)')
     plt.ylabel(r'$V_{g2}$ (V)')
-    filename = f'number_of_electron_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
     plt.close('all')
 
 
-def create_honeycomb_diagram(qd_simulation, directory_name=None, dpi=600):
+def create_honeycomb_diagram(qd_simulation, path=None, dpi=600):
     """
     This function creates the honeycomb diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's the differential of the stability diagram created in create_stability_diagram
@@ -465,15 +471,16 @@ def create_honeycomb_diagram(qd_simulation, directory_name=None, dpi=600):
     qd_simulation : QDSimulation.QDSimulation
         The quantum dot simulation
 
-    directory_name : string
+    path : string
         The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     Returns
     ----------
     """
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     fig, ax = plt.subplots()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
@@ -488,19 +495,19 @@ def create_honeycomb_diagram(qd_simulation, directory_name=None, dpi=600):
     plt.title(f'Resolution: {round(np.mean(np.diff(qd_simulation.voltages)),8)} (V)   Cm: {qd_simulation.Cm}')
     plt.xlabel(r'$V_{g1}$ (V)')
     plt.ylabel(r'$V_{g2}$ (V)')
-    filename = f'stability_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
     plt.close('all')
 
 
-def create_staircase_plot(qd_simulation, directory_name=None, dpi=600):
-    if directory_name is not None:
-        if not os.path.isdir(f'{directory_name}'):
-            os.mkdir(f'{directory_name}')
+def create_staircase_plot(qd_simulation, path=None, dpi=600):
+    if path is not None:
+        directory = '\\'.join(path.split('\\')[:-1])
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
     fig, ax = plt.subplots()
 
@@ -528,8 +535,8 @@ def create_staircase_plot(qd_simulation, directory_name=None, dpi=600):
     ax.plot(x, y)
     for key in keys:
         ax.scatter(x[key], scatter.get(key))
-    if directory_name is None:
+    if path is None:
         plt.show()
     else:
-        plt.savefig(fname=f'{directory_name}\\{filename}', dpi=dpi)
+        plt.savefig(fname=f'{path}', dpi=dpi)
 

@@ -136,7 +136,7 @@ def find_correspondence(voltage_target, voltage_table, verbose=False):
         voltages[v] = np.sort(voltage_table[v])
         if i % 50 == 0:
             left = len(voltage_target) - i
-            print(f'Done: {i}\tLeft: {left}\tTime left: {(left / 50 ) * (time.time() - time_loop)}')
+            print(f'Done: {i}\tLeft: {left}\tTime left: {round((left / 50 ) * (time.time() - time_loop),2)}s')
             time_loop = time.time()
     if verbose:
         print(f'Total time {time.time() - time_start}')

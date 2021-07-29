@@ -63,8 +63,7 @@ class QDSimulation:
 
     def __init__(self, voltages, n_dots=2, T=0.1, Cm=0.4, parameter_model='UNSW', verbose=True):
         if n_dots != 2:
-            print(f'Error: {n_dots} is not supported. Use 2 instead.')
-            exit(1)
+            raise Exception(f'{n_dots} is not supported. Use 2 instead.')
         self.stability_diagram = [[None for _ in range(len(voltages))] for _ in range(len(voltages))]
         self.voltages = voltages
 
@@ -72,6 +71,7 @@ class QDSimulation:
         self.Cg2 = 0
         self.CL = 0
         self.CR = 0
+        self.parameter_model = parameter_model
         self.set_parameter_model(parameter_model)
 
         self.T = T
