@@ -9,7 +9,7 @@ from .HelperFunction import is_square
 import h5py
 
 
-def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, plots=None, file_output=False, verbose=False, show=False):
+def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=None, plots=None, verbose=False):
     """
     This function plot the result plot, resistance plot, the pulsed programming plot and the stability diagram.
     It creates the folders and saves the plots accordingly.
@@ -26,7 +26,7 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, p
         The pulsed programming
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
     plots : list of string
         This list contains the plots to output. By default, it contains all the plots.
@@ -43,63 +43,60 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name, p
     file_output : bool
         If true, output the values of the graph in a file.
 
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
 
     if plots is None:
         plots = ['result', 'resist', 'pulsed_programming', 'amplitude', 'gaussian', 'stability', 'honeycomb']
-    if not os.path.isdir(f'{directory_name}'):
-        os.mkdir(f'{directory_name}')
+
     if verbose:
         print('\n##########################\n'
               'Start plots')
         start = time.time()
     if 'result' in plots and memristor_sim is not None:
-        create_result_plot(memristor_sim, directory_name, file_output=file_output, show=show)
+        create_result_plot(memristor_sim, directory_name)
     if verbose:
         print(f'Result plot: {time.time()-start}')
         start = time.time()
 
     if 'resist' in plots and memristor_sim is not None:
-        create_resist_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
+        create_resist_plot(pulsed_programming, directory_name)
     if verbose:
         print(f'Resist plot: {time.time()-start}')
         start = time.time()
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
-        create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
+        create_pulsed_programming_plot(pulsed_programming, directory_name)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
 
     if 'amplitude' in plots and pulsed_programming is not None:
-        create_amplitude_plot(pulsed_programming, directory_name, file_output=file_output, show=show)
+        create_amplitude_plot(pulsed_programming, directory_name)
     if verbose:
         print(f'Amplitude plot: {time.time()-start}')
         start = time.time()
 
     if 'gaussian' in plots and pulsed_programming is not None:
-        create_gaussian_distribution(pulsed_programming, directory_name, file_output=file_output, show=show)
+        create_gaussian_distribution(pulsed_programming, directory_name)
     if verbose:
         print(f'Gaussian plot: {time.time() - start}')
         start = time.time()
 
     if 'stability' in plots and qd_sim is not None:
-        create_stability_diagram(qd_sim, directory_name, file_output=file_output, show=show)
+        create_stability_diagram(qd_sim, directory_name)
     if verbose:
         print(f'Stability plot: {time.time()-start}')
         start = time.time()
 
     if 'honeycomb' in plots and qd_sim is not None:
-        create_honeycomb_diagram(qd_sim, directory_name, file_output=file_output, show=show)
+        create_honeycomb_diagram(qd_sim, directory_name)
     if verbose:
         print(f'Honeycomb plot: {time.time()-start}')
 
 
-def create_result_plot(memristor_simulation, directory_name, file_output=False, show=False):
+def create_result_plot(memristor_simulation, directory_name=None):
     """
     This function creates plots from the simulation voltages and save them in Result
 
@@ -109,18 +106,14 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False, 
         The memristor simulation object.
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\Result'):
-        os.mkdir(f'{directory_name}\\Result')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
 
     plt.clf()
     fig = plt.figure()
@@ -145,18 +138,15 @@ def create_result_plot(memristor_simulation, directory_name, file_output=False, 
     filename = f'{memristor_simulation.pulsed_programming.circuit.number_of_memristor}_memristor_{memristor_simulation.pulsed_programming.nb_states}_states.jpg'
     plt.tight_layout()
     plt.tight_layout()
-    plt.savefig(fname=f'{directory_name}\\Result\\{filename}')
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
+
     plt.close('all')
 
-    if file_output:
-        with h5py.File(f'{directory_name}\\Result\\result.hdf5', 'w') as f:
-            f.create_dataset("voltages", data=memristor_simulation.voltages)
-            f.create_dataset("resistances", data=memristor_simulation.resistances)
 
-
-def create_resist_plot(pulsed_programming, directory_name, file_output=False, show=False):
+def create_resist_plot(pulsed_programming, directory_name=None):
     """
     This function creates plots from the simulation resistances and save them in Resist
 
@@ -166,18 +156,14 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False, sh
         The pulsed programming
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\Resist'):
-        os.mkdir(f'{directory_name}\\Resist')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
     # list_resist_temp = list_resist
     # if simulation.is_using_conductance:
     #     for i in range(len(list_resist)):
@@ -194,19 +180,14 @@ def create_resist_plot(pulsed_programming, directory_name, file_output=False, sh
     filename = f'{pulsed_programming.circuit.number_of_memristor}_memristor_{pulsed_programming.nb_states}_states' \
                f'_{pulsed_programming.distribution_type}.jpg'
     plt.tight_layout()
-    plt.savefig(fname=f'{directory_name}\\Resist\\{filename}')
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
     plt.close('all')
 
-    if file_output:
-        with h5py.File(f'{directory_name}\\Resist\\resist.hdf5', 'w') as f:
-            f.create_dataset("res_states", data=pulsed_programming.res_states)
-            f.create_dataset("res_states_practical", data=pulsed_programming.res_states_practical)
-            f.create_dataset("nb_states", data=pulsed_programming.nb_states)
 
-
-def create_pulsed_programming_plot(pulsed_programming, directory_name, file_output=False, show=False):
+def create_pulsed_programming_plot(pulsed_programming, directory_name=None):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -219,18 +200,14 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
         The pulsed programming
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\PulsedProgramming'):
-        os.mkdir(f'{directory_name}\\PulsedProgramming')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
 
     ax = plt.axes()
 
@@ -322,21 +299,14 @@ def create_pulsed_programming_plot(pulsed_programming, directory_name, file_outp
     plt.title('Pulsed programming of a memristor')
     filename = f'{pulsed_programming.nb_states}_states_{pulsed_programming.distribution_type}_{pulsed_programming.pulse_algorithm}.jpg'
     plt.tight_layout()
-    plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
     plt.close('all')
 
-    if file_output:
-        x, y, action, annotation = zip(*pulsed_programming.graph_resistance)
-        with h5py.File(f'{directory_name}\\PulsedProgramming\\pulsed_graph.hdf5', 'w') as f:
-            f.create_dataset("x", data=x)
-            f.create_dataset("y", data=y)
-            f.create_dataset("action", data=action)
-            f.create_dataset("annotation", data=annotation)
 
-
-def create_amplitude_plot(pulsed_programming, directory_name, file_output=False, show=False):
+def create_amplitude_plot(pulsed_programming, directory_name=None):
     """
     This function creates a plot from the amplitude of the pulses in the pulsed programming simulation.
 
@@ -346,18 +316,14 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False,
         The pulsed programming
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\PulsedProgramming'):
-        os.mkdir(f'{directory_name}\\PulsedProgramming')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
 
     voltages_read = []
     voltages_set = []
@@ -389,20 +355,14 @@ def create_amplitude_plot(pulsed_programming, directory_name, file_output=False,
     plt.ylabel('Voltage (V)')
     filename = f'{pulsed_programming.pulse_algorithm}_{pulsed_programming.max_voltage}_V_max.jpg'
     plt.tight_layout()
-    plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
     plt.close('all')
 
-    if file_output:
-        voltages, counter, action = zip(*pulsed_programming.graph_voltages)
-        with h5py.File(f'{directory_name}\\PulsedProgramming\\amplitude.hdf5', 'w') as f:
-            f.create_dataset("voltages", data=voltages)
-            f.create_dataset("counter", data=counter)
-            f.create_dataset("action", data=action)
 
-
-def create_gaussian_distribution(pulsed_programming, directory_name, file_output=False, show=False):
+def create_gaussian_distribution(pulsed_programming, directory_name=None):
     """
     Output the gaussian distribution of the variability_read and variability_write.
 
@@ -412,18 +372,14 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
         The pulsed programming
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\PulsedProgramming'):
-        os.mkdir(f'{directory_name}\\PulsedProgramming')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
 
     # Write
     if pulsed_programming.variance_write != 0:
@@ -437,17 +393,14 @@ def create_gaussian_distribution(pulsed_programming, directory_name, file_output
         plt.ylabel('Number of appearance')
         filename = f'variability_write_gaussian_{pulsed_programming.variance_write}_variance.jpg'
         plt.tight_layout()
-        plt.savefig(fname=f'{directory_name}\\PulsedProgramming\\{filename}')
-        if show:
+        if directory_name is None:
             plt.show()
+        else:
+            plt.savefig(fname=f'{directory_name}\\{filename}')
         plt.close('all')
 
-        if file_output:
-            with h5py.File(f'{directory_name}\\PulsedProgramming\\variability_write.hdf5', 'w') as f:
-                f.create_dataset("variability_write", data=pulsed_programming.variability_write)
 
-
-def create_stability_diagram(qd_simulation, directory_name, file_output=False, show=False):
+def create_stability_diagram(qd_simulation, directory_name=None):
     """
     This function creates the stability diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's uses scatter with the height represented as color.
@@ -458,18 +411,14 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False, s
         The quantum dot simulation
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\StabilityDiagram'):
-        os.mkdir(f'{directory_name}\\StabilityDiagram')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
     plt.figure()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
 
@@ -499,18 +448,14 @@ def create_stability_diagram(qd_simulation, directory_name, file_output=False, s
     plt.ylabel(r'$V_{g2}$ (V)')
     filename = f'number_of_electron_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\StabilityDiagram\\{filename}')
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
     plt.close('all')
 
-    if file_output:
-        with h5py.File(f'{directory_name}\\StabilityDiagram\\stability.hdf5', 'w') as f:
-            f.create_dataset("voltages", data=qd_simulation.voltages)
-            f.create_dataset("stability_diagram", data=qd_simulation.stability_diagram)
 
-
-def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False, show=False):
+def create_honeycomb_diagram(qd_simulation, directory_name=None):
     """
     This function creates the honeycomb diagram from the qd_simulation and save them in Simulation\\StabilityDiagram.
     It's the differential of the stability diagram created in create_stability_diagram
@@ -521,18 +466,15 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False, s
         The quantum dot simulation
 
     directory_name : string
-        The directory name where the plots will be save
+        The directory name where the plots will be save. If left by default, which is None, the plots will be show instead.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
-    show : bool
-        If true, will show the plots.
     Returns
     ----------
     """
-    if not os.path.isdir(f'{directory_name}\\StabilityDiagram'):
-        os.mkdir(f'{directory_name}\\StabilityDiagram')
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
+
     fig, ax = plt.subplots()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
 
@@ -548,21 +490,18 @@ def create_honeycomb_diagram(qd_simulation, directory_name, file_output=False, s
     plt.ylabel(r'$V_{g2}$ (V)')
     filename = f'stability_diagram_{qd_simulation.N_max}_Nmax_{qd_simulation.Cm}_Cm_{qd_simulation.parameter_model}.jpg'
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\StabilityDiagram\\{filename}', dpi=1200)
-    if show:
+    if directory_name is None:
         plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
     plt.close('all')
 
-    if file_output:
-        with h5py.File(f'{directory_name}\\StabilityDiagram\\honeycomb.hdf5', 'w') as f:
-            dx, dy = np.gradient(qd_simulation.stability_diagram)
-            color = np.sqrt((dx / 2) ** 2 + (dy / 2) ** 2)
 
-            f.create_dataset("voltages", data=qd_simulation.voltages)
-            f.create_dataset("honeycomb", data=color)
+def create_staircase_plot(qd_simulation, directory_name=None):
+    if directory_name is not None:
+        if not os.path.isdir(f'{directory_name}'):
+            os.mkdir(f'{directory_name}')
 
-
-def create_staircase_plot(qd_simulation, directory_name, file_output=False, show=False):
     fig, ax = plt.subplots()
 
     y = np.diff(qd_simulation.stability_diagram[0])
@@ -589,5 +528,8 @@ def create_staircase_plot(qd_simulation, directory_name, file_output=False, show
     ax.plot(x, y)
     for key in keys:
         ax.scatter(x[key], scatter.get(key))
-    plt.savefig(f'{directory_name}\\staircase_{resolution}.png', dpi=600)
+    if directory_name is None:
+        plt.show()
+    else:
+        plt.savefig(fname=f'{directory_name}\\{filename}')
 
