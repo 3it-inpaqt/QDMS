@@ -162,6 +162,8 @@ class PulsedProgramming:
             print(f'Mean diff: {np.mean(list(diff_voltage.keys()))}')
             print(f'Min diff: {np.min(list(diff_voltage.keys()))}\tMax diff: {np.max(list(diff_voltage.keys()))}')
 
+        return self.voltage_output
+
     def simulate_list_memristor(self, list_resistance, precision):
         """
         This function will set the memristors to the resistance wanted list_resistance.

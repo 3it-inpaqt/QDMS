@@ -144,6 +144,8 @@ class MemristorSimulation:
         for i in self.circuit.list_memristor:
             i.g = 1 / i.r_on
 
+        return self.voltages_memristor
+
     def simulate_linear(self):
         if self.verbose:
             timer_start = time.time()

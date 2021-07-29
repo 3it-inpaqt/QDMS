@@ -40,9 +40,6 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=No
     verbose : bool
         Output in console the timer of the plots.
 
-    file_output : bool
-        If true, output the values of the graph in a file.
-
     Returns
     ----------
     """
@@ -143,7 +140,6 @@ def create_result_plot(memristor_simulation, path=None, dpi=600):
     ax2.set_xticklabels(tick_function(new_tick_locations))
     ax2.set_xlabel(r"Conductance G (S)")
 
-    plt.tight_layout()
     plt.tight_layout()
     if path is None:
         plt.show()
