@@ -175,7 +175,7 @@ class PulsedProgramming:
             [[macro_tune, is_relative_variability], [fine_tune, is_relative_variability]] for the balance() method.
         """
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
-            plot = True if i == 0 else False
+            plot = True if i == self.memristor_simulation.circuit.number_of_memristor - 1 else False
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i], plot=plot)
             elif self.pulse_algorithm == 'log':
@@ -198,6 +198,7 @@ class PulsedProgramming:
         final_g = np.sum([1 / i for i in list_resistance])
         delta_g = final_g - self.memristor_simulation.circuit.current_conductance()
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
+            plot = True if i == 0 else False
             final_res = 1 / (self.memristor_simulation.circuit.list_memristor[-(i+1)].g + delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
@@ -205,12 +206,12 @@ class PulsedProgramming:
 
                 if precision[0][0] != 0 or precision is not None:
                     self.tolerance, self.is_relative_tolerance = precision[0][0], precision[0][1]
-                    self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
+                    self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res, plot)
                     # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
                 if precision[1][0] != 0 or precision is not None:
                     self.tolerance, self.is_relative_tolerance = precision[1][0], precision[1][1]
-                    self.small_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res)
+                    self.small_convergence(self.memristor_simulation.circuit.list_memristor[-(i+1)], final_res, plot)
                     # print(f'{final_res}\t{1 / self.memristor_simulation.circuit.list_memristor[-(i+1)].g}\t{final_g - self.memristor_simulation.circuit.current_conductance()}')
 
                 self.tolerance, self.is_relative_tolerance = p_tolerance, p_relative

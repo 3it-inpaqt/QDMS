@@ -236,7 +236,7 @@ def U_DQD(N1, N2, Vg1, Vg2, Cg1, Cg2, Cm, CL, CR, e=1):
 #     return moy/Z
 
 
-def N_moy_DQD(Vg1, Vg2, Cg1, Cg2, Cm, CL, CR, N_min=0, N_max=10, kBT=0.01, e=1, verbose=False):
+def N_moy_DQD(Vg1, Vg2, Cg1, Cg2, Cm, CL, CR, N_min=0, N_max=10, kBT=0.01, e=1, verbose=False, is_occupation=False):
     """
 
     Parameters
@@ -290,7 +290,10 @@ def N_moy_DQD(Vg1, Vg2, Cg1, Cg2, Cm, CL, CR, N_min=0, N_max=10, kBT=0.01, e=1, 
             E = U_DQD(N1, N2, Vg1, Vg2, Cg1, Cg2, Cm, CL, CR, e=e)
             Z = Z + np.exp(-E / kBT)
 
-            moy = moy + (N1 - N2) * np.exp(-E / kBT)
+            if is_occupation:
+                moy = moy + (N1 + N2) * np.exp(-E / kBT)
+            else:
+                moy = moy + (N1 - N2) * np.exp(-E / kBT)
 
     if verbose:
         end = time.time()

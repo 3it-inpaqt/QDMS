@@ -9,7 +9,7 @@ from .HelperFunction import is_square
 import h5py
 
 
-def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=None, plots=None, verbose=False, dpi=600):
+def plot_everything(memristor_sim, qd_sim, pulsed_programming, number_iteration=10, directory_name=None, plots=None, verbose=False, dpi=600):
     """
     This function plot the result plot, resistance plot, the pulsed programming plot and the stability diagram.
     It creates the folders and saves the plots accordingly.
@@ -67,7 +67,7 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=No
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
         path = f'{directory_name}\\pulsed_programming' if directory_name is not None else None
-        create_pulsed_programming_plot(pulsed_programming, path, dpi=dpi)
+        create_pulsed_programming_plot(pulsed_programming, number_iteration, path, dpi=dpi)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
@@ -190,7 +190,7 @@ def create_resist_plot(memristor_simulation, path=None, dpi=600):
     plt.close('all')
 
 
-def create_pulsed_programming_plot(pulsed_programming, path=None, dpi=600):
+def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, path=None, dpi=600):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -217,7 +217,16 @@ def create_pulsed_programming_plot(pulsed_programming, path=None, dpi=600):
 
     ax.set_xlabel('Pulse Number')
     ax.set_ylabel('Resistance \u03A9')
-    y, x, action, annotation = zip(*pulsed_programming.graph_resistance)
+
+    def find_index(pulsed_programming, n):
+        counter = 0
+        for i in range(len(pulsed_programming.graph_resistance)):
+            if pulsed_programming.graph_resistance[i]:
+                counter += 1
+                if counter > n:
+                    return i
+
+    y, x, action, annotation = zip(*pulsed_programming.graph_resistance[0:find_index(pulsed_programming, number_iteration)])
     time_tick_locations = []
 
     list_set = []
