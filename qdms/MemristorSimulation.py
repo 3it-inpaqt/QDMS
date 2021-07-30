@@ -184,7 +184,7 @@ class MemristorSimulation:
         lrs = self.circuit.memristor_model.r_on
         hrs = self.circuit.memristor_model.r_off
         res_states = []
-        if self.distribution_type == 'linear':
+        if self.distribution_type == 'linear' or self.distribution_type == 'linear_test':
             res_states = [[int(lrs + i * ((hrs - lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
         elif self.distribution_type == 'full_spread':
             res_states = spread_resistor_list(lrs, hrs, self.nb_states, self.circuit.number_of_memristor)
