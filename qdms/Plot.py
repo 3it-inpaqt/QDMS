@@ -67,14 +67,14 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, number_iteration=
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
         path = f'{directory_name}\\pulsed_programming' if directory_name is not None else None
-        create_pulsed_programming_plot(pulsed_programming, number_iteration, path=path, dpi=dpi)
+        create_pulsed_programming_plot(pulsed_programming, path=path, number_iteration=number_iteration, dpi=dpi)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
 
     if 'amplitude' in plots and pulsed_programming is not None:
         path = f'{directory_name}\\amplitude' if directory_name is not None else None
-        create_amplitude_plot(pulsed_programming, path, dpi=dpi)
+        create_amplitude_plot(pulsed_programming, path, number_iteration=number_iteration, dpi=dpi)
     if verbose:
         print(f'Amplitude plot: {time.time()-start}')
         start = time.time()
