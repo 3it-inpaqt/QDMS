@@ -190,7 +190,7 @@ def create_resist_plot(memristor_simulation, path=None, dpi=600):
     plt.close('all')
 
 
-def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, path=None, dpi=600):
+def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, annotation=False,path=None, dpi=600):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -274,16 +274,17 @@ def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, path
     else:
         y_read = [0]
 
-    for annotation_ in annotate_point:
-        last_pulse = max(max(y_read), max(y_reset), max(y_set))
-        n_max = last_pulse + 0.2*last_pulse
-        n_min = annotation_[1] + 0.01*last_pulse
-        plt.hlines(annotation_[2], n_min, n_max, linestyles='dashed', colors='black')
-        h = annotation_[2] + (pulsed_programming.memristor_simulation.circuit.memristor_model.r_off - pulsed_programming.memristor_simulation.circuit.memristor_model.r_on) / 100
-        space = (5 - len(str(annotation_[0]))) * '  '
-        text = f'{annotation_[0]}{space}{round(annotation_[2])} \u03A9'
-        plt.annotate(text=text, xy=(last_pulse, h), color='r')
-        time_tick_locations.append(annotation_[1])
+    if annotation:
+        for annotation_ in annotate_point:
+            last_pulse = max(max(y_read), max(y_reset), max(y_set))
+            n_max = last_pulse + 0.2*last_pulse
+            n_min = annotation_[1] + 0.01*last_pulse
+            plt.hlines(annotation_[2], n_min, n_max, linestyles='dashed', colors='black')
+            h = annotation_[2] + (pulsed_programming.memristor_simulation.circuit.memristor_model.r_off - pulsed_programming.memristor_simulation.circuit.memristor_model.r_on) / 100
+            space = (5 - len(str(annotation_[0]))) * '  '
+            text = f'{annotation_[0]}{space}{round(annotation_[2])} \u03A9'
+            plt.annotate(text=text, xy=(last_pulse, h), color='r')
+            time_tick_locations.append(annotation_[1])
     # plt.tight_layout()
     plt.legend(loc='upper left')
 
