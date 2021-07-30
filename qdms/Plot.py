@@ -67,7 +67,7 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, number_iteration=
 
     if 'pulsed_programming' in plots and pulsed_programming is not None:
         path = f'{directory_name}\\pulsed_programming' if directory_name is not None else None
-        create_pulsed_programming_plot(pulsed_programming, number_iteration, path, dpi=dpi)
+        create_pulsed_programming_plot(pulsed_programming, number_iteration, path=path, dpi=dpi)
     if verbose:
         print(f'Pulsed programming plot: {time.time()-start}')
         start = time.time()
@@ -190,7 +190,7 @@ def create_resist_plot(memristor_simulation, path=None, dpi=600):
     plt.close('all')
 
 
-def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, is_annotation=False,path=None, dpi=600):
+def create_pulsed_programming_plot(pulsed_programming, path=None, number_iteration=10, is_annotation=False, dpi=600):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -321,7 +321,7 @@ def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, is_a
     plt.close('all')
 
 
-def create_amplitude_plot(pulsed_programming, path=None, dpi=600):
+def create_amplitude_plot(pulsed_programming, path=None, number_iteration=10, dpi=600):
     """
     This function creates a plot from the amplitude of the pulses in the pulsed programming simulation.
 
@@ -345,7 +345,17 @@ def create_amplitude_plot(pulsed_programming, path=None, dpi=600):
     voltages_set = []
     voltages_reset = []
 
-    for i in pulsed_programming.graph_voltages:
+    def find_index(pulsed_programming_, n):
+        counter_ = 0
+        p_res = 0
+        for i in range(len(pulsed_programming_.graph_resistance)):
+            if pulsed_programming_.graph_resistance[i][3] and p_res != pulsed_programming_.graph_resistance[i][0]:
+                p_res = pulsed_programming_.graph_resistance[i][0]
+                counter_ += 1
+                if counter_ > n:
+                    return i
+
+    for i in pulsed_programming.graph_voltages[:find_index(pulsed_programming, number_iteration)]:
         if i[2] == 'reset':
             voltages_reset.append([i[0], i[1]])
         elif i[2] == 'set':
