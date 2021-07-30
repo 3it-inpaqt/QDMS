@@ -190,7 +190,7 @@ def create_resist_plot(memristor_simulation, path=None, dpi=600):
     plt.close('all')
 
 
-def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, annotation=False,path=None, dpi=600):
+def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, is_annotation=False,path=None, dpi=600):
     """
     This function creates a plot from the pulsed programming and save them in Simulation\\PulsedProgramming.
     Resistance in function of the pulses.
@@ -274,7 +274,7 @@ def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, anno
     else:
         y_read = [0]
 
-    if annotation:
+    if is_annotation:
         for annotation_ in annotate_point:
             last_pulse = max(max(y_read), max(y_reset), max(y_set))
             n_max = last_pulse + 0.2*last_pulse
