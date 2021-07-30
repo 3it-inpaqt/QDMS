@@ -133,9 +133,6 @@ class MemristorSimulation:
 
         if self.distribution_type == 'linear':
             self.simulate_linear()
-        elif self.distribution_type == 'linear_test':
-            self.distribution_type = 'linear'
-            self.simulate_loop()
         elif self.distribution_type == 'full_spread':
             self.simulate_loop()
 
@@ -184,7 +181,7 @@ class MemristorSimulation:
         lrs = self.circuit.memristor_model.r_on
         hrs = self.circuit.memristor_model.r_off
         res_states = []
-        if self.distribution_type == 'linear' or self.distribution_type == 'linear_test':
+        if self.distribution_type == 'linear':
             res_states = [[int(lrs + i * ((hrs - lrs) / (self.nb_states - 1))) for i in range(self.nb_states)]]
         elif self.distribution_type == 'full_spread':
             res_states = spread_resistor_list(lrs, hrs, self.nb_states, self.circuit.number_of_memristor)
@@ -211,10 +208,7 @@ class MemristorSimulation:
         j = 0
         for i in current_states:
             current_res.append(list_resistance[j][i])
-            if self.distribution_type == 'linear':
-                j = 0
-            elif self.distribution_type == 'full_spread':
-                j += 1
+            j += 1
 
         for i in range(self.circuit.number_of_memristor):
             self.circuit.list_memristor[i].g = 1 / current_res[i]
