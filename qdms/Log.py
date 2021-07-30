@@ -114,27 +114,27 @@ def load_everything_pickle(path, verbose=False):
               'Start loading')
         start = time.time()
 
-    memristor_ = decompress_pickle(path + '\\memristor') if os.path.exists(f"{path}\\memristor.pbz2") else None
+    memristor_ = decompress_pickle(path) if os.path.exists(f"{path}\\memristor.pbz2") else None
     if verbose:
         print(f'Memristor loaded: {time.time()-start}')
         start = time.time()
 
-    circuit_ = decompress_pickle(path + '\\circuit') if os.path.exists(f"{path}\\circuit.pbz2") else None
+    circuit_ = decompress_pickle(path) if os.path.exists(f"{path}\\circuit.pbz2") else None
     if verbose:
         print(f'Circuit loaded: {time.time()-start}')
         start = time.time()
 
-    memristor_sim_ = decompress_pickle(path + '\\memristor_sim') if os.path.exists(f"{path}\\memristor_sim.pbz2") else None
+    memristor_sim_ = decompress_pickle(path) if os.path.exists(f"{path}\\memristor_sim.pbz2") else None
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
         start = time.time()
 
-    pulsed_programming_ = decompress_pickle(path + '\\pulsed_programming') if os.path.exists(f"{path}\\pulsed_programming.pbz2") else None
+    pulsed_programming_ = decompress_pickle(path) if os.path.exists(f"{path}\\pulsed_programming.pbz2") else None
     if verbose:
         print(f'Pulsed programming loaded: {time.time()-start}')
         start = time.time()
 
-    qd_simulation_ = decompress_pickle(path + '\\qd_simulation') if os.path.exists(f"{path}\\qd_simulation.pbz2") else None
+    qd_simulation_ = decompress_pickle(path) if os.path.exists(f"{path}\\qd_simulation.pbz2") else None
     if verbose:
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
