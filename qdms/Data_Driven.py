@@ -95,7 +95,7 @@ class Data_Driven(Memristor):
             self.variability_a = 1.672e-5
             self.variability_b = 6.645e-2
 
-        elif self.parameter_model == 'O921C_4k':
+        elif self.parameter_model == 'O921C_4K':
             r_off = 16000
             r_on = 1800
             self.A_p = 257.7128190985076
