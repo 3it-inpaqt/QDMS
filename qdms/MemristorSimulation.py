@@ -151,7 +151,7 @@ class MemristorSimulation:
         if self.verbose:
             timer_start_ = time.time()
         for current_res in res_values:
-            if counter % 100000 and self.verbose:
+            if counter % 100000 == 0 and self.verbose:
                 print(f'Done: {counter}\tLeft: {len(res_values) - counter}')
                 took = round(time.time() - timer_start_, 2)
                 print(f'Total time elapsed: {time.time() - timer_start}s\tTime Left: {took * (len(res_values) - counter) / 100000}')
