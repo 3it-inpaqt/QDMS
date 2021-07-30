@@ -225,7 +225,7 @@ def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, path
             if pulsed_programming_.graph_resistance[i][3] and p_res != pulsed_programming_.graph_resistance[i][0]:
                 p_res = pulsed_programming_.graph_resistance[i][0]
                 counter_ += 1
-                if counter > n:
+                if counter_ > n:
                     return i
 
     y, x, action, annotation = zip(*pulsed_programming.graph_resistance[0:find_index(pulsed_programming, number_iteration)])
