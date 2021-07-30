@@ -18,7 +18,7 @@ def decompress_pickle(file):
     return data
 
 
-def save_everything_pickle(path, memristor_sim=None, qd_simulation=None, pulsed_programming=None, circuit=None, memristor=None, verbose=False):
+def save_everything_pickle(path, memristor_sim=None, qd_simulation=None, pulsed_programming=None, circuit=None, memristor=None, algorithm=None, verbose=False):
     """
     This function save all the parameters in a folder name SaveData.
 
@@ -78,6 +78,11 @@ def save_everything_pickle(path, memristor_sim=None, qd_simulation=None, pulsed_
         compressed_pickle(f'{path}\\qd_simulation', qd_simulation)
         if verbose:
             print(f'QD simulation: {time.time()-start}')
+            start = time.time()
+    if algorithm is not None:
+        compressed_pickle(f'{path}\\algorithm', algorithm)
+        if verbose:
+            print(f'QD simulation: {time.time()-start}')
 
 
 def load_everything_pickle(path, verbose=False):
@@ -115,28 +120,32 @@ def load_everything_pickle(path, verbose=False):
               'Start loading')
         start = time.time()
 
-    memristor_ = decompress_pickle(f"{path}\\memristor.pbz2") if os.path.exists(f"{path}\\memristor.pbz2") else None
+    memristor = decompress_pickle(f"{path}\\memristor.pbz2") if os.path.exists(f"{path}\\memristor.pbz2") else None
     if verbose:
         print(f'Memristor loaded: {time.time()-start}')
         start = time.time()
 
-    circuit_ = decompress_pickle(f"{path}\\circuit.pbz2") if os.path.exists(f"{path}\\circuit.pbz2") else None
+    circuit = decompress_pickle(f"{path}\\circuit.pbz2") if os.path.exists(f"{path}\\circuit.pbz2") else None
     if verbose:
         print(f'Circuit loaded: {time.time()-start}')
         start = time.time()
 
-    memristor_sim_ = decompress_pickle(f"{path}\\memristor_sim.pbz2") if os.path.exists(f"{path}\\memristor_sim.pbz2") else None
+    memristor_sim = decompress_pickle(f"{path}\\memristor_sim.pbz2") if os.path.exists(f"{path}\\memristor_sim.pbz2") else None
     if verbose:
         print(f'Memristor simulation loaded: {time.time()-start}')
         start = time.time()
 
-    pulsed_programming_ = decompress_pickle(f"{path}\\pulsed_programming.pbz2") if os.path.exists(f"{path}\\pulsed_programming.pbz2") else None
+    pulsed_programming = decompress_pickle(f"{path}\\pulsed_programming.pbz2") if os.path.exists(f"{path}\\pulsed_programming.pbz2") else None
     if verbose:
         print(f'Pulsed programming loaded: {time.time()-start}')
         start = time.time()
 
-    qd_simulation_ = decompress_pickle(f"{path}\\qd_simulation.pbz2") if os.path.exists(f"{path}\\qd_simulation.pbz2") else None
+    qd_simulation = decompress_pickle(f"{path}\\qd_simulation.pbz2") if os.path.exists(f"{path}\\qd_simulation.pbz2") else None
     if verbose:
         print(f'Quantum dot simulation loaded: {time.time()-start}')
 
-    return memristor_, circuit_, memristor_sim_, pulsed_programming_, qd_simulation_
+    algorithm = decompress_pickle(f"{path}\\algorithm.pbz2") if os.path.exists(f"{path}\\algorithm.pbz2") else None
+    if verbose:
+        print(f'Quantum dot simulation loaded: {time.time()-start}')
+
+    return memristor, circuit, memristor_sim, pulsed_programming, qd_simulation, algorithm
