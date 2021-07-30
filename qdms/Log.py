@@ -2,6 +2,7 @@ import bz2
 import pickle
 import _pickle as cPickle
 import os
+import time
 
 
 # Pickle a file and then compress it into a file with extension
