@@ -127,7 +127,7 @@ def create_result_plot(memristor_simulation, path=None, dpi=600):
 
     resistance_list = [1/np.sum(1/memristor_simulation.voltages_memristor[k]) for k in list(memristor_simulation.voltages_memristor.keys())]
     new_tick_locations = np.linspace(resistance_list[0], resistance_list[-1], num=6)
-    ax1.scatter(resistance_list,list(memristor_simulation.voltages_memristor), label=f'{memristor_simulation.circuit.number_of_memristor} memristor with {memristor_simulation.nb_states} states')
+    ax1.scatter(resistance_list,list(memristor_simulation.voltages_memristor.keys()), label=f'{memristor_simulation.circuit.number_of_memristor} memristor with {memristor_simulation.nb_states} states')
 
     ax1.set_xlabel(r'Resistance R ($\Omega$)')
     ax1.set_ylabel('Voltage (V)')
