@@ -218,11 +218,13 @@ def create_pulsed_programming_plot(pulsed_programming, number_iteration=10, path
     ax.set_xlabel('Pulse Number')
     ax.set_ylabel('Resistance \u03A9')
 
-    def find_index(pulsed_programming, n):
-        counter = 0
-        for i in range(len(pulsed_programming.graph_resistance)):
-            if pulsed_programming.graph_resistance[i]:
-                counter += 1
+    def find_index(pulsed_programming_, n):
+        counter_ = 0
+        p_res = 0
+        for i in range(len(pulsed_programming_.graph_resistance)):
+            if pulsed_programming_.graph_resistance[i][3] and p_res != pulsed_programming_.graph_resistance[i][0]:
+                p_res = pulsed_programming_.graph_resistance[i][0]
+                counter_ += 1
                 if counter > n:
                     return i
 
