@@ -268,7 +268,7 @@ def create_pulsed_programming_plot(pulsed_programming, path=None, dpi=600):
         n_max = last_pulse + 0.2*last_pulse
         n_min = annotation_[1] + 0.01*last_pulse
         plt.hlines(annotation_[2], n_min, n_max, linestyles='dashed', colors='black')
-        h = annotation_[2] + (pulsed_programming.hrs - pulsed_programming.lrs) / 100
+        h = annotation_[2] + (pulsed_programming.memristor_simulation.circuit.memristor_model.r_off - pulsed_programming.memristor_simulation.circuit.memristor_model.r_on) / 100
         space = (5 - len(str(annotation_[0]))) * '  '
         text = f'{annotation_[0]}{space}{round(annotation_[2])} \u03A9'
         plt.annotate(text=text, xy=(last_pulse, h), color='r')
