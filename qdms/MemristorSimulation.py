@@ -147,10 +147,20 @@ class MemristorSimulation:
         if self.verbose:
             timer_start = time.time()
         res_values = list(itertools.combinations_with_replacement(self.list_resistance[0], self.circuit.number_of_memristor))
+        counter = 0
+        if self.verbose:
+            timer_start_ = time.time()
         for current_res in res_values:
+            if counter % 100000 and self.verbose:
+                print(f'Done: {counter}\tLeft: {len(res_values) - counter}')
+                took = round(time.time() - timer_start_, 2)
+                print(f'Total time elapsed: {time.time() - timer_start}s\tTime Left: {took * (len(res_values) - counter) / 100000}')
+                timer_start_ = time.time()
+
             for i in range(self.circuit.number_of_memristor):
                 self.circuit.list_memristor[i].g = 1 / current_res[i]
-            self.voltages_memristor[round(self.circuit.current_v_out(), 12)] = [1 / i.g for i in self.circuit.list_memristor]
+            self.voltages_memristor[round(self.circuit.current_v_out(), 12)] = current_res
+            counter += 1
         if self.verbose:
             print(f'Total time elapsed: {round(time.time() - timer_start, 2)}s')
             print()
