@@ -153,7 +153,7 @@ class MemristorSimulation:
         for current_res in res_values:
             for i in range(self.circuit.number_of_memristor):
                 self.circuit.list_memristor[i].g = 1 / current_res[i]
-            self.voltages_memristor[self.circuit.current_v_out()] = [1 / i.g for i in self.circuit.list_memristor]
+            self.voltages_memristor[round(self.circuit.current_v_out(), 12)] = [1 / i.g for i in self.circuit.list_memristor]
         if self.verbose:
             print(f'Total time elapsed: {round(time.time() - timer_start, 2)}s')
             print()
@@ -218,7 +218,7 @@ class MemristorSimulation:
 
         for i in range(self.circuit.number_of_memristor):
             self.circuit.list_memristor[i].g = 1 / current_res[i]
-        self.voltages_memristor[self.circuit.current_v_out()] = [1/i.g for i in self.circuit.list_memristor]
+        self.voltages_memristor[round(self.circuit.current_v_out(), 12)] = [1/i.g for i in self.circuit.list_memristor]
 
     def loop_rec(self, list_resistance, counter, current_states):
         """
