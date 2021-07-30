@@ -48,7 +48,7 @@ class PulsedProgramming:
     """
 
     def __init__(self, memristor_simulation, pulse_algorithm='fabien', max_voltage=0, tolerance=0, is_relative_tolerance=False,
-                 variance_write=0, number_of_reading=1, max_pulse=20000, verbose=False):
+                 variance_write=0, number_of_reading=1, max_pulse=20000, verbose=False, plot_memristor=0):
         self.memristor_simulation = memristor_simulation
         self.pulse_algorithm = pulse_algorithm
         self.tolerance = tolerance
@@ -59,6 +59,7 @@ class PulsedProgramming:
         self.max_pulse = max_pulse
         self.verbose = verbose
         self.voltage_output = {}
+        self.plot_memristor = plot_memristor
 
         self.index_variability = 0
         self.variability_write = np.random.normal(0, variance_write, 1000)
@@ -175,7 +176,7 @@ class PulsedProgramming:
             [[macro_tune, is_relative_variability], [fine_tune, is_relative_variability]] for the balance() method.
         """
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
-            plot = True if i == self.memristor_simulation.circuit.number_of_memristor - 1 else False
+            plot = True if i == self.plot_memristor else False
             if self.pulse_algorithm == 'fabien':
                 self.fabien_convergence(self.memristor_simulation.circuit.list_memristor[i], list_resistance[i], plot=plot)
             elif self.pulse_algorithm == 'log':
@@ -198,7 +199,7 @@ class PulsedProgramming:
         final_g = np.sum([1 / i for i in list_resistance])
         delta_g = final_g - self.memristor_simulation.circuit.current_conductance()
         for i in range(self.memristor_simulation.circuit.number_of_memristor):
-            plot = True if i == 0 else False
+            plot = True if -(i+1) == self.plot_memristor else False
             final_res = 1 / (self.memristor_simulation.circuit.list_memristor[-(i+1)].g + delta_g)
             if self.memristor_simulation.circuit.memristor_model.r_on <= final_res <= self.memristor_simulation.circuit.memristor_model.r_off:
                 p_tolerance, p_relative = self.tolerance, self.is_relative_tolerance
