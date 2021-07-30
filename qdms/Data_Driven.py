@@ -95,6 +95,25 @@ class Data_Driven(Memristor):
             self.variability_a = 1.672e-5
             self.variability_b = 6.645e-2
 
+        elif self.parameter_model == 'O921C_4k':
+            r_off = 16000
+            r_on = 1800
+            self.A_p = 257.7128190985076
+            self.A_n = -11.403039436044947
+            self.t_p = -1.8072909907614225
+            self.t_n = -1.553306691442444
+            self.k_p = 5.11e-4
+            self.k_n = 1.17e-3
+            self.r_p = [9225.10091519594, -6342.703123090929]
+            self.r_n = [-4585.047127293936, -15957.311142302002]
+            self.eta = 1
+            self.a_p =  0.33255197429308136
+            self.a_n = 0.33255197429308136
+            self.b_p = 1.8747884736433298
+            self.b_n = 1.8747884736433298
+            self.variability_a = 1.672e-5
+            self.variability_b = 6.645e-2
+
         else:
             raise(Exception(f'Parameter model for Data_Driven {self.parameter_model} is unknown.'))
 
