@@ -146,6 +146,6 @@ def load_everything_pickle(path, verbose=False):
 
     algorithm = decompress_pickle(f"{path}\\algorithm.pbz2") if os.path.exists(f"{path}\\algorithm.pbz2") else None
     if verbose:
-        print(f'Quantum dot simulation loaded: {time.time()-start}')
+        print(f'Algorithm loaded: {time.time()-start}')
 
     return memristor, circuit, memristor_sim, pulsed_programming, qd_simulation, algorithm
