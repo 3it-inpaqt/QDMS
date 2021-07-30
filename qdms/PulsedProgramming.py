@@ -423,5 +423,5 @@ class PulsedProgramming:
                 print('Got max pulse')
             if plot:
                 self.graph_resistance.append([current_res, counter, action, flag_finish])
-                print(f'{self.graph_resistance[-1]}\t{self.graph_voltages}')
+                print(f'{self.graph_resistance[-1]}\t{self.graph_voltages[-1]}')
             counter += 1
