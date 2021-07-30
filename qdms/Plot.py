@@ -60,7 +60,7 @@ def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=No
 
     if 'resist' in plots and memristor_sim is not None:
         path = f'{directory_name}\\resist' if directory_name is not None else None
-        create_resist_plot(pulsed_programming, path, dpi=dpi)
+        create_resist_plot(memristor_sim, path, dpi=dpi)
     if verbose:
         print(f'Resist plot: {time.time()-start}')
         start = time.time()
