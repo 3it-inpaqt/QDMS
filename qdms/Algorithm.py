@@ -29,7 +29,6 @@ def algorithm(resolution, memristor_simulation, verbose=False):
     for k, v in memristor_simulation.voltages_memristor.items():
         if v_min <= k <= v_max:
             voltage_table[k] = v
-    print(voltage_table)
     print(f'Sweep between {v_min} and {v_max} with a step of {resolution}, which give {round(len(voltage_target))} values')
     voltages = find_correspondence(voltage_target, voltage_table, verbose=verbose)
 
