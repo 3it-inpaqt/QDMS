@@ -1,7 +1,10 @@
 from Circuit import Circuit
+from Algorithm import algorithm
+from .coulomb_blockade import *
 from MemristorSimulation import MemristorSimulation
 from HelperFunction import is_square
 import numpy as np
+import pickle
 from QDSimulation import QDSimulation
 from Plot import plot_everything
 from Data_Driven import Data_Driven
@@ -297,6 +300,105 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
         if verbose:
             print(f'{len(configurations) - config_done} configurations left\tCurrent: {directory_name}\tTook: {time.time()-start}')
             config_done += 1
+
+def parametric_test_quality_diagram(path, configuration, variability=None, nb_occurences=10, verbose=False):
+    """
+    This function generates numerous complete simulations to identify the impact of resolution and memristor variability
+    on the quality of stability diagram
+
+    Parameters
+    ----------
+    path : string
+        The path to the saving folder.
+
+    configuration : iterable
+        The configuration simulated with this disposition: [number of memristor, number of states, tolerance, voltage resolution].
+
+    variability : list of float
+        Contains the variability used. Default: [0, 0.1, 0.5, 1, 2, 5, 10, 20] %
+
+    nb_occurences : int
+        Number of occurences per stability diagram.
+
+    verbose : bool
+        If true, output timers in console.
+    Returns
+    -------
+
+    """
+
+    if variability is None:
+        variability = np.array([0, 0.1, 0.5, 1, 2, 3, 4, 5])
+    variances = variability / 300
+    config_done = 0
+    rmss = []
+    results = {}
+    directory_name = f'{path}//parametric_stability_diagram_quality'
+    if not os.path.isdir(f'{path}'):
+        os.mkdir(f'{path}')
+    if not os.path.isdir(f'{directory_name}'):
+        os.mkdir(f'{directory_name}')
+    if verbose:
+        start = time.time()
+        start_ = start
+
+    for variance in variances:
+        sub_directory_name = directory_name + f'//{round(variance * 300, 2)}'
+        if not os.path.isdir(f'{sub_directory_name}'):
+            os.mkdir(f'{sub_directory_name}')
+
+        for config in configuration:
+            start_ = time.time()
+            memristor = Data_Driven(is_variability_on=False)
+            circuit = Circuit(memristor_model=memristor, number_of_memristor=config[0], is_new_architecture=True,
+                              v_in=1e-3, gain_resistance=0, R_L=1)
+            memristor_sim = MemristorSimulation(circuit, config[1], distribution_type='full_spread', verbose=True) #CHANGE WHEN VARIA AVAILABLE
+            memristor_sim.simulate()
+            voltages_target = algorithm(config[3], memristor_sim)
+            pulsed_programming = PulsedProgramming(memristor_sim, verbose=True, pulse_algorithm='fabien',
+                                                   tolerance=config[2], is_relative_tolerance=True,
+                                                   number_of_reading=1)
+            voltages_target_ = pulsed_programming.simulate(voltages_target, [[50, False], [10, False]])
+            quantum_sim = QDSimulation(list(voltages_target_.keys()))
+            quantum_sim.simulate()
+
+            rms = 0
+            v_shift = []
+            for i in range(nb_occurences):
+                if verbose:
+                    print(f'Config {config_done+1}/{len(variances)*len(configuration)}: loop {i+1}/{nb_occurences}')
+                voltage_target = (memristor_sim.voltages_memristor.max() - memristor_sim.voltages_memristor.min())*np.random.random()
+                ind = np.where(memristor_sim.voltages_memristor>=voltage_target)[0][0]
+                diagram_slice = quantum_sim.stability_diagram[:, ind]
+                tol = (memristor_sim.voltages_memristor.max() - memristor_sim.voltages_memristor.min()) / (20 * int(diagram_slice.max()) - int(diagram_slice.min()))
+                if 2*tol/1e-8<1000:
+                    nb_points = 2*tol/1e-8
+                else:
+                    nb_points = 1000
+                derivative_slice = np.gradient(diagram_slice)
+                i_left = 0
+                for j in range(int(diagram_slice.max())-int(diagram_slice.min())):
+                    i_right = np.where(diagram_slice < diagram_slice.min()+j+1)[0][-1]
+                    v_trans_varia = memristor_sim.voltages_memristor[i_left + np.armax(derivative_slice[i_left:i_right])]
+                    i_left = i_right
+
+                    sweep_x = np.linspace(v_trans_varia - tol, v_trans_varia + tol, nb_points)
+                    sweep_y = np.linspace(memristor_sim.voltages_memristor[ind], memristor_sim.voltages_memristor[ind], 1)
+                    x_mesh, y_mesh = np.meshgrid(sweep_x, sweep_y)
+                    high_res_diagram = N_moy_DQD(x_mesh, y_mesh, Cg1=quantum_sim.Cg1, Cg2=quantum_sim.Cg2, Cm=quantum_sim.Cm,
+                                                 CL=quantum_sim.CL, CR=quantum_sim.CR, N_min=quantum_sim.N_min,
+                                                 N_max=quantum_sim.N_max, kBT=2 * quantum_sim.kB * quantum_sim.T, e=1.602e-19)
+                    derivative_high_res = np.gradient(high_res_diagram[0])
+                    v_trans_high_res = sweep_x[np.argmax(derivative_high_res)]
+                    v_shift.append(v_trans_varia-v_trans_high_res)
+                    rms += v_shift[-1]**2
+            rmss.append(rms/len(v_shift))
+            results[f'{config_done}'] = {'RMS': rmss, 'voltage_shift': v_shift, 'config': config, 'variance': variance}
+            config_done += 1
+    with open(f'{directory_name}\\data.pickle', 'wb') as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if verbose:
+        print(f'For {len(variances) * len(configuration)} simulations -> {time.time() - start} s')
 
 
 ########################################################################################################################
