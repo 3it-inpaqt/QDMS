@@ -264,7 +264,7 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
         circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=configuration[1], v_in=configuration[2]
                           , gain_resistance=configuration[3], R_L=configuration[4])
 
-        memristor_simulation = qdms.MemristorSimulation(circuit, 2)
+        memristor_simulation = qdms.MemristorSimulation(circuit, 5)
         memristor_simulation.simulate()
 
         directory_name = f'{configuration[0]}x1_{configuration[2]}_{configuration[3]}_{configuration[4]}'
@@ -871,7 +871,7 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     ax2.set_yscale('log')
     # plt.title('title')
     ax2.set_ylabel('Resolution (V)')
-    ax.set_xlabel('# of states for a memristor')
+    ax.set_xlabel('Number of memristor')
     filename = f'resolution_memristor_plot_min_max_.jpg'
     plt.tight_layout()
     plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
