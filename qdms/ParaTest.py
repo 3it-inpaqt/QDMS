@@ -24,6 +24,9 @@ def parametric_test_resolution_memristor(path, configurations=None):
     -------
 
     """
+    if not os.path.isdir(f'{path}'):
+        os.mkdir(f'{path}')
+
     if configurations is None:
         conf_4_linear = [[4, 'linear', i] for i in range(2, 13)]
         # conf_4_half_spread = [[4, 'half_spread', i] for i in range(2, 13)]
@@ -36,6 +39,7 @@ def parametric_test_resolution_memristor(path, configurations=None):
     config_done = 0
     res = qdms.Data_Driven()
     for configuration in configurations:
+
         print(f'{len(configurations) - config_done} configurations left')
         circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                           , gain_resistance=0, R_L=1)
@@ -45,6 +49,8 @@ def parametric_test_resolution_memristor(path, configurations=None):
 
         directory_name = f'{int(np.sqrt(configuration[0]))}x{int(np.sqrt(configuration[0]))}_{configuration[1]}_{configuration[2]}_states'
 
+        if not os.path.isdir(f'{path}'):
+            os.mkdir(f'{path}\\{directory_name}')
         qdms.Log.compressed_pickle(f'{path}\\{directory_name}', memristor_sim)
         config_done += 1
 
