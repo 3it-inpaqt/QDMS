@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 import os
 import time
-
+import matplotlib.pyplot as plt
 
 ########################################################################################################################
 # Creating values functions
