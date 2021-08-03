@@ -581,7 +581,7 @@ def load_voltage_min_max_data(path, verbose=False):
 ########################################################################################################################
 # Plot functions
 
-def create_resolution_memristor_plot(memristor_simulations, directory_name, resolution_goal=100e-6):
+def create_resolution_memristor_plot(memristor_simulations, directory_name=None, resolution_goal=100e-6):
     """
     This function creates a plot showing the impact of the number of states of multiple pulsed simulation on the resolution.
     They shouldn't have variability and be between the same LRS and HRS.
@@ -639,17 +639,15 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name, reso
     ax.plot([1, biggest_nb_state],[resolution_goal, resolution_goal], label='Goal', color='black')
     ax.set_yscale('log')
     ax.legend()
-    title = f'LRS: {round(memristor_simulations[0][0].pulsed_programming.lrs/1000, 1)}k\u03A9 & HRS: {round(memristor_simulations[0][0].pulsed_programming.hrs/1000, 1)}k\u03A9'
-    plt.title(title)
 
     plt.ylabel('Resolution (V)')
     plt.xlabel('# of states for a memristor')
     filename = f'resolution_memristor_plot.jpg'
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
-
-    plt.close('all')
-    # plt.show()
+    if directory_name is None:
+        plt.show()
+    else:
+        plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
 
 
 def create_resolution_memristor_cut_plot(memristor_simulations, directory_name, resolution_goal=100e-6, cut_extremes=None):
