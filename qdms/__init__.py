@@ -10,4 +10,5 @@ from .QDSimulation import QDSimulation
 from . import Log
 from . import Plot
 from .Algorithm import algorithm
+from . import ParaTest
 
