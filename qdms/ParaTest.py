@@ -264,7 +264,7 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
         circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=configuration[1], v_in=configuration[2]
                           , gain_resistance=configuration[3], R_L=configuration[4])
 
-        memristor_simulation = qdms.MemristorSimulation(circuit, 5)
+        memristor_simulation = qdms.MemristorSimulation(circuit, 10)
         memristor_simulation.simulate()
 
         directory_name = f'{configuration[0]}x1_{configuration[2]}_{configuration[3]}_{configuration[4]}'
