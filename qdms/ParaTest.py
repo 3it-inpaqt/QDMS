@@ -869,12 +869,14 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     ax2.set_yscale('log')
     # plt.title('title')
     ax2.set_ylabel('Resolution (V)')
-    ax.set_xlabel('Number of memristor')
-    filename = f'resolution_memristor_plot_min_max_.jpg'
+    ax.set_xlabel('Number of memristors')
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
-    plt.close('all')
-    # plt.show()
+
+    if directory_name is None:
+        plt.show()
+    else:
+        filename = f'v_min_max.png'
+        plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
 
 
 def create_resolution_variance_plot(memristor_simulations, directory_name, resolution_goal=None):
