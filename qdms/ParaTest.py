@@ -819,7 +819,7 @@ def create_voltage_min_max_plot_2(memristor_simulations, directory_name):
     # plt.show()
 
 
-def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
+def create_voltage_min_max_plot_3(memristor_simulations, directory_name=None):
     """
     This function creates a plot showing the impact of lrs and hrs on the maximum and minimum voltage possible.
 
