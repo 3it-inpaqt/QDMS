@@ -264,7 +264,7 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
         circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=configuration[1], v_in=configuration[2]
                           , gain_resistance=configuration[3], R_L=configuration[4])
 
-        memristor_simulation = qdms.MemristorSimulation(circuit, 10)
+        memristor_simulation = qdms.MemristorSimulation(circuit, 15)
         memristor_simulation.simulate()
 
         directory_name = f'{configuration[0]}x1_{configuration[2]}_{configuration[3]}_{configuration[4]}'
@@ -849,24 +849,22 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     x.clear()
     y.clear()
 
-    ax2 = ax.twinx()
-    for current in memristor_simulations:
-        x.append(current.circuit.number_of_memristor)
-        y.append(np.mean(np.diff(list(current.voltages_memristor.keys()))))
+    with plt.rc_context({'ytick.color': 'blue'}):
+        ax2 = ax.twinx()
+        for current in memristor_simulations:
+            x.append(current.circuit.number_of_memristor)
+            y.append(np.mean(np.diff(list(current.voltages_memristor.keys()))))
 
-    temp = []
-    for index in range(len(x)):
-        temp.append([x[index], y[index]])
-    temp = list(np.unique(temp, axis=0))
-    x, y = zip(*temp)
-    x = list(x)
-    y = list(y)
+        temp = []
+        for index in range(len(x)):
+            temp.append([x[index], y[index]])
+        temp = list(np.unique(temp, axis=0))
+        x, y = zip(*temp)
+        x = list(x)
+        y = list(y)
 
-    lns2 = ax2.plot(x, y, color='red', marker='^', label='Resolution', linestyle='dotted')
-
-    lns = lns1 + lns2
-    labs = [l.get_label() for l in lns]
-    ax.legend(lns, labs, loc=0)
+    with plt.rc_context({'ytick.color': 'red'}):
+        ax2.plot(x, y, color='red', marker='^', label='Resolution', linestyle='dotted')
 
     ax2.set_yscale('log')
     # plt.title('title')
