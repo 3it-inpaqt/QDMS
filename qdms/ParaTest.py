@@ -746,8 +746,8 @@ def create_voltage_min_max_plot_1(memristor_simulations, directory_name):
     counter = 0
     for current in memristor_simulations:
         x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
-        voltages_min = min(list(current.voltages.keys()))
-        voltages_max = max(list(current.voltages.keys()))
+        voltages_min = min(list(current.voltages_memristor.keys()))
+        voltages_max = max(list(current.voltages_memristor.keys()))
         y = [voltages_min, voltages_max]
         ax.plot(x, y, color='black', marker='o', linestyle='dotted')
 
