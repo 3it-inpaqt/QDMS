@@ -1,3 +1,4 @@
+import qdms.Log
 from Circuit import Circuit
 from Algorithm import algorithm
 from .coulomb_blockade import *
@@ -42,26 +43,21 @@ def parametric_test_resolution_memristor(path, configurations=None):
         conf_9_linear = [[9, 'linear', i] for i in range(2, 10)]
         # conf_9_half_spread = [[9, 'half_spread', i] for i in range(2, 8)]
         conf_9_full_spread = [[9, 'full_spread', i] for i in range(2, 7)]
-        configurations = conf_9_full_spread
+        configurations = conf_9_full_spread + conf_9_linear + conf_4_linear + conf_4_full_spread
 
     config_done = 0
-    res = Data_Driven()
+    res = qdms.Data_Driven()
     for configuration in configurations:
         print(f'{len(configurations) - config_done} configurations left')
-        circuit = Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
+        circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                           , gain_resistance=0, R_L=1)
 
-        pulsed_programming = PulsedProgramming(circuit, configuration[2], distribution_type=configuration[1]
-                                               , max_voltage=2, tolerance=10, variance_read=0,variance_write=0
-                                               , lrs=1000, hrs=3000, pulse_algorithm='log', number_of_reading=1)
-        pulsed_programming.simulate()
-        memristor_sim = MemristorSimulation(pulsed_programming, is_using_conductance=False, verbose=True)
+        memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], verbose=True)
         memristor_sim.simulate()
 
         directory_name = f'{int(np.sqrt(configuration[0]))}x{int(np.sqrt(configuration[0]))}_{configuration[1]}_{configuration[2]}_states'
 
-        save_everything_hdf5(path, directory_name, memristor=res, pulsed_programming=pulsed_programming, circuit=circuit
-                        , memristor_sim=memristor_sim, verbose=True)
+        qdms.Log.compressed_pickle(f'{path}\\{directory_name}', memristor_sim)
         config_done += 1
 
 

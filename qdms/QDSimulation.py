@@ -64,7 +64,7 @@ class QDSimulation:
     def __init__(self, voltages_x, voltages_y, n_dots=2, T=0.1, Cm=0.4, parameter_model='UNSW', verbose=True):
         if n_dots != 2:
             raise Exception(f'{n_dots} is not supported. Use 2 instead.')
-        self.stability_diagram = [[None for _ in range(len(voltages))] for _ in range(len(voltages))]
+        self.stability_diagram = [[None for _ in range(len(voltages_x))] for _ in range(len(voltages_y))]
         self.voltages_x = voltages_x
         self.voltages_y = voltages_y
 
@@ -158,19 +158,19 @@ class QDSimulation:
 
     def find_number_electron(self):
         if self.parameter_model == 'UNSW':
-            return int(min(self.voltages) * 65), int(max(self.voltages) * 65)
+            return int(min(self.voltages_x) * 65), int(max(self.voltages_x) * 65)
 
         elif self.parameter_model == 'QuTech':
-            return int(min(self.voltages) * 30), int(max(self.voltages) * 35)
+            return int(min(self.voltages_x) * 30), int(max(self.voltages_x) * 35)
 
         elif self.parameter_model == 'Princeton':
-            return int(min(self.voltages) * 155), int(max(self.voltages) * 155)
+            return int(min(self.voltages_x) * 155), int(max(self.voltages_x) * 155)
 
         elif self.parameter_model == 'Sandia_national_lab':
-            return int(min(self.voltages) * 10), int(max(self.voltages) * 15)
+            return int(min(self.voltages_x) * 10), int(max(self.voltages_x) * 15)
 
         elif self.parameter_model == 'CEA_LETI':
-            return int(min(self.voltages) * 60), int(max(self.voltages) * 125)
+            return int(min(self.voltages_x) * 60), int(max(self.voltages_x) * 125)
 
         elif self.parameter_model == 'UCL':
-            return int(min(self.voltages) * 1), int(max(self.voltages) * 10)
+            return int(min(self.voltages_x) * 1), int(max(self.voltages_x) * 10)
