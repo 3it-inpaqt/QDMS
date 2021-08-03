@@ -119,6 +119,8 @@ def create_result_plot(memristor_simulation, path=None, dpi=600):
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
     plt.clf()
     fig = plt.figure()
@@ -169,6 +171,8 @@ def create_resist_plot(memristor_simulation, path=None, dpi=600):
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
     # list_resist_temp = list_resist
     # if simulation.is_using_conductance:
     #     for i in range(len(list_resist)):
@@ -212,6 +216,8 @@ def create_pulsed_programming_plot(pulsed_programming, path=None, number_iterati
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
     ax = plt.axes()
 
@@ -340,6 +346,8 @@ def create_amplitude_plot(pulsed_programming, path=None, number_iteration=10, dp
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
     voltages_read = []
     voltages_set = []
@@ -406,6 +414,8 @@ def create_gaussian_distribution(pulsed_programming, path=None, dpi=600):
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
     # Write
     if pulsed_programming.variance_write != 0:
@@ -445,6 +455,8 @@ def create_stability_diagram(qd_simulation, path=None, dpi=600):
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
     plt.figure()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
 
@@ -500,6 +512,8 @@ def create_honeycomb_diagram(qd_simulation, path=None, dpi=600):
         directory = '\\'.join(path.split('\\')[:-1])
         if not os.path.isdir(directory):
             os.mkdir(directory)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
     fig, ax = plt.subplots()
     x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
