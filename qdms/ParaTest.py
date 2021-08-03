@@ -604,7 +604,6 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
     fig, ax = plt.subplots()
     x = []
     y = []
-    colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'olive', 'cyan', 'gray']
     counter = 0
     biggest_nb_state = 0
     distribution_type = ''
@@ -624,12 +623,14 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
 
         if current_conf[0].distribution_type == 'linear':
             distribution_type = 'No spreading'
+            color = 'red'
         elif current_conf[0].distribution_type == 'full_spread':
             distribution_type = 'Full state spreading'
+            color = 'blue'
         number_of_memristor = int(np.sqrt(current_conf[0].circuit.number_of_memristor))
         label = f'{distribution_type} ({number_of_memristor}x{number_of_memristor})'
         marker = 'o' if number_of_memristor == 2 else 's'
-        ax.plot(x, y, color=colors[counter], label=label, marker=marker, linestyle='dotted')
+        ax.plot(x, y, color=color, label=label, marker=marker, linestyle='dotted')
         counter += 1
         x.clear()
         y.clear()
