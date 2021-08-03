@@ -556,7 +556,7 @@ def load_voltage_min_max_data(path, verbose=False):
     for directory in directories:
         if directory.endswith('.jpg'):
             continue
-        memristor_simulation = load_everything_hdf5(f'{path}\\{directory}', qd_simulation=0)[3]
+        memristor_simulation = qdms.Log.decompress_pickle(f'{path}\\{directory}')
         memristor_simulations.append(memristor_simulation)
 
     return memristor_simulations
