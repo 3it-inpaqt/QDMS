@@ -516,7 +516,7 @@ def create_honeycomb_diagram(qd_simulation, path=None, dpi=600):
             os.mkdir(path)
 
     fig, ax = plt.subplots()
-    x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
+    x, y = np.meshgrid(qd_simulation.voltages_x, qd_simulation.voltages_y)
 
     dx, dy = np.gradient(qd_simulation.stability_diagram)
     color = np.sqrt((dx/2)**2 + (dy/2)**2)
@@ -525,7 +525,7 @@ def create_honeycomb_diagram(qd_simulation, path=None, dpi=600):
     ax.set_xlabel('X-axis', fontweight='bold')
     ax.set_ylabel('Y-axis', fontweight='bold')
 
-    plt.title(f'Resolution: {round(np.mean(np.diff(qd_simulation.voltages)),8)} (V)   Cm: {qd_simulation.Cm}')
+    plt.title(f'Resolution: {round(np.mean(np.diff(qd_simulation.voltages_x)),8)} (V)   Cm: {qd_simulation.Cm}')
     plt.xlabel(r'$V_{g1}$ (V)')
     plt.ylabel(r'$V_{g2}$ (V)')
     plt.tight_layout()
