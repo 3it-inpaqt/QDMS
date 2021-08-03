@@ -267,11 +267,7 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
         memristor_simulation = qdms.MemristorSimulation(circuit, 2)
         memristor_simulation.simulate()
 
-        if qdms.HelperFunction.is_square(configuration[0]):
-            nb_memristor = [int(np.sqrt(configuration[0])), int(np.sqrt(configuration[0]))]
-        else:
-            nb_memristor = [configuration[0], 1]
-        directory_name = f'{nb_memristor[0]}x{nb_memristor[1]}_{configuration[2]}_{configuration[3]}_{configuration[4]}'
+        directory_name = f'{configuration[0]}x1_{configuration[2]}_{configuration[3]}_{configuration[4]}'
 
         qdms.Log.compressed_pickle(f'{path}\\{directory_name}', memristor_simulation)
 
