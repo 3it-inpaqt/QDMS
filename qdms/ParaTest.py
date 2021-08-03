@@ -625,6 +625,7 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
 
     ax.plot([1, biggest_nb_state],[resolution_goal, resolution_goal], label='Goal', color='black')
     ax.set_yscale('log')
+    ax.set_set_xticks([4, 8, 12, 16, 20])
 
     plt.ylabel('Resolution (V)')
     plt.xlabel('# of states for a memristor')
