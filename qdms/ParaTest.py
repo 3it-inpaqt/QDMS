@@ -852,7 +852,7 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     ax2 = ax.twinx()
     for current in memristor_simulations:
         x.append(current.circuit.number_of_memristor)
-        y.append(np.mean(np.diff(current.voltages)))
+        y.append(np.mean(np.diff(list(current.voltages_memristor.keys()))))
 
     temp = []
     for index in range(len(x)):
