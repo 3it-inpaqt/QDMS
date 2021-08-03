@@ -622,9 +622,9 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
         x = list(x)
         y = list(y)
 
-        if current_conf[0].pulsed_programming.distribution_type == 'linear':
+        if current_conf[0].distribution_type == 'linear':
             distribution_type = 'No spreading'
-        elif current_conf[0].pulsed_programming.distribution_type == 'full_spread':
+        elif current_conf[0].distribution_type == 'full_spread':
             distribution_type = 'Full state spreading'
         number_of_memristor = int(np.sqrt(current_conf[0].pulsed_programming.circuit.number_of_memristor))
         label = f'{distribution_type} ({number_of_memristor}x{number_of_memristor})'
