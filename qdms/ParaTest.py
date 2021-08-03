@@ -440,7 +440,7 @@ def load_resolution_memristor_data(path, verbose=False):
         current_conf = str(current_conf[0] + '_' + current_conf[1])
         if current_conf != previous_conf:
             index_conf += 1
-        memristor_simulations[index_conf].append(load_everything_hdf5(path + '\\' + current_dir, qd_simulation=0, verbose=False)[3])
+        memristor_simulations[index_conf].append(qdms.Log.decompress_pickle(path + '\\' + current_dir))
         previous_conf = current_conf
         if verbose:
             conf_left -= 1
