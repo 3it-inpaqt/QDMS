@@ -240,23 +240,18 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
     if configurations is None:
         configurations = []
         nb_memristor = [3, 4, 5, 6, 7, 8, 9, 10]
+
         architecture = [True]
         gain_resistance = [[0]]
-        v_in = [[0.5e-3, 1e-3, 4e-3]]
+        v_in = [1e-3]
         resistance_load = [1]
-        lrs_hrs = [[1000, 3000]]
         for nb_memristor_ in nb_memristor:
-            for lrs_hrs_ in lrs_hrs:
-                for architecture_ in architecture:
-                    if architecture_:
-                        for v_in_ in v_in[0]:
-                            for gain_resistance_ in gain_resistance[0]:
-                                for resistance_load_ in resistance_load:
-                                    configurations.append([nb_memristor_, architecture_, v_in_, gain_resistance_, resistance_load_, lrs_hrs_])
-                    else:
-                        for v_in_ in v_in[1]:
-                            for gain_resistance_ in gain_resistance[1]:
-                                configurations.append([nb_memristor_, architecture_, v_in_, gain_resistance_, 0, lrs_hrs_])
+            for architecture_ in architecture:
+                if architecture_:
+                    for v_in_ in v_in:
+                        for gain_resistance_ in gain_resistance[0]:
+                            for resistance_load_ in resistance_load:
+                                configurations.append([nb_memristor_, architecture_, v_in_, gain_resistance_, resistance_load_])
 
     config_done = 0
     if not os.path.isdir(f'{path}'):
@@ -264,28 +259,21 @@ def parametric_test_voltage_min_max(path, configurations=None, verbose=False):
     for configuration in configurations:
         if verbose:
             start = time.time()
-        res = Data_Driven()
+        res = qdms.Data_Driven()
 
-        circuit = Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=configuration[1], v_in=configuration[2]
+        circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=configuration[1], v_in=configuration[2]
                           , gain_resistance=configuration[3], R_L=configuration[4])
 
-        pulsed_programming = PulsedProgramming(circuit, 2, distribution_type='linear'
-                           , max_voltage=2.8, tolerance=10, is_relative_tolerance=False,variance_read=1/300,variance_write=0,
-                           lrs=configuration[5][0], hrs=configuration[5][1], pulse_algorithm='log', number_of_reading=5)
-        pulsed_programming.simulate()
-
-        memristor_simulation = MemristorSimulation(pulsed_programming)
+        memristor_simulation = qdms.MemristorSimulation(circuit, 2)
         memristor_simulation.simulate()
 
         if is_square(configuration[0]):
             nb_memristor = [int(np.sqrt(configuration[0])), int(np.sqrt(configuration[0]))]
         else:
             nb_memristor = [configuration[0], 1]
-        architecture = 'new' if configuration[1] else 'old'
-        directory_name = f'{nb_memristor[0]}x{nb_memristor[1]}_{architecture}_{configuration[2]}_{configuration[3]}_{configuration[4]}'
+        directory_name = f'{nb_memristor[0]}x{nb_memristor[1]}_{configuration[2]}_{configuration[3]}_{configuration[4]}'
 
-        save_everything_hdf5(f'{path}', f'{directory_name}', memristor=res, pulsed_programming=pulsed_programming,
-                             circuit=circuit, memristor_sim=memristor_simulation)
+        qdms.Log.compressed_pickle(f'{path}\\{directory_name}', memristor_simulation)
 
         if verbose:
             print(f'{len(configurations) - config_done} configurations left\tCurrent: {directory_name}\tTook: {time.time()-start}')
@@ -637,7 +625,6 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
 
     ax.plot([1, biggest_nb_state],[resolution_goal, resolution_goal], label='Goal', color='black')
     ax.set_yscale('log')
-    ax.legend()
 
     plt.ylabel('Resolution (V)')
     plt.xlabel('# of states for a memristor')
