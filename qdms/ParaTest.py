@@ -44,7 +44,7 @@ def parametric_test_resolution_memristor(path, configurations=None):
         circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                           , gain_resistance=0, R_L=1)
 
-        memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], verbose=True)
+        memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], distribution_type=configuration[1],verbose=True)
         memristor_sim.simulate()
 
         directory_name = f'{int(np.sqrt(configuration[0]))}x{int(np.sqrt(configuration[0]))}_{configuration[1]}_{configuration[2]}_states'
