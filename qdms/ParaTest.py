@@ -837,19 +837,20 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     fig, ax = plt.subplots()
 
     counter = 0
-    for current in memristor_simulations:
-        x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
-        voltages_min = min(list(current.voltages_memristor.keys()))
-        voltages_max = max(list(current.voltages_memristor.keys()))
-        y = [voltages_min, voltages_max]
-        lns1 = ax.plot(x, y, color='blue', marker='o', label='Voltage output', linestyle='dotted')
+    with plt.rc_context({'ytick.color': 'blue'}):
+        for current in memristor_simulations:
+            x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
+            voltages_min = min(list(current.voltages_memristor.keys()))
+            voltages_max = max(list(current.voltages_memristor.keys()))
+            y = [voltages_min, voltages_max]
+            ax.plot(x, y, color='blue', marker='o', label='Voltage output', linestyle='dotted')
 
-        counter += 1
+            counter += 1
     ax.set_ylabel('Voltage output (V)')
     x.clear()
     y.clear()
 
-    with plt.rc_context({'ytick.color': 'blue'}):
+    with plt.rc_context({'ytick.color': 'red'}):
         ax2 = ax.twinx()
         for current in memristor_simulations:
             x.append(current.circuit.number_of_memristor)
@@ -863,7 +864,6 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
         x = list(x)
         y = list(y)
 
-    with plt.rc_context({'ytick.color': 'red'}):
         ax2.plot(x, y, color='red', marker='^', label='Resolution', linestyle='dotted')
 
     ax2.set_yscale('log')
