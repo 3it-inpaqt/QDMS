@@ -626,7 +626,7 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
             distribution_type = 'No spreading'
         elif current_conf[0].distribution_type == 'full_spread':
             distribution_type = 'Full state spreading'
-        number_of_memristor = int(np.sqrt(current_conf[0].pulsed_programming.circuit.number_of_memristor))
+        number_of_memristor = int(np.sqrt(current_conf[0].circuit.number_of_memristor))
         label = f'{distribution_type} ({number_of_memristor}x{number_of_memristor})'
         marker = 'o' if number_of_memristor == 2 else 's'
         ax.plot(x, y, color=colors[counter], label=label, marker=marker, linestyle='dotted')
