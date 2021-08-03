@@ -745,24 +745,22 @@ def create_voltage_min_max_plot_1(memristor_simulations, directory_name):
 
     counter = 0
     for current in memristor_simulations:
-        x = [int(current.pulsed_programming.circuit.number_of_memristor), int(current.pulsed_programming.circuit.number_of_memristor)]
-        voltages_min = min(current.voltages)
-        voltages_max = max(current.voltages)
+        x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
+        voltages_min = min(list(current.voltages.keys()))
+        voltages_max = max(list(current.voltages.keys()))
         y = [voltages_min, voltages_max]
         ax.plot(x, y, color='black', marker='o', linestyle='dotted')
 
         counter += 1
 
-    title = f'LRS: {round(memristor_simulations[0].pulsed_programming.lrs/1000, 1)}k\u03A9 & HRS: {round(memristor_simulations[0].pulsed_programming.hrs/1000, 1)}k\u03A9'
-    plt.title(title)
     plt.ylabel('Voltage output (V)')
     plt.xlabel('Number of memristors')
     filename = f'voltage_min_max_plot_1.jpg'
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
-
-    plt.close('all')
-    # plt.show()
+    if directory_name is None:
+        plt.show()
+    else:
+        plt.savefig(f'{directory_name}\\{filename}', dpi=1200)
 
 
 def create_voltage_min_max_plot_2(memristor_simulations, directory_name):
