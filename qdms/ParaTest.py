@@ -610,9 +610,9 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
     distribution_type = ''
     for current_conf in memristor_simulations:
         for current in current_conf:
-            biggest_nb_state = current.pulsed_programming.nb_states if current.pulsed_programming.nb_states > biggest_nb_state else biggest_nb_state
-            x.append(current.pulsed_programming.nb_states)
-            y.append(np.mean(np.diff(current.voltages)))
+            biggest_nb_state = current.nb_states if current.nb_states > biggest_nb_state else biggest_nb_state
+            x.append(current.nb_states)
+            y.append(np.mean(np.diff(list(current.voltages_memristor.keys()))))
 
         temp = []
         for index in range(len(x)):
@@ -624,8 +624,6 @@ def create_resolution_memristor_plot(memristor_simulations, directory_name=None,
 
         if current_conf[0].pulsed_programming.distribution_type == 'linear':
             distribution_type = 'No spreading'
-        elif current_conf[0].pulsed_programming.distribution_type == 'half_spread':
-            distribution_type = 'Line state spreading'
         elif current_conf[0].pulsed_programming.distribution_type == 'full_spread':
             distribution_type = 'Full state spreading'
         number_of_memristor = int(np.sqrt(current_conf[0].pulsed_programming.circuit.number_of_memristor))
