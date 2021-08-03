@@ -786,7 +786,7 @@ def create_voltage_min_max_plot_2(memristor_simulations, directory_name):
         voltages_min = min(current.voltages)
         voltages_max = max(current.voltages)
 
-        v_in = current.pulsed_programming.circuit.v_in
+        v_in = current.circuit.v_in
         gain_resistance = current.pulsed_programming.circuit.gain_resistance
         if current.pulsed_programming.circuit.is_new_architecture:
             color = 'blue'
@@ -838,9 +838,9 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
 
     counter = 0
     for current in memristor_simulations:
-        x = [int(current.pulsed_programming.circuit.number_of_memristor), int(current.pulsed_programming.circuit.number_of_memristor)]
-        voltages_min = min(current.voltages)
-        voltages_max = max(current.voltages)
+        x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
+        voltages_min = min(list(current.voltages_memristor.keys()))
+        voltages_max = max(list(current.voltages_memristor.keys()))
         y = [voltages_min, voltages_max]
         lns1 = ax.plot(x, y, color='blue', marker='o', label='Voltage output', linestyle='dotted')
 
@@ -849,7 +849,6 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     x.clear()
     y.clear()
 
-    counter = 0
     ax2 = ax.twinx()
     for current in memristor_simulations:
         x.append(current.pulsed_programming.circuit.number_of_memristor)
