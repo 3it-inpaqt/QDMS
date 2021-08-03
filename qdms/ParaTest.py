@@ -834,10 +834,10 @@ def create_voltage_min_max_plot_3(memristor_simulations, directory_name):
     Returns
     ----------
     """
-    fig, ax = plt.subplots()
-
-    counter = 0
     with plt.rc_context({'ytick.color': 'blue'}):
+        fig, ax = plt.subplots()
+
+        counter = 0
         for current in memristor_simulations:
             x = [int(current.circuit.number_of_memristor), int(current.circuit.number_of_memristor)]
             voltages_min = min(list(current.voltages_memristor.keys()))
