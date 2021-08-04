@@ -91,10 +91,10 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
     res = qdms.Data_Driven()
     circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                       , gain_resistance=0, R_L=1)
-    memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], distribution_type=configuration[1],is_using_conductance=False, verbose=False)
+    memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], distribution_type=configuration[1],is_using_conductance=False, verbose=verbose)
     memristor_sim.simulate()
 
-    algorithm = qdms.algorithm(0.0001, memristor_sim)
+    algorithm = qdms.algorithm(0.0001, memristor_sim, verbose=verbose)
     directory_name = f'{path}//{configuration[0]}x{1}_{configuration[1]}_{configuration[2]}_states'
 
     if not os.path.isdir(f'{path}'):
@@ -115,7 +115,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
                 print(f'{len(variability) - config_done} variability left {index} simulation -> {(((len(variability) - config_done) * nb_occurences) - index) * (time.time() - start_)} s left')
                 start_ = time.time()
 
-            pulsed_programming = qdms.PulsedProgramming(memristor_sim, tolerance=2, is_relative_tolerance=True, pulse_algorithm='fabien', number_of_reading=1)
+            pulsed_programming = qdms.PulsedProgramming(memristor_sim, tolerance=2, is_relative_tolerance=True, pulse_algorithm='fabien', number_of_reading=1,  verbose=verbose)
             pulsed_programming.simulate(algorithm, [[50, False], [10, False]])
             while os.path.isdir(f'{sub_directory_name}\\{str(index)}'):
                 index += 1
