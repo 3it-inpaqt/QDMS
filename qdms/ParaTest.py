@@ -66,7 +66,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
         The path to the saving folder.
 
     configuration : iterable
-        The configuration simulated with this disposition: [number of memristor, distribution_type, number of states, tolerance].
+        The configuration simulated with this disposition: [number of memristor, distribution_type, number of states].
 
     variability : list of float
         Contains the variability used. Default: [0, 0.1, 0.5, 1, 2, 5, 10, 20] %
@@ -89,13 +89,13 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
         variability = np.array([0, 0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
     config_done = 0
     res = qdms.Data_Driven()
-    circuit = qdms.Circuit(memristor_model=res, number_of_memristor=9, is_new_architecture=True, v_in=1e-3
+    circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                       , gain_resistance=0, R_L=1)
-    memristor_sim = qdms.MemristorSimulation(circuit, 10, distribution_type='linear',is_using_conductance=False, verbose=False)
+    memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], distribution_type=configuration[1],is_using_conductance=False, verbose=False)
     memristor_sim.simulate()
 
     algorithm = qdms.algorithm(0.0001, memristor_sim)
-    directory_name = f'{path}//{configuration[0]}x{1}_{configuration[1]}_{configuration[2]}_states_{configuration[3]}_tolerance'
+    directory_name = f'{path}//{configuration[0]}x{1}_{configuration[1]}_{configuration[2]}_states'
 
     if not os.path.isdir(f'{path}'):
         os.mkdir(f'{path}')
