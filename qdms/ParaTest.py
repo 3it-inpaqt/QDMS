@@ -116,7 +116,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
                 start_ = time.time()
 
             pulsed_programming = qdms.PulsedProgramming(memristor_sim, tolerance=2, is_relative_tolerance=True, pulse_algorithm='fabien', number_of_reading=1,  verbose=verbose)
-            pulsed_programming.simulate(algorithm, [[50, False], [25, False]])
+            pulsed_programming.simulate(algorithm, [[100, False], [25, False]])
             while os.path.isdir(f'{sub_directory_name}\\{str(index)}'):
                 index += 1
 
