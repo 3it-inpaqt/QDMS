@@ -55,7 +55,7 @@ def parametric_test_resolution_memristor(path, configurations=None):
         config_done += 1
 
 
-def parametric_test_resolution_variance(path, configuration, variability=None, nb_occurences=100, verbose=False, light=False):
+def parametric_test_resolution_variance(path, configuration, variability=None, nb_occurences=100, verbose=False):
     """
     This function generates many memristor simulations and saves them in a folder with proper names to use
     load_resolution_variance() on it.
@@ -86,15 +86,16 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
     """
 
     if variability is None:
-        variability = np.array([0, 0.1, 0.5, 1, 2, 3, 4, 5])
-    variances = variability / 300
+        variability = np.array([0, 0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
     config_done = 0
-    res = Data_Driven()
-    circuit = Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
+    res = qdms.Data_Driven()
+    circuit = qdms.Circuit(memristor_model=res, number_of_memristor=9, is_new_architecture=True, v_in=1e-3
                       , gain_resistance=0, R_L=1)
+    memristor_sim = qdms.MemristorSimulation(circuit, 8, distribution_type='linear',is_using_conductance=False, verbose=False)
+    memristor_sim.simulate()
 
-    nb_memristor = [int(np.sqrt(configuration[0])),int(np.sqrt(configuration[0]))] if is_square(configuration[0]) else [configuration[0], 1]
-    directory_name = f'{path}//{nb_memristor[0]}x{nb_memristor[1]}_{configuration[1]}_{configuration[2]}_states_{configuration[3]}_tolerance'
+    algorithm = qdms.algorithm(0.0001, memristor_sim)
+    directory_name = f'{path}//{configuration[0]}x{1}_{configuration[1]}_{configuration[2]}_states_{configuration[3]}_tolerance'
 
     if not os.path.isdir(f'{path}'):
         os.mkdir(f'{path}')
@@ -104,32 +105,22 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
         start = time.time()
         start_ = start
 
-    for variance in variances:
-        sub_directory_name = directory_name + f'//{round(variance * 300, 2)}'
+    for var in variability:
+        sub_directory_name = directory_name + f'//{round(var, 2)}'
         if not os.path.isdir(f'{sub_directory_name}'):
             os.mkdir(f'{sub_directory_name}')
 
         for index in range(nb_occurences):
             if verbose:
-                print(f'{len(variances) - config_done} variances left {index} simulation -> {(((len(variances) - config_done) * nb_occurences) - index) * (time.time() - start_)} s left')
+                print(f'{len(variability) - config_done} variability left {index} simulation -> {(((len(variability) - config_done) * nb_occurences) - index) * (time.time() - start_)} s left')
                 start_ = time.time()
 
-            pulsed_programming = PulsedProgramming(circuit, configuration[2], distribution_type=configuration[1]
-                                                   , max_voltage=2, tolerance=configuration[3], variance_read=variance, variance_write=variance
-                                                   , lrs=1000, hrs=3000, pulse_algorithm='log', number_of_reading=1)
-            pulsed_programming.simulate()
-            memristor_sim = MemristorSimulation(pulsed_programming, is_using_conductance=False, verbose=False)
-            memristor_sim.simulate()
+            pulsed_programming = qdms.PulsedProgramming(memristor_sim, tolerance=2, is_relative_tolerance=True, pulse_algorithm='fabien', number_of_reading=1)
+            pulsed_programming.simulate(algorithm, [[50, False], [10, False]])
             while os.path.isdir(f'{sub_directory_name}\\{str(index)}'):
                 index += 1
 
-            if light:
-                save_everything_hdf5(sub_directory_name, str(index), memristor=res, pulsed_programming=pulsed_programming, circuit=circuit
-                               , verbose=False)
-                save_memristor_simulation_hdf5(memristor_sim, f'{sub_directory_name}\\{index}', light=True)
-            else:
-                save_everything_hdf5(sub_directory_name, str(index), memristor=res, pulsed_programming=pulsed_programming, circuit=circuit
-                                , memristor_sim=memristor_sim, verbose=False)
+            qdms.Log.compressed_pickle()
 
         config_done += 1
 
