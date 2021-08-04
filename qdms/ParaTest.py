@@ -88,7 +88,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
     if variability is None:
         variability = np.array([0, 0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
     config_done = 0
-    res = qdms.Data_Driven()
+    res = qdms.Data_Driven(is_variability_on=True,parameter_model='O921C_4K')
     circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
                       , gain_resistance=0, R_L=1)
     memristor_sim = qdms.MemristorSimulation(circuit, configuration[2], distribution_type=configuration[1],is_using_conductance=False, verbose=verbose)
