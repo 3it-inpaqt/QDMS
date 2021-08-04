@@ -91,7 +91,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
     res = qdms.Data_Driven()
     circuit = qdms.Circuit(memristor_model=res, number_of_memristor=9, is_new_architecture=True, v_in=1e-3
                       , gain_resistance=0, R_L=1)
-    memristor_sim = qdms.MemristorSimulation(circuit, 8, distribution_type='linear',is_using_conductance=False, verbose=False)
+    memristor_sim = qdms.MemristorSimulation(circuit, 10, distribution_type='linear',is_using_conductance=False, verbose=False)
     memristor_sim.simulate()
 
     algorithm = qdms.algorithm(0.0001, memristor_sim)
@@ -120,7 +120,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
             while os.path.isdir(f'{sub_directory_name}\\{str(index)}'):
                 index += 1
 
-            qdms.Log.compressed_pickle()
+            qdms.Log.compressed_pickle(f'{sub_directory_name}\\{str(index)}', pulsed_programming)
 
         config_done += 1
 
