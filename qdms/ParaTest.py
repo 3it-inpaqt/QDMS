@@ -86,7 +86,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
     """
 
     if variability is None:
-        variability = np.array([0, 0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
+        variability = np.array([0, 0.25, 0.5, 1, 1.5, 2, 3, 4, 5])
     config_done = 0
     res = qdms.Data_Driven(is_variability_on=True,parameter_model='O921C_4K')
     circuit = qdms.Circuit(memristor_model=res, number_of_memristor=configuration[0], is_new_architecture=True, v_in=1e-3
@@ -109,6 +109,8 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
         sub_directory_name = directory_name + f'//{round(var, 2)}'
         if not os.path.isdir(f'{sub_directory_name}'):
             os.mkdir(f'{sub_directory_name}')
+        res.variability_a = 0
+        res.variability_b = var
 
         for index in range(nb_occurences):
             if verbose:
@@ -120,7 +122,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
             while os.path.isdir(f'{sub_directory_name}\\{str(index)}'):
                 index += 1
 
-            qdms.Log.compressed_pickle(f'{sub_directory_name}\\{str(index)}', pulsed_programming)
+            qdms.Log.compressed_pickle(f'{sub_directory_name}\\{str(index)}', pulsed_programming.voltage_output)
 
         config_done += 1
 
