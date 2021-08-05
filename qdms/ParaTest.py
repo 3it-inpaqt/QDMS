@@ -127,7 +127,7 @@ def parametric_test_resolution_variance(path, configuration, variability=None, n
         config_done += 1
 
     if verbose:
-        print(f'For {len(variances) * nb_occurences} simulations -> {time.time() - start} s')
+        print(f'For {len(variability) * nb_occurences} simulations -> {time.time() - start} s')
 
 
 def parametric_test_pulsed_programming(path, configurations=None, verbose=False, nb_occurences=10, plot=False):
@@ -466,12 +466,11 @@ def load_resolution_variance_data(path, verbose=False):
             if verbose:
                 print(f'{current_dir_var} variance {current_dir_sim} simulation')
             path_ = f'{path}\\{current_dir_var}\\{current_dir_sim}'
-            sim = load_everything_hdf5(path_, qd_simulation=0, verbose=False, light=False)[3]
-            sim.resolution = np.mean(np.diff(sim.voltages))
-            sim.std = np.std(np.diff(sim.voltages))
-            sim.voltages.clear()
-            sim.resistances.clear()
-            memristor_simulations[index_var].append(sim)
+            sim = qdms.Log.decompress_pickle(path_)
+            resolution = np.mean(np.diff(list(sim.keys())))
+            std = np.std(np.diff(list(sim.keys())))
+            sim.clear()
+            memristor_simulations[index_var].append([resolution, std, current_dir_var])
         index_var += 1
         if verbose:
             print()
@@ -899,8 +898,8 @@ def create_resolution_variance_plot(memristor_simulations, directory_name, resol
 
     for current_var in memristor_simulations:
         for current_sim in current_var:
-            variance_.append(current_sim.pulsed_programming.variance_read * 300)
-            resolution_.append(current_sim.resolution)
+            variance_.append(current_sim[2])
+            resolution_.append(current_sim[0])
         biggest_variance = variance_[0] if variance_[0] > biggest_variance else biggest_variance
         variance.append(variance_[0])
         # std.append(np.mean(std_[:]))
@@ -915,21 +914,20 @@ def create_resolution_variance_plot(memristor_simulations, directory_name, resol
     if resolution_goal is not None:
         plt.plot([0,biggest_variance],[resolution_goal, resolution_goal], label='Goal', color='black')
 
-    nb_memristor = memristor_simulations[0][0].pulsed_programming.circuit.number_of_memristor
-    nb_states = memristor_simulations[0][0].pulsed_programming.nb_states
-    distribution = memristor_simulations[0][0].pulsed_programming.distribution_type
-    tolerance = memristor_simulations[0][0].pulsed_programming.tolerance
-    plt.title(f'{int(np.sqrt(nb_memristor))}x{int(np.sqrt(nb_memristor))} {distribution} {nb_states} states {tolerance} tolerance {len(memristor_simulations[0])} simulations per point')
+    # nb_memristor = memristor_simulations[0][0].pulsed_programming.circuit.number_of_memristor
+    # nb_states = memristor_simulations[0][0].pulsed_programming.nb_states
+    # distribution = memristor_simulations[0][0].pulsed_programming.distribution_type
+    # tolerance = memristor_simulations[0][0].pulsed_programming.tolerance
+    # plt.title(f'{int(np.sqrt(nb_memristor))}x{int(np.sqrt(nb_memristor))} {distribution} {nb_states} states {tolerance} tolerance {len(memristor_simulations[0])} simulations per point')
     plt.ylabel('Resolution (nV)')
     plt.xlabel('Variability (%)')
     # plt.xscale('symlog')
-    filename = f'resolution_variance_plot.jpg'
     plt.tight_layout()
-    plt.savefig(f'{directory_name}\\{filename}', dpi=1600)
-
-    # plt.close('all')
-    plt.show()
-
+    if directory_name is None:
+        plt.show()
+    else:
+        filename = f'resolution_variance_plot.svg'
+        plt.savefig(f'{directory_name}\\{filename}', dpi=1600)
 
 def create_std_variance_plot(memristor_simulations, directory_name, resolution_goal=None):
     """
