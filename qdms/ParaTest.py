@@ -468,9 +468,9 @@ def load_resolution_variance_data(path, verbose=False):
             path_ = f'{path}\\{current_dir_var}\\{current_dir_sim}'
             sim = qdms.Log.decompress_pickle(path_)
             resolution = np.mean(np.diff(list(sim.keys())))
-            std = np.std(np.diff(list(sim.keys())))
+            # std = np.std(np.diff(list(sim.keys())))
             sim.clear()
-            memristor_simulations[index_var].append([resolution, std, current_dir_var])
+            memristor_simulations[index_var].append([resolution, float(current_dir_var)])
         index_var += 1
         if verbose:
             print()
@@ -898,7 +898,7 @@ def create_resolution_variance_plot(memristor_simulations, directory_name, resol
 
     for current_var in memristor_simulations:
         for current_sim in current_var:
-            variance_.append(current_sim[2])
+            variance_.append(current_sim[1])
             resolution_.append(current_sim[0])
         biggest_variance = variance_[0] if variance_[0] > biggest_variance else biggest_variance
         variance.append(variance_[0])
