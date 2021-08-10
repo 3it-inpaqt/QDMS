@@ -40,5 +40,3 @@ Lead Reseacher : Pierre-Antoine Mouny ([PAMouny](https://github.com/PAMouny))
 Programmer : Sébastien Graveline ([Talgarr](https://github.com/Talgarr))
 
 Quantum dot simulator : []()
-
-Data driven model : []() and []()
