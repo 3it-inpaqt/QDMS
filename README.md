@@ -29,16 +29,6 @@ pip uninstall qdms -y
 
 To get started with this library, see [Getting Started](https://github.com/Talgarr/TestOfficial/wiki/Getting-started).
 
-## Tests
-
-To run the tests, you need to clone the repository, open the file in terminal and then run:
-```
-python setup.py pytest
-python clear.py
-```
-clear.py is a script that delete the files and folders created by the tests.
-
-
 ## Credit
 
 Institution : [3IT](https://www.usherbrooke.ca/3it/en/)
