@@ -4,7 +4,7 @@ More precisely, it simulates the voltage output of a memristor circuit composed 
 
 ## Installation
 
-QDMS was developed on python 3.9.5, but could work on other version. To install the library and its dependencies, use:
+QDMS was developed on python 3.9.5, but should work on 3.X.X . To install the library and its dependencies, use:
 
 ```
 pip install git+https://github.com/3it-nano/QDMS
@@ -27,17 +27,7 @@ pip uninstall qdms -y
 
 ## Getting started
 
-To get started with this library, see [Getting Started](https://github.com/Talgarr/TestOfficial/wiki/Getting-started).
-
-## Tests
-
-To run the tests, you need to clone the repository, open the file in terminal and then run:
-```
-python setup.py pytest
-python clear.py
-```
-clear.py is a script that delete the files and folders created by the tests.
-
+To get started with this library, see [Getting Started](https://github.com/3it-nano/QDMS/wiki/Getting-started).
 
 ## Credit
 
@@ -45,10 +35,8 @@ Institution : [3IT](https://www.usherbrooke.ca/3it/en/)
 
 Research group : [3IT Nano](https://github.com/3it-nano)
 
-Lead Reseacher : Pierre-Antoine Mouny ([PAMouny](https://github.com/PAMouny))
+Lead Reseacher : [Pierre-Antoine Mouny](https://github.com/PAMouny)
 
-Programmer : Sébastien Graveline ([Talgarr](https://github.com/Talgarr))
+Programmer : [Sébastien Graveline](https://github.com/Talgarr)
 
 Quantum dot simulator : []()
-
-Data driven model : []() and []()
