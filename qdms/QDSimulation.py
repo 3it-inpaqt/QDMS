@@ -66,8 +66,8 @@ class QDSimulation:
         self.Cg2 = 0
         self.CL = 0
         self.CR = 0
-        self.parameter_model = parameter_model
-        self.set_parameter_model(parameter_model)
+        self.parameter_model = parameter_model.lower()
+        self.set_parameter_model()
 
         self.T = T
         self.Cm = Cm
@@ -90,34 +90,33 @@ class QDSimulation:
         print(self.N_max)
         print(self.verbose)
 
-    def set_parameter_model(self, parameter_model):
-        self.parameter_model = parameter_model
-        if self.parameter_model == 'UNSW':
+    def set_parameter_model(self):
+        if self.parameter_model == 'UNSW'.lower():
             self.Cg1 = 10.3e-18
             self.Cg2 = self.Cg1
             self.CL = 5 * self.Cg1
             self.CR = self.CL
-        elif self.parameter_model == 'QuTech':
+        elif self.parameter_model == 'QuTech'.lower():
             self.Cg1 = 5.80e-18
             self.Cg2 = 4.56e-18
             self.CL = 2.5 * self.Cg1
             self.CR = 2.7 * self.Cg2
-        elif self.parameter_model == 'Princeton':
+        elif self.parameter_model == 'Princeton'.lower():
             self.Cg1 = 24.3e-18
             self.Cg2 = self.Cg1
             self.CL = 0.08 * self.Cg1
             self.CR = self.CL
-        elif self.parameter_model == 'Sandia_national_lab':
+        elif self.parameter_model == 'Sandia_national_lab'.lower():
             self.Cg1 = 1.87e-18
             self.Cg2 = self.Cg1
             self.CL = 1.7*self.Cg1
             self.CR = self.CL
-        elif self.parameter_model == 'CEA_LETI':
+        elif self.parameter_model == 'CEA_LETI'.lower():
             self.Cg1 = 10.3e-18
             self.Cg2 = 19.7e-18
             self.CL = 0.1 * self.Cg1
             self.CR = 0.2 * self.Cg2
-        elif self.parameter_model == 'UCL':
+        elif self.parameter_model == 'UCL'.lower():
             self.Cg1 = 9.1e-19
             self.Cg2 = self.Cg1
             self.CL = 2.2 * self.Cg1
@@ -148,20 +147,23 @@ class QDSimulation:
                                             kBT=2 * self.kB * self.T, e=1.602e-19, verbose=self.verbose)
 
     def find_number_electron(self):
-        if self.parameter_model == 'UNSW':
+        if self.parameter_model == 'UNSW'.lower():
             return int(min(self.voltages_x) * 65), int(max(self.voltages_x) * 65)
 
-        elif self.parameter_model == 'QuTech':
+        elif self.parameter_model == 'QuTech'.lower():
             return int(min(self.voltages_x) * 30), int(max(self.voltages_x) * 35)
 
-        elif self.parameter_model == 'Princeton':
+        elif self.parameter_model == 'Princeton'.lower():
             return int(min(self.voltages_x) * 155), int(max(self.voltages_x) * 155)
 
-        elif self.parameter_model == 'Sandia_national_lab':
+        elif self.parameter_model == 'Sandia_national_lab'.lower():
             return int(min(self.voltages_x) * 10), int(max(self.voltages_x) * 15)
 
-        elif self.parameter_model == 'CEA_LETI':
+        elif self.parameter_model == 'CEA_LETI'.lower():
             return int(min(self.voltages_x) * 60), int(max(self.voltages_x) * 125)
 
-        elif self.parameter_model == 'UCL':
+        elif self.parameter_model == 'UCL'.lower():
             return int(min(self.voltages_x) * 1), int(max(self.voltages_x) * 10)
+
+        else:
+            raise Exception(f'Parameter model {self.parameter_model} not supported.')
