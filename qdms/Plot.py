@@ -9,7 +9,7 @@ from .HelperFunction import is_square
 import h5py
 
 
-def plot_everything(memristor_sim, qd_sim, pulsed_programming, number_iteration=10, directory_name=None, plots=None, verbose=False, dpi=600):
+def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=None, number_iteration=10, plots=None, verbose=False, dpi=600):
     """
     This function plot the result plot, resistance plot, the pulsed programming plot and the stability diagram.
     It creates the folders and saves the plots accordingly.
