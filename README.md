@@ -35,8 +35,8 @@ Institution : [3IT](https://www.usherbrooke.ca/3it/en/)
 
 Research group : [3IT Nano](https://github.com/3it-nano)
 
-Lead Reseacher : Pierre-Antoine Mouny ([PAMouny](https://github.com/PAMouny))
+Lead Reseacher : [Pierre-Antoine Mouny](https://github.com/PAMouny)
 
-Programmer : Sébastien Graveline ([Talgarr](https://github.com/Talgarr))
+Programmer : [Sébastien Graveline](https://github.com/Talgarr)
 
 Quantum dot simulator : []()
