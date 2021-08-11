@@ -49,10 +49,6 @@ class QDSimulation:
     N_max : int
         Maximum number of electron
 
-    n_dots : int
-        Number of dots.
-        Accepted : 1 or 2
-
     Cm : float
         Ratio of the cross capacitance.
 
@@ -61,9 +57,7 @@ class QDSimulation:
 
     """
 
-    def __init__(self, voltages_x, voltages_y, n_dots=2, T=0.1, Cm=0.4, parameter_model='UNSW', verbose=True):
-        if n_dots != 2:
-            raise Exception(f'{n_dots} is not supported. Use 2 instead.')
+    def __init__(self, voltages_x, voltages_y, T=0.1, Cm=0.4, parameter_model='UNSW', verbose=True):
         self.stability_diagram = [[None for _ in range(len(voltages_x))] for _ in range(len(voltages_y))]
         self.voltages_x = voltages_x
         self.voltages_y = voltages_y
@@ -79,7 +73,6 @@ class QDSimulation:
         self.Cm = Cm
         self.kB = 1.381e-23
         self.N_min, self.N_max = self.find_number_electron()
-        self.n_dots = n_dots
         self.verbose = verbose
 
     def print(self):
@@ -95,7 +88,6 @@ class QDSimulation:
         print(self.kB)
         print(self.N_min)
         print(self.N_max)
-        print(self.n_dots)
         print(self.verbose)
 
     def set_parameter_model(self, parameter_model):
@@ -150,11 +142,10 @@ class QDSimulation:
             print("##########################")
             print(f"Start QD simulation with {len(self.voltages_x)} voltages and {self.N_max} electrons")
 
-        if self.n_dots == 2:
-            x, y = np.meshgrid(self.voltages_x, self.voltages_y)
-            self.stability_diagram = N_moy_DQD(x, y, Cg1=self.Cg1, Cg2=self.Cg2, Cm=self.Cm * (self.Cg1+self.Cg2)/2,
-                                                CL=self.CL, CR=self.CR, N_min=self.N_min, N_max=self.N_max,
-                                                kBT=2 * self.kB * self.T, e=1.602e-19, verbose=self.verbose)
+        x, y = np.meshgrid(self.voltages_x, self.voltages_y)
+        self.stability_diagram = N_moy_DQD(x, y, Cg1=self.Cg1, Cg2=self.Cg2, Cm=self.Cm * (self.Cg1+self.Cg2)/2,
+                                            CL=self.CL, CR=self.CR, N_min=self.N_min, N_max=self.N_max,
+                                            kBT=2 * self.kB * self.T, e=1.602e-19, verbose=self.verbose)
 
     def find_number_electron(self):
         if self.parameter_model == 'UNSW':
