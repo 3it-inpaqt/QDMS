@@ -27,7 +27,7 @@ pip uninstall qdms -y
 
 ## Getting started
 
-To get started with this library, see [Getting Started](https://github.com/Talgarr/TestOfficial/wiki/Getting-started).
+To get started with this library, see [Getting Started](https://github.com/3it-nano/QDMS/wiki/Getting-started).
 
 ## Credit
 
