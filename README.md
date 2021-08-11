@@ -4,7 +4,7 @@ More precisely, it simulates the voltage output of a memristor circuit composed 
 
 ## Installation
 
-QDMS was developed on python 3.9.5, but could work on other version. To install the library and its dependencies, use:
+QDMS was developed on python 3.9.5, but should work on 3.X.X . To install the library and its dependencies, use:
 
 ```
 pip install git+https://github.com/3it-nano/QDMS
