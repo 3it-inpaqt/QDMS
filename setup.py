@@ -9,7 +9,7 @@ setup(
     author_email='Sebastien.Graveline@usherbrooke.ca',
     license='MIT',
     url='https://github.com/3it-nano/QDMS/',
-    install_requires=['numpy', 'matplotlib', 'cpickle'],
+    install_requires=['numpy', 'matplotlib'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest==6.2.4'],
     test_suite='tests',
