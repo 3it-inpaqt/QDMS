@@ -447,7 +447,7 @@ def create_stability_diagram(qd_simulation, path=None, dpi=600):
             os.mkdir(directory)
 
     plt.figure()
-    x, y = np.meshgrid(qd_simulation.voltages, qd_simulation.voltages)
+    x, y = np.meshgrid(qd_simulation.voltages_x, qd_simulation.voltages_y)
 
     def find_size(number_of_element):
         if number_of_element < 50:
@@ -470,7 +470,7 @@ def create_stability_diagram(qd_simulation, path=None, dpi=600):
 
     cbar = plt.colorbar()
     cbar.ax.set_ylabel('Number of electrons')
-    plt.title(f'Number of voltages: {len(qd_simulation.voltages)}')
+    plt.title(f'Number of voltages: {len(qd_simulation.voltages_x)}')
     plt.xlabel(r'$V_{g1}$ (V)')
     plt.ylabel(r'$V_{g2}$ (V)')
     plt.tight_layout()
