@@ -9,7 +9,7 @@ setup(
     author_email='Sebastien.Graveline@usherbrooke.ca',
     license='NotYet',
     url='https://github.com/Talgarr/TestOfficial/',
-    install_requires=['numpy', 'matplotlib', 'h5py'],
+    install_requires=['numpy', 'matplotlib'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest==6.2.4'],
     test_suite='tests',

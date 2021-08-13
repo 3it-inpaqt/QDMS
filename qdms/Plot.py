@@ -6,7 +6,6 @@ from .QDSimulation import QDSimulation
 import math
 import time
 from .HelperFunction import is_square
-import h5py
 
 
 def plot_everything(memristor_sim, qd_sim, pulsed_programming, directory_name=None, number_iteration=10, plots=None, verbose=False, dpi=600):
