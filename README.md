@@ -10,6 +10,9 @@ QDMS was developed on python 3.9.5, but should work on 3.X.X . To install the li
 pip install git+https://github.com/3it-nano/QDMS
 ```
 
+The dependencies are: matlplotlib, numpy and cpickle.
+
+
 ## Uninstallation
 
 To remove the library and all dependencies, use pip-autoremove:
