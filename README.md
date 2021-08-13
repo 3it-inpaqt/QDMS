@@ -40,3 +40,4 @@ Research group : [3IT Nano](https://github.com/3it-nano)
 
 Lead Reseacher : [Pierre-Antoine Mouny](https://github.com/PAMouny)
 
+Programmer : [Sébastien Graveline](https://github.com/Talgarr)
