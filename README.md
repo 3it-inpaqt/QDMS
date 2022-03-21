@@ -2,6 +2,9 @@ A python library that simulates the control of a memristor circuit on a quantum 
 
 More precisely, it simulates the voltage output of a memristor circuit composed of a memristor model following your devices. The resistive value is found using pulsed programming on the memristor model. Then, the stability diagram can be generated from the voltage output, which represents the possible control this circuit can have on a quantum dot.
 
+All simulation data presented in the article Memristor-based cryogenic programmable DC sources for scalable in-situ quantum-dot control is reproductible using this library. Experimental data is available at https://osf.io/fpb9r/?view_only=151acd3c70464b4d82af30213beb791d.
+
+
 ## Installation
 
 QDMS was developed on python 3.9.5, but should work on 3.X.X . To install the library and its dependencies, use:
